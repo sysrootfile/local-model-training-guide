@@ -1,7 +1,7 @@
 ---
 title: "Kapsam Haritası: Bu Rehberde Neyi Ölçtük, Neyi Ölçmedik"
 description: "Rehberin hangi eksenlerde hangi kanıt kademesinde durduğunu gösteren harita. Ölçüm kafeslerinin birim listesi, on kafesin neyi ölçtüğü, bilerek kapsam dışı bırakılan konular ve yeni bir ölçüm sayfasına girmeden önce kabul edilen koşum kuralları."
-dogrulama: 2026-10-20
+dogrulama: 2026-10-26
 ---
 
 Bu rehberin bir sorunu var ve adı eksiklik değil: **her satır aynı kesinlikle görünüyor.** "LoRA'da
@@ -127,7 +127,7 @@ sayfanın sayısı hangi sunucunun sürümünden geldi:
 | [Çıkarım Parametreleri](/kullanim/cikarim-parametreleri/) | 0.40.4 | **aktarma künye:** tavan davranışı K0 kolundan, yani yukarıdaki kayıttan okundu |
 | [Lisans ve Model Kartı](/kullanim/lisans-ve-model-karti/) | 0.40.4 | 17 Ekim 14:21:44-14:22:38 |
 | [Eminlik ve Kalibrasyon](/kullanim/eminlik-ve-kalibrasyon/) | **0.40.5** | 17 Ekim 22:09:25-23:13:16, dört ayrı kayıt |
-| [Eşzamanlılık](/kullanim/eszamanlilik/) | **0.40.6** | 19 Ekim, üç sunucu ayarı |
+| [Eşzamanlılık](/kullanim/eszamanlilik/) | **0.40.6** (A-D koşumları) / **0.40.11** (E koşumu, `=3`) | 19 Ekim, üç sunucu ayarı; 20 Ekim K = 8; 26 Ekim 00:29-00:32, `eszamanli-kaydi-4.txt` |
 | [Gömme Modeli Eğitimi](/rag/gomme-egitimi/) | 0.40.4 (A-D) | sürüm **kayda değil kafes README'sine yazılmış** (`ornekler/gomme-egitimi/README.md`, makine satırı); `kol-a.txt` 17 Ekim 15:46:48'de başlıyor ama logda künye satırı yok — betik üretmiyordu. 20 Ekim'deki E kolu `kol-e.txt` başında `Ollama sürümü: 0.40.6` satırını yazdı |
 
 Üç şey bu defterin kendisi için söylenmesi gereken:
@@ -165,21 +165,8 @@ anlatıyor.
 
 Bazı boşluklar tembellikten değil, karar çıkmadığı için duruyor. Açık olanlar:
 
-- **Sunucu tarafı eşzamanlılığın bir ara seviyesi kaldı.** `OLLAMA_NUM_PARALLEL`'ın **3** seviyesi
-  ölçülmedi; ölçümü koşan taraf o değişkeni yazamaz (kural 3), 19 Ekim'de makine sahibi yazdı ve
-  sunucuyu o yeniden başlattı. Varsayılan (=1), **=2** ve =4 koşundu, [Eşzamanlılık](/kullanim/eszamanlilik/)
-  sayfasında: varsayılan ayarla aynı anda salıverilen dört istek sıraya giriyor, `=2` ikişerli çift kurup
-  taşanı bekletiyor, `=4`'de sıra kalkıyor ama iş paylaşılıyor (tek isteğin hızı 14,97 → 6,38 tok/sn).
-  Bellek bedeli de üç noktadan ölçüldü ve **eşit adımlarla gitmiyor** (ilk ek yuva ≈233 MiB, sonrakiler
-  ≈145 MiB). 20 Ekim'de aynı eksene bir koşum daha eklendi: **K = 8**, varsayılan sunucuda (`-np 1`)
-  koşuldu ve [Eşzamanlılık](/kullanim/eszamanlilik/) sayfasında. K = 5, 6, 7 ve **K > 8** hâlâ
-  "ölçülmedi"; `=2` / `=4` sunucularında K > 4 de öyle. `/api/embed` eşzamanlılığı da o sayfada
-  "ölçülmedi" olarak duruyor — 24 parçanın tek istekte ölçülmüş olması ayrı bir şey, eşzamanlı
-  gömme isteği ayrı. Seviye 3'ün
-  koşum tarifi — sahibin yazacağı iki adım, günlükten okunacak iki satır, koşanın tek komutu —
-  `ornekler/eszamanli-olcu/README.md` içindeki "Seviye 3" başlığında duruyor.
-- **GPU.** Bu makinede hiçbir GPU ölçümü yok (Radeon RX 570 var, ROCm'un Windows'ta bu kartta
-  çalıştığı **bilinmiyor**). GPU gerektiren kod "çalıştırılmadı" etiketiyle duruyor.
+- **Sunucu tarafı eşzamanlılık ara seviyesi dolduruldu; kalan uçlar açık.** `OLLAMA_NUM_PARALLEL`'ın **3** seviyesi 2026-10-26'da koşuldu (aşağıdaki kapanış paragrafı). Ölçümü koşan taraf o değişkeni yazamaz (kural 3); 19 Ekim'de makine sahibi =2 ve =4'ü, 26 Ekim sabahına karşı =3'ü yazdı ve sunucuyu her seferinde o yeniden başlattı. Varsayılan (=1), **=2**, **=3** ve =4 koşundu, [Eşzamanlılık](/kullanim/eszamanlilik/) sayfasında: varsayılan ayarla aynı anda salıverilen dört istek sıraya giriyor, `=2` ikişerli çift kurup taşanı bekletiyor, `=3` üçlü kilit adımı kurup tekini ~4,3 sn kaydırıyor, `=4`'de sıra kalkıyor ama iş paylaşılıyor (tek isteğin hızı 14,97 → 6,38 tok/sn). Bellek bedeli de **dört noktadan** ölçüldü ve **eşit adımlarla gitmiyor** (ilk ek yuva ≈233 MiB, sonraki üçü ≈145/144 MiB). 20 Ekim'de **K = 8** kolu da koşuldu (varsayılan sunucuda, `-np 1`). K = 5, 6, 7 ve **K > 8** hâlâ "ölçülmedi"; `=2` / `=3` / `=4` sunucularında K > yuva sayısının ikisi (K=2×2=4 üstü taşmalar ayrı ayrı) de öyle. `/api/embed` eşzamanlılığı da o sayfada "ölçülmedi" olarak duruyor — 24 parçanın tek istekte ölçülmüş olması ayrı bir şey, eşzamanlı gömme isteği ayrı. Seviye koşumlarının tarifi — sahibin yazacağı iki adım, günlükten okunacak iki satır, koşanın tek komutu — `ornekler/eszamanli-olcu/README.md` içindeki "Seviye 3" başlığında duruyor.
+- **GPU.** Bu makinede hiçbir GPU ölçümü yok. Araştırma (2026-10-25, kademe 1): Ollama'nın Windows ROCm listesi RDNA3 kuşağını kapsıyor, Polaris (RX 570, gfx803) listede yok; ek GPU desteğinin belgelenmiş yolu Vulkan. Yerel gözlem (2026-10-25/26, kademe 2, sunucu 0.40.10/0.40.11): Vulkan backend kurulu ve etkin (`OLLAMA_VULKAN:true`), ama `llama-server --list-devices` **üç kütüphanede de (vulkan, cuda, rocm) 0xc0000005 ile çakılıyor** ve sunucu `inference compute id=cpu` ile açılıyor — yani bu sürümde RX 570 GPU'ya çıkamıyor; GPU gerektiren kod "çalıştırılmadı" etiketiyle duruyor. Keşif çökmesi sürüm hatası olabilir: ilerleyen Ollama sürümlerinde tek yoklamayla yeniden denenebilir.
 - **Toplu (batch) gömme — sınır çizildi, karşılaştırma ölçüldü.** `/api/embed` çok girdi kabul ediyor;
   tek istekte 24 parça 17 Ekim'de (kol A), aynı 24 parçanın **tek istekte vs 24 ayrı istekte**
   karşılaştırması 20 Ekim'de (E kolu) ölçüldü. E'nin iki yanı, tekrar aralıkları ve hükmü
@@ -266,7 +253,7 @@ Kabul kurallarının bugünkü uygulaması. Koşumdan önce, sayılar değişmes
 | Öğe | Sabitlenen değer | Koşumdan sonra |
 | --- | --- | --- |
 | Soru | Aynı makinede, aynı modelde 1 / 2 / 4 istek **yarışırken** neler oluyor | cevaplandı, üç kez: varsayılan ayarla yarışmıyor sıraya giriyor; `=2` ayarında yuva kadarı yarışıyor taşan sıraya giriyor; `=4` ayarında yarışıyor ama paylaşarak. Üstüne ayrı kalem olarak koşulan K = 8 (20 Ekim) aynı eksende dördüncü bir desen açmadı: varsayılan sunucuda merdiven sekiz basamağa çıktı |
-| Sunucu ayarı | `OLLAMA_NUM_PARALLEL` = 1 (varsayılan), 2, 4 — kullanıcı yazar, sunucuyu kullanıcı yeniden başlatır | varsayılan, **=2** ve **=4** koşuldu (ikisini de makine sahibi yazdı, kural 3 olduğu gibi işledi; değerler artık betik etiketi değil `server.log`'daki `server config` ve `-np 2` / `-np 4` satırlarından okundu). **3 ölçülmedi.** K = 8 kolu için değişken yazılmadı, sunucu yeniden başlatılmadı — 19 Ekim'deki kapanıştan beri aynı süreçte `:1` / `-np 1` ile koştu |
+| Sunucu ayarı | `OLLAMA_NUM_PARALLEL` = 1 (varsayılan), 2, 4 — kullanıcı yazar, sunucuyu kullanıcı yeniden başlatır | varsayılan, **=2** ve **=4** koşuldu (ikisini de makine sahibi yazdı, kural 3 olduğu gibi işledi; değerler artık betik etiketi değil `server.log`'daki `server config` ve `-np 2` / `-np 4` satırlarından okundu). K = 8 kolu için değişken yazılmadı, sunucu yeniden başlatılmadı — 19 Ekim'deki kapanıştan beri aynı süreçte `:1` / `-np 1` ile koştu. **=3 de koşuldu** (2026-10-26, 0.40.11; aşağıdaki kapanış paragrafı) — dört sunucu ayarının dördü de artık ölçümlü |
 | Model | `qwen2.5:3b-instruct-q4_K_M`, gömme `bge-m3` | sohbet modeli koştu; `bge-m3` bu turda hiç denenmedi — ama üçüncü koşumun **elenen** denemesinde o model kendi kendine yüklendi ve ölçümü bozdu (aşağıdaki başarısızlık satırı) |
 | Uç | `/api/chat` ve `/api/embed`, yalnız `http://127.0.0.1:11434` | `/api/chat` ölçüldü, `/api/embed` **koşulmadı** |
 | Kol | seviye başına 5 tekrar | üç koşum × (5 tekrar × 3 kol) = **105 ölçüm isteği**, 45 dalga. K = 8 kolu ayrı: 5 tekrar × 1 kol = 40 ölçüm isteği (+1 ısıtma) |
@@ -335,7 +322,19 @@ yabancı satır 0, `/api/ps` tek kopya; sonuç [Eşzamanlılık](/kullanim/eszam
 `/api/embed` karşılaştırması 20 Ekim 11:45-11:46'da koşuldu: 125 ölçüm isteği, iki yanın beşer
 tekrarı, ön kayıtlı min–maks kuralı; tekrar aralıkları çakışmadı ve hüküm verildi. İki yanın
 saniyeleri [Hız ve Maliyet](/kullanim/hiz-ve-maliyet/) sayfasının "Toplu gömme" bölümünde.
-Yalnız `=3` **hâlâ koşulmadı**; yukarıdaki engeli ve "koş" iznini bekliyor.
+
+**Üçüncü kalem de kapandı (2026-10-26):** `=3`, kendi eşiğiyle koşuldu ve geçti. Makine sahibi
+iki kez env yazıp sunucuyu iki kez restart etti — ilk restart'ta tray süreci eski ortamı miras
+aldı ve günlük `OLLAMA_NUM_PARALLEL:1` okuduğu için pencere açılmadı (kapanış doğrulaması
+günlükle yapıldı; `reg query` 3 gösterse bile koşum başlamadı); ikinci restart'ta açılış satırı
+`:3` okundu. Koşum 00:29:18-00:32:39, 35 ölçüm isteği + 1 ısıtma, 0 hata; günlükte llama-server
+`-c 12288 -np 3` (önceden kaydedilen 12288 beklentisi tuttu), kirletme imzası 37 satır
+(36 × 74 + 1 × 32), yabancı satır 0, yuva sayımı `id 0: 22, id 1: 10, id 2: 5`. Sayılar
+[Eşzamanlılık](/kullanim/eszamanlilik/) sayfasında; pencere sırasında sunucu Docker Desktop'ın
+Ollama entegrasyonu bge-m3'ü kendi kendine yüklediği için risk altındaydı — kirletme denetimi
+pencere içinde sessiz olduğunu gösterdi, ama **bu aracın kimliği netleşti**: her Ollama açılışında
+bge-m3'ü yükleyen istemci `com.docker.backend.exe`. =2 koşumunun elenen penceresindeki faili
+meçhul kirleticinin kimliği de böylece belli oldu.
 
 Üç kalem için de önceden bağlanan başka şeyler:
 
