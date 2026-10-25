@@ -1,0 +1,78 @@
+[veri] korpus Vikipedi'den indiriliyor (tek sefer, 2 model paylaşacak)...
+[veri] İstanbul ilinde toplu ulaşım: 16,740 karakter -> 25 parça
+[veri] İstanbul Metrosu: 29,235 karakter -> 42 parça
+[veri] Marmaray: 12,099 karakter -> 17 parça
+[veri] Tünel (İstanbul): 4,390 karakter -> 6 parça
+[veri] T1 (İstanbul Tramvayı): 6,767 karakter -> 7 parça
+[veri] Metrobüs: 2,463 karakter -> 3 parça
+[veri] İETT: 13,148 karakter -> 19 parça
+[veri] İstanbul Deniz Otobüsleri: 4,019 karakter -> 6 parça
+[veri] toplam: 125 parça, 88,861 karakter
+[veri] Maddeler CC BY-SA lisansıyla yayımlanır; kaynak göstermeden yeniden kullanılamaz.
+
+==============================================================
+MODEL: bge-m3
+==============================================================
+  [bge-m3] indeks 25/125...
+  [bge-m3] indeks 50/125...
+  [bge-m3] indeks 75/125...
+  [bge-m3] indeks 100/125...
+  [bge-m3] indeks 125/125...
+  [bge-m3] indeks: 125 parça, boyut=1024, 495.7 sn
+
+  Orijinal sorular  : hit@1=0.83  MRR=0.917  (n=6)
+  kapsam içi bandı  : 0.598 - 0.714
+  Parafraz sorular  : hit@1=0.67  MRR=0.767  (n=6)
+  kapsam içi bandı  : 0.623 - 0.714
+  [MISS] 'Metrobüs hattı nereden nereye gidiyor?' -> beklenen Metrobüs, ilk sırada İstanbul ilinde toplu ulaşım
+  [MISS] 'İstanbul metrosundaki en eski hat hangisi?' -> beklenen İstanbul Metrosu, ilk sırada İstanbul ilinde toplu ulaşım
+
+  Kapsam dışı (n=8) en iyi benzerlikler:
+    0.344  Evde pizza hamuru nasıl yapılır?
+    0.416  Ankara'da hangi müzeler gezilir?
+    0.485  Türkiye'nin en uzun nehri hangisidir?
+    0.321  Kedi yavrusu bakımı için nelere dikkat edilmeli?
+    0.454  İstanbul'da nerede ucuz otel bulunur?
+    0.473  Borsa İstanbul'dan hisse senedi nasıl alınır?
+    0.431  Otomobil motor yağı ne zaman değiştirilir?
+    0.469  Galatasaray kulübü kaç yılında kuruldu?
+  kapsam dışı bandı : 0.321 - 0.485
+  ayırma payı       : +0.113 (en düşük kapsam içi 0.598 eksi en yüksek kapsam dışı 0.485)
+  eşik önerisi      : 0.541 (bantların ortası)
+  [UYARI] devralınan eşik 0.35 bantların DIŞINDA — bu korpusta geçersiz!
+
+==============================================================
+MODEL: nomic-embed-text
+==============================================================
+  [nomic-embed-text] indeks 25/125...
+  [nomic-embed-text] indeks 50/125...
+  [nomic-embed-text] indeks 75/125...
+  [nomic-embed-text] indeks 100/125...
+  [nomic-embed-text] indeks 125/125...
+  [nomic-embed-text] indeks: 125 parça, boyut=768, 503.7 sn
+
+  Orijinal sorular  : hit@1=0.83  MRR=0.889  (n=6)
+  kapsam içi bandı  : 0.634 - 0.808
+  Parafraz sorular  : hit@1=1.00  MRR=1.000  (n=6)
+  kapsam içi bandı  : 0.624 - 0.779
+
+  Kapsam dışı (n=8) en iyi benzerlikler:
+    0.642  Evde pizza hamuru nasıl yapılır?
+    0.658  Ankara'da hangi müzeler gezilir?
+    0.655  Türkiye'nin en uzun nehri hangisidir?
+    0.688  Kedi yavrusu bakımı için nelere dikkat edilmeli?
+    0.737  İstanbul'da nerede ucuz otel bulunur?
+    0.714  Borsa İstanbul'dan hisse senedi nasıl alınır?
+    0.718  Otomobil motor yağı ne zaman değiştirilir?
+    0.685  Galatasaray kulübü kaç yılında kuruldu?
+  kapsam dışı bandı : 0.642 - 0.737
+  ayırma payı       : -0.112 (en düşük kapsam içi 0.624 eksi en yüksek kapsam dışı 0.737)
+  eşik önerisi      : YOK — bantlar çakışıyor, hiçbir eşik 'bilmiyor' davranışı üretemez.
+
+==============================================================
+KARŞILAŞTIRMA ÖZETİ (125 parçalık Vikipedi korpusu)
+==============================================================
+  model                hit@1(ory)   hit@1(para)   MRR(para)   ayırma
+  bge-m3               0.83         0.67          0.767       +0.113
+  nomic-embed-text     0.83         1.00          1.000       -0.112
+OLC_BITTI 0

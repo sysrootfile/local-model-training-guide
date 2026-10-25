@@ -1,0 +1,14 @@
+#BASLIK {"bariyer_bekleme_sn": 30.0, "dalga_arasi_sn": 3.0, "isletim": "Windows 11", "kollar": [1, 2], "model": "qwen2.5:3b-instruct-q4_K_M", "ollama_suru": "0.40.6", "python": "3.12.10", "secenekler": {"keep_alive": "10m", "num_predict": 64, "temperature": 0.0}, "sunucu_etiketi": "OLLAMA_NUM_PARALLEL=4 (server.log 2026-10-19T12:15:11 server config satiri)", "tekrar": 1, "toplam_istek": 3, "uyari": "OLLAMA_NUM_PARALLEL sunucunun kendi ortam değişkenidir; betik onu okuyamaz. 'sunucu_etiketi' kullanıcının yazdığı değerdir, ölçüm değil.", "zaman": "2026-10-19 12:17:18"}
+#PS_GIRIS {"models": []}
+#NOT 3 istek; her dalgadan sonra 3 sn boşluk, model 10m sicak tutuluyor.
+#ISITMA {"duvar_sn": 25.625, "http_kod": 200, "hata": null, "eval_count": 64, "load_sn": 18.7188}
+#KAYIT {"bariyer_sn": 0.0, "cevap_uzunluk": 226, "decode_sn": 4.5959, "done_reason": "length", "duvar_sn": 5.953, "eval_count": 64, "hata": null, "http_kod": 200, "k": 1, "load_sn": 0.0199, "no": 1, "prefill_sn": 1.3181, "prompt_eval_cached_count": 28, "prompt_eval_count": 74, "tekrar": 1, "total_sn": 5.9554}
+#DALGA {"beklenen": 1, "hata_sayisi": 0, "k": 1, "tamamlanan": 1, "tekrar": 1, "yapilan_sn": 5.953}
+#PS_KOL {"k": 1, "ps": {"models": [{"name": "qwen2.5:3b-instruct-q4_K_M", "size": 2716000582, "size_vram": 0, "expires_at": "2026-10-19T12:22:49.8460227+03:00", "processor": null}]}}
+#KAYIT {"bariyer_sn": 0.0, "cevap_uzunluk": 208, "decode_sn": 7.1824, "done_reason": "length", "duvar_sn": 9.235, "eval_count": 64, "hata": null, "http_kod": 200, "k": 2, "load_sn": 0.0081, "no": 1, "prefill_sn": 2.0207, "prompt_eval_cached_count": 73, "prompt_eval_count": 74, "tekrar": 1, "total_sn": 9.2215}
+#KAYIT {"bariyer_sn": 0.0, "cevap_uzunluk": 226, "decode_sn": 7.1822, "done_reason": "length", "duvar_sn": 9.235, "eval_count": 64, "hata": null, "http_kod": 200, "k": 2, "load_sn": 0.012, "no": 2, "prefill_sn": 2.0214, "prompt_eval_cached_count": 0, "prompt_eval_count": 74, "tekrar": 1, "total_sn": 9.2214}
+#DALGA {"beklenen": 2, "hata_sayisi": 0, "k": 2, "tamamlanan": 2, "tekrar": 1, "yapilan_sn": 9.235}
+#PS_KOL {"k": 2, "ps": {"models": [{"name": "qwen2.5:3b-instruct-q4_K_M", "size": 2716000582, "size_vram": 0, "expires_at": "2026-10-19T12:23:02.0749798+03:00", "processor": null}]}}
+#BOSALT {"http_kod": 200, "hata": null}
+#PS_BITIS {"models": []}
+#BITIS {"zaman": "2026-10-19 12:18:05", "toplam_kayit": 3, "olcu_dalga_sn": 15.19, "kullanim": "python ozetle.py <bu-dosya> ile yeniden hesaplayin"}

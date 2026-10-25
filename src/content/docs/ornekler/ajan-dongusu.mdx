@@ -1,0 +1,120 @@
+---
+title: "Örnek 7: Ajan Döngüsü"
+description: Örnek 6'nın RAG hattını bir araca sarıp kararı modele bırakan yedi denemeli ölçüm betiği — tur sayısı, token gideri, kesilen cevap ve tool_choice'un gerçek davranışı tek kayıtta.
+dogrulama: 2026-10-25
+---
+
+import ajanKod from '../../../../ornekler/ajan-dongusu/ajan.py?raw';
+import { Code } from 'astro-expressive-code/components';
+
+Bu, **yedinci çalıştırılabilir örnek projemiz**. [Örnek 6](/ornekler/viki-rag/) aynı korpus üzerinde sabit bir hat kuruyordu: soruyu göm, parça getir, bağlamı okut, cevap ver. Bu projede o hattın arama adımı bir **araca** dönüşüyor ve kararı modele bırakıyoruz: aracı çağıracak mı, hangi argümanla, kaç tur? Amaç ajan kurmak değil, **ajanın bu makinede ne kadara mal olduğunu ve nerelerde nasıl kırıldığını** gösteren bir ölçüm kaydı üretmek. GPU yok; Ollama ve internet yeterli.
+
+:::note[Bu makinede çalıştırıldı]
+Betik gerçekten çalıştırıldı; sayfadaki tüm sayılar `cikti/ajan-kaydi.txt` kaydından alındı (**2026-10-16, 02:11-02:18**, tek süreç, başka Ollama isteği yok; Python 3.12, Ollama 0.40.4 (makine 2026-10-19'da 0.40.6; bu sayfadaki sayılar o sürümde yeniden ölçülmedi), `bge-m3` + `qwen2.5:3b-instruct-q4_K_M`, AMD Ryzen 5 2600, CPU). Koşum **7,5 dakika** sürdü; ilk çağrılar soğuk başlangıcı içeriyor (`ollama ps` boştu). Korpus canlı kaynaktan geldiği için parça sayıları ve benzerlik skorları sizin koşumunuzda oynayabilir. Betik hiçbir harici Python paketi gerektirmez.
+:::
+
+## 1) Ne yapıyoruz?
+
+İki hat, aynı 125 parçalık Vikipedi korpusu, aynı sorular:
+
+```text
+SABİT HAT (Örnek 6)   soru ──► göm ──► parça getir ──► bağlam + soru ──► model ──► cevap
+                      (geçiş sayısı kodda sabit: 1 üretim)
+
+AJAN DÖNGÜSÜ (Örnek 7) soru + ARAÇ KATALOĞU ──► model
+                          │                          │
+                          │                    tool_calls? ── hayır ──► cevap
+                          │                          │
+                          └── evet: aracı ÇALIŞTIR ──┘  sonucu mesaj listesine ekle
+                                              └──► tekrar modele sor (tur sayacı +1)
+```
+
+Betiğin yedi denemesi şunları ölçüyor:
+
+| Deneme | Soru / kurulum | Ne arıyor |
+| --- | --- | --- |
+| A | "Marmaray hangi yılında hizmete açıldı?" | Sabit hat: tek geçişin duvar süresi ve tokenı |
+| B | Aynı soru, araç kataloğuyla | Ajanın aynı işi kaç turda, kaç saniyede yaptığı |
+| B2 | İki bilgi isteyen karşılaştırma sorusu | Döngü gerçekten iki geçiş yapıyor mu? |
+| C | Uzunluk sorusu + birim dönüşümü | İki araç sırayla seçiliyor mu? |
+| D | "Şu an İstanbul'da yağmur yağıyor mu?" | Hiçbir aracın cevaplayamadığı soru kaç tur yakar? |
+| E | Aynı istem, 0 / 1 / 2 araç | Araç kataloğunun token gideri |
+| F | `tool_choice` dört biçimde | Belgelenmemiş alan bir şey yapıyor mu? |
+| G | `format: "json"` + `tools` | İkili aynı istekte buluşunca ne oluyor? |
+| H | Araç mesajında `tool_name` yok | Alan gerçekten gerekli mi? |
+
+## 2) Kurulum
+
+```bash
+ollama pull bge-m3                        # arama aracı için
+ollama pull qwen2.5:3b-instruct-q4_K_M    # araç kararı ve cevap için
+
+cd ornekler/ajan-dongusu
+# Ollama açık olmalı; koşum sırasında başka Ollama isteği göndermeyin
+PYTHONUTF8=1 ../../.venv/Scripts/python.exe -u ajan.py > cikti/ajan-kaydi.txt 2>&1
+```
+
+Betik ilk koşumda korpusu Vikipedi'den indirir ve `cikti/korpus.json`a yazar; sonraki koşumlar o dosyayı okur. Bu bilinçli bir tercih: aynı gün içinde art arda tam korpus çekimi Wikimedia'da **HTTP 429** üretmişti (`olc.py` koşumunda yaşandı). Gömme vektörleri de [Örnek 6 / hibrit aramanın](/rag/parcalama-ve-hibrit-arama/) önbelleğiyle (`../viki-rag/cikti/vektor-indeks.json.gz`) eşleşirse vektörleştirme atlanır — bu koşumda atlandı, kayda `[indeks] önbellekten 125 vektör okundu` satırı düştü.
+
+İki yardımcı keşif betiği de aynı klasörde: `kesif.py` araç çağrısının istek/cevap alanlarını tek tek bastırır, `kesif_dongu.py` araç mesajının üç biçimini (`tool_name`, yalın `content`, `tool_call_id`) karşılaştırır. Günlükleri `cikti/kesif.txt` ve `cikti/kesif-dongu.txt`.
+
+## 3) Betiğin tamamı
+
+<Code code={ajanKod} lang="python" title="ornekler/ajan-dongusu/ajan.py" />
+
+## 4) Satır Satır
+
+### a) Araç, bir fonksiyon imzasıdır
+
+Katalogda iki işlev var: `viki_ara(soru)` Örnek 6'nın `getir()` çağrısının sarmalanmış hâli, `birim_donustur(miktar, kaynak, hedef)` ise hiçbir RAG işi olmayan saf bir hesap. İkincisi bilerek eklendi: tek araçlı bir katalog, modelin **seçim** yaptığını göstermez; iki araç, seçimi ölçülebilir kılar.
+
+`viki_ara` bir bulguyu geri çevirdiğinde **boş metin yerine açıklama** döndürüyor:
+
+```python
+if en_iyi < v6.ZAYIF_ESIK:
+    return (f"(Eşik altında: en iyi benzerlik {en_iyi:.3f} < {v6.ZAYIF_ESIK}. "
+            f"Belgelerde cevap olmayabilir; kullanıcıya bunu söyle.)")
+```
+
+`ZAYIF_ESIK = 0.54`, bu korpusta [Örnek 6'nın `olc.py` ölçümüyle](/rag/rag-degerlendirme/) seçilmiş bir değer; araç onu koruyor. D senaryosunda model bu metni gördü ve kullanıcıya "en iyi benzerlik oranı 0.496'dır" diye aktardı — yani eşik mesajı işini yaptı (uydurma tarih yerine belgenin yetersizliğini söyledi) ama **iç sayıyı sızdırdı**. Araç metnini yazarken kullanıcıya görünme ihtimalini de yazın.
+
+### b) Döngü: kapanış koşulu ve sayaç
+
+`ajan()` içindeki tavan `MAKS_TUR = 5`, cevap üretim tavanı `NUM_PREDICT = 300`. Döngü, `tool_calls` boş geldiği an kapanıyor; `for/else` yapısıyla sayaça yapışan tur ayrı satırda loglanıyor. Koşumda hiçbir senaryo 3. tura gitmedi — sayaç boşta kaldı, ama `NUM_PREDICT` boşta kalmadı: B'nin ikinci turu tam 300 token üretip `done_reason=length` ile kesildi.
+
+### c) Faz dökümü: maliyetin doğduğu yer
+
+`faz()` her yanıtın Ollama alanlarını tek satıra çeviriyor: `total_duration`, `load_duration`, `prompt_eval_count`, **`prompt_eval_cached_count`**, `prompt_eval_duration`, `eval_count`, `eval_duration`. Dördüncü alan kritik: önbellekten kaç tokenın bedava geldiğini gösteriyor. B senaryosunda ikinci tur 2.277 token okudu, yalnız **363'ü** önbellekten geldi — araçtan dönen 4.994 karakterin tamamı yeniden ödendi. Aynı tabloyu çıplak gözle görmek isterseniz koşumu `stream: true` ile tekrarlayın; o zaman ilk token gecikmesi de eklenir (bu betik akış kipini denemiyor).
+
+## 5) Koşumdan Beş Okuma
+
+| Okuma | Kayıttaki sayı | Ne anlama geliyor |
+| --- | --- | --- |
+| Aynı soruda ajan, sabit hattan uzun | sabit 78,8 sn (10,79 arama + 68,03 üretim) / ajan 95,2 sn; ek girdi 697 token | Bedel turdan değil, araç sonucunun ikinci turun istemine girmesinden doğuyor |
+| Cevap kesildi | B tur 2: 300 tok, `done_reason=length` | Yarım cevap logda hata değildir; `done_reason` okumayan izleme bunu görmez |
+| Katalog para değilse de bedava değil | taban 73 → 1 araç 237 → 2 araç 346 token | İki araçlık katalog her turun başında +273 token |
+| `tool_choice` hiçbir şeyi reddetmedi | yok / `auto` / `required` / çöp değer: dördü de HTTP 200 ve araç çağırdı | Alan belgesiz; test ayırt edici değildi, ama dayanak olmaya da değmez |
+| `format` araçların yerini aldı | `content` içinde JSON metni, `tool_calls` alanı yok | Yapılandırılmış çıktı kipi araç protokolünü susturuyor |
+
+Tam tablo, tur tur döküm ve diğer dört senaryonun (B2, C, D, D2, H) arızaları: [Ajan Ölçümü](/ajan/ajan-olcumu/).
+
+:::caution[Betikte bilerek düzeltmediğimiz bir kusur var]
+`birim_donustur()` süre ve uzunluk birimlerini birbirinden ayırmalıydı; yazılan kontrol `BİRİMLER[kaynak] * BİRİMLER[hedef] <= 0` çarpıma bakıyor ve pozitif faktörlerle hiçbir zaman çalışmıyor. C senaryosunda model `{"miktar": 1, "kaynak": "sa", "hedef": "m"}` argümanlarını üretti, araç `1 sa = 3600 m` dedi, model de "T1 hattının uzunluğu 3600 metredir" yazdı. Sayfadaki sayılar **bu kusurlu hâliyle** ölçüldüğü için kod olduğu gibi bırakıldı ve satırın üstüne not düşüldü. Ders ikili: ölçüm aletindeki kusur, modelin kusuru sanılır — aracı kötü argümanı reddetmeyen bir ajanın uydurmasını tartışmanın anlamı yok.
+:::
+
+## 6) Kendi aracınızla deneyin
+
+1. `viki_ara` yerine kendi verinizi okuyan bir araç yazın (bir `sqlite` sorgusu, bir HTTP isteği, bir dosya araması). İmza değişmez: isim, tek cümlelik açıklama, zorunlu argümanlar.
+2. Araç sayısını ikiye çıkarın ve **birbirine benzeyen** iki araç tanımlayın; `C` senaryosundaki yanlış seçimi siz de göreceksiniz. Bu, katalog okuma kapasitesini ölçmenin en ucuz yolu.
+3. `NUM_PREDICT`'i 300'den 80'e indirin: `done_reason=length` satırlarının nasıl çoğaldığını izleyin. Küçük modellerde uzun cevap tavanı, cevabın kalitesinden önce gecikme bütçenizi yer.
+4. `MAKS_TUR`'u 2'ye indirin ve `D` senaryosunu tekrar koşun; tur tavanının gecikmeyi ne kadar kestiği tek satırla ölçülür.
+5. `format: "json"` ekini `tools` ile birlikte gönderen bir istek yazın (`G`). Bulut API'sinden alıştığınız "yapılandırılmış çıktı + araç" davranışının yerelde farklı olduğunu görmek, bu sayfanın en öğretici satırı.
+
+## 7) Buradan sonrası
+
+- Sayıların tamamı ve yorumu: [Ajan Ölçümü](/ajan/ajan-olcumu/)
+- İstek/cevap biçimi, şablon şartı, MCP'nin kapsamı: [Araç Çağırma Mekaniği ve MCP](/ajan/arac-cagirma-ve-mcp/)
+- Ajan mı sabit hat mı kararının haritası: [Ajan mı Sabit RAG Hattı mı?](/ajan/ajan-mi-sabit-hat-mi/)
+- Aracın sardığı sabit hat: [Örnek 6: Vikipedi'den Türkçe RAG](/ornekler/viki-rag/)
+- Eşik değerinin nasıl ölçüldüğü: [RAG Değerlendirmesi](/rag/rag-degerlendirme/)
+- Ön-yükleme, önbellek ve `num_ctx` kırpması: [Hız ve Maliyet](/kullanim/hiz-ve-maliyet/)

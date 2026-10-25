@@ -1,0 +1,21 @@
+model: qwen2.5:3b-instruct-q4_K_M | embedding: bge-m3 | cpu (%100), Ollama yerel
+süreler Ollama'nın döndürdüğü alanlardan; 'duvar' = HTTP dahil gerçek bekleme
+
+==============================================================================
+E12 — 2,05 sn'NIN KAYNAĞI: localhost çözümlemesi mi, bağlantı kurma mı?
+==============================================================================
+  E11 vekil sunucuyu eledi. Üç olasılık: DNS/hosts çözümü, TCP el sıkışması,
+  ya da her istekte yeni bağlantı kuran istemci. Bağlantı yeniden kullanımı test edilir.
+  http://localhost:11434 (urllib)    fark medyan  2.03 sn | denemeler 2.01 2.03 2.03 2.04
+  http://127.0.0.1:11434 (urllib)    fark medyan  0.00 sn | denemeler 0.00 0.00 0.00 0.00
+  127.0.0.1 + http.client            fark medyan  0.00 sn | denemeler 0.00 0.00 0.00 0.00
+
+==============================================================================
+E13 — İNDEKSLEME A/B: localhost mu, 127.0.0.1 mi (10 parça)
+==============================================================================
+  Örnek 6 indeksi parça başına bir HTTP isteği atar; isim çözümleme gideri
+  bu döngüde 125 kez ödenir. 10 parçalık bir A/B bunu doğrudan gösterir.
+  localhost : 10 parça   35.6 sn (3.56 sn/parça) | sunucu işi   15.3 sn | istemci gideri   20.3 sn (57%)
+  127.0.0.1 : 10 parça   16.1 sn (1.61 sn/parça) | sunucu işi   16.1 sn | istemci gideri    0.0 sn (0%)
+
+bitti.

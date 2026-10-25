@@ -1,0 +1,11 @@
+{
+  "veri_seti": "AlicanKiraz0/Turkish-SFT-Dataset-v1.0",
+  "ham_kayit": 5579,
+  "eslenen": 5579,
+  "elenen_sebepler": {
+    "cevap çok kısa": 4
+  },
+  "egitim": 5297,
+  "test": 278,
+  "seed": 42
+}

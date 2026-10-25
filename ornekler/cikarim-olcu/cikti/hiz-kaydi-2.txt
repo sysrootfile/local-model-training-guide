@@ -1,0 +1,88 @@
+model: qwen2.5:3b-instruct-q4_K_M | embedding: bge-m3 | cpu (%100), Ollama yerel
+süreler Ollama'nın döndürdüğü alanlardan; 'duvar' = HTTP dahil gerçek bekleme
+
+==============================================================================
+E4 — num_ctx: bellek, yüklenme ve SESSİZ KIRPMA
+==============================================================================
+  taban: istek 688 token (num_ctx=8192, kırpma yok varsayımı)
+  num_ctx=512                    duvar   12.8 | sunucu  10.78 | yük  3.26 | ön-yük   258 tok /  6.40 sn [  40.3 tok/sn, 0 önb.] | çözme   16 tok /  1.10 sn [  14.5 tok/sn]
+      ^ KIRPMA: 688 token'lık istekten yalnız 258 değerlendirildi (430 token sessizce düştü)
+      ps: qwen2.5:3b-instruct-q4_K_M 357c53fb659c 2.0 GB 100% CPU 512 llamacpp 4 minutes from now
+  num_ctx=2048                   duvar   25.1 | sunucu  23.08 | yük  3.21 | ön-yük   688 tok / 18.47 sn [  37.3 tok/sn, 0 önb.] | çözme   16 tok /  1.38 sn [  11.6 tok/sn]
+      sığdı: 688/688 token değerlendirildi
+      ps: qwen2.5:3b-instruct-q4_K_M 357c53fb659c 2.1 GB 100% CPU 2048 llamacpp 4 minutes from now
+  num_ctx=4096                   duvar   24.5 | sunucu  22.54 | yük  3.48 | ön-yük   688 tok / 17.80 sn [  38.7 tok/sn, 0 önb.] | çözme   16 tok /  1.25 sn [  12.8 tok/sn]
+      sığdı: 688/688 token değerlendirildi
+      ps: qwen2.5:3b-instruct-q4_K_M 357c53fb659c 2.2 GB 100% CPU 4096 llamacpp 4 minutes from now
+  num_ctx=8192                   duvar   24.0 | sunucu  21.93 | yük  3.22 | ön-yük   688 tok / 17.39 sn [  39.6 tok/sn, 0 önb.] | çözme   16 tok /  1.30 sn [  12.3 tok/sn]
+      sığdı: 688/688 token değerlendirildi
+      ps: qwen2.5:3b-instruct-q4_K_M 357c53fb659c 2.4 GB 100% CPU 8192 llamacpp 4 minutes from now
+
+==============================================================================
+E2b — ÇÖZME HIZI EĞRİSİ (uzun üretimeye zorlayan istek)
+==============================================================================
+  E2'de model 32 ve 128 token isteğini 16 token'da kendi kesmişti;
+  bu kez saydıran bir istekle çözme fazını gerçekten uzatıyoruz.
+  num_predict=64 -> 64 token üretildi duvar   11.4 | sunucu   9.41 | yük  3.26 | ön-yük    62 tok /  1.50 sn [  41.2 tok/sn, 0 önb.] | çözme   64 tok /  4.64 sn [  13.8 tok/sn]
+                                 istenen 64, üretilen 64, ms/token 72.5
+  num_predict=256 -> 256 token üretildi duvar   20.5 | sunucu  18.39 | yük  0.01 | ön-yük    62 tok /  0.07 sn [ 861.1 tok/sn, 61 önb.] | çözme  256 tok / 18.30 sn [  14.0 tok/sn]
+                                 istenen 256, üretilen 256, ms/token 71.5
+  num_predict=512 -> 412 token üretildi duvar   31.9 | sunucu  29.89 | yük  0.01 | ön-yük    62 tok /  0.07 sn [ 859.4 tok/sn, 61 önb.] | çözme  412 tok / 29.80 sn [  13.8 tok/sn]
+                                 istenen 512, üretilen 412, ms/token 72.3
+
+==============================================================================
+E3b — ÖNBELLEKSİZ ÖN-YÜKLEME EĞRİSİ + Türkçe karakter/token oranı
+==============================================================================
+  her satırın başına benzersiz bir numara konur: önbellek eşleşmez,
+  böylece prompt_eval_duration gerçekten baştan sona önbelleksizdir.
+    485 karakter (x1) ->   216 tok /   4.76 sn [  45.4 tok/sn, 24 önb.]
+    961 karakter (x2) ->   375 tok /   8.74 sn [  42.9 tok/sn, 24 önb.]
+   1913 karakter (x4) ->   693 tok /  16.60 sn [  41.7 tok/sn, 24 önb.]
+   3817 karakter (x8) ->  1329 tok /  33.42 sn [  39.8 tok/sn, 24 önb.]
+  fark   476 karakter ->  159 token = 2.99 karakter/token | 3.98 sn -> 39.9 tok/sn
+  fark   952 karakter ->  318 token = 2.99 karakter/token | 7.86 sn -> 40.5 tok/sn
+  fark  1904 karakter ->  636 token = 2.99 karakter/token | 16.82 sn -> 37.8 tok/sn
+
+==============================================================================
+E7b — İLK TOKEN SÜRESİ (model bellekte ve önbellek sıcak)
+==============================================================================
+  kısa prompt            tur 1: ilk token   6.85 sn | duvar   9.6 sn | sunucu  7.54 sn | ön-yük 211 tok (24 önb.) /  4.78 sn | çözme 2.74 sn
+  kısa prompt            tur 2: ilk token   2.14 sn | duvar   4.9 sn | sunucu  2.86 sn | ön-yük 211 tok (210 önb.) /  0.07 sn | çözme 2.78 sn
+  uzun prompt (Vikipedi x4) tur 1: ilk token  14.99 sn | duvar  18.4 sn | sunucu 16.40 sn | ön-yük 688 tok (183 önb.) / 12.93 sn | çözme 3.46 sn
+  uzun prompt (Vikipedi x4) tur 2: ilk token   2.14 sn | duvar   5.5 sn | sunucu  3.44 sn | ön-yük 688 tok (687 önb.) /  0.09 sn | çözme 3.33 sn
+
+==============================================================================
+E10 — BOŞALT/YÜKLE ÇEVRİMİ: 42,7 sn'lik aykırı değerin peşi
+==============================================================================
+  E9 sırasında keep_alive=0 ile boşaltan küçük bir istek 42,7 sn sürdü;
+  model işi 1-2 sn'ydi. Döngüyü 5 kez tekrarlayıp dağılımı ölçüyoruz.
+  1. boşalt-çağrısı  duvar    7.4 | sunucu   5.32 | yük  3.24 | ön-yük  37 tok /  1.04 sn | çözme  16 tok /  1.05 sn
+     yeniden yükleme  duvar    7.3 | sunucu   5.27 | yük  3.11 | ön-yük  37 tok /  1.13 sn [ 32.7 tok/sn,   0 önb.] | fazlar  5.26 | hesap dışı  0.01 | RAM 3.6 GiB boş
+  2. boşalt-çağrısı  duvar    3.2 | sunucu   1.17 | yük  0.01 | ön-yük  37 tok /  0.08 sn | çözme  16 tok /  1.08 sn
+     yeniden yükleme  duvar    7.3 | sunucu   5.23 | yük  3.11 | ön-yük  37 tok /  1.05 sn [ 35.3 tok/sn,   0 önb.] | fazlar  5.22 | hesap dışı  0.01 | RAM 3.6 GiB boş
+  3. boşalt-çağrısı  duvar    3.2 | sunucu   1.12 | yük  0.01 | ön-yük  37 tok /  0.07 sn | çözme  16 tok /  1.03 sn
+     yeniden yükleme  duvar    7.3 | sunucu   5.22 | yük  3.11 | ön-yük  37 tok /  1.04 sn [ 35.4 tok/sn,   0 önb.] | fazlar  5.22 | hesap dışı  0.01 | RAM 3.5 GiB boş
+  4. boşalt-çağrısı  duvar    3.2 | sunucu   1.15 | yük  0.01 | ön-yük  37 tok /  0.07 sn | çözme  16 tok /  1.06 sn
+     yeniden yükleme  duvar    7.3 | sunucu   5.27 | yük  3.11 | ön-yük  37 tok /  1.05 sn [ 35.1 tok/sn,   0 önb.] | fazlar  5.26 | hesap dışı  0.01 | RAM 3.5 GiB boş
+  5. boşalt-çağrısı  duvar    3.2 | sunucu   1.15 | yük  0.01 | ön-yük  37 tok /  0.08 sn | çözme  16 tok /  1.06 sn
+     yeniden yükleme  duvar    7.3 | sunucu   5.25 | yük  3.11 | ön-yük  37 tok /  1.07 sn [ 34.7 tok/sn,   0 önb.] | fazlar  5.25 | hesap dışı  0.01 | RAM 3.6 GiB boş
+  günlük kuyruğunda 20 sn üstü 57 POST satırı (toplam 844)
+    2026/10/16 - 00:29:30 24.6 sn
+    2026/10/16 - 00:30:08 23.1 sn
+    2026/10/16 - 00:30:32 22.5 sn
+    2026/10/16 - 00:30:56 21.9 sn
+    2026/10/16 - 00:32:00 29.9 sn
+    2026/10/16 - 00:33:25 33.4 sn
+
+==============================================================================
+E11 — DUVAR-SUNUCU FARKI: ~2 sn'nin kaynağı (vekil sunucu algılama?)
+==============================================================================
+  E1/E9'da her sıcak çağrıda duvar, sunucu süresinden ~2,0 sn büyüktü.
+  varsayılan   duvar  7.90 | sunucu  5.87 | fark  2.03 sn
+  varsayılan   duvar  3.21 | sunucu  1.18 | fark  2.04 sn
+  varsayılan   duvar  3.32 | sunucu  1.30 | fark  2.03 sn
+  varsayılan   duvar  3.22 | sunucu  1.22 | fark  2.00 sn
+  [atlandı] E11: TypeError: OpenerDirector.open() got an unexpected keyword argument 'headers'
+
+bitti.
+B2 0

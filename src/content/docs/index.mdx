@@ -1,0 +1,115 @@
+---
+title: Model Eğitimi Rehberi
+description: Türkçe, sıfırdan ileri seviyeye model eğitimi rehberi — veri bulma, veri hazırlama, fine-tuning, LoRA/QLoRA, değerlendirme ve yayınlama.
+template: splash
+hero:
+  title: Model Eğitimi Rehberi
+  tagline: Veri bulmaktan kendi modelini çalıştırmaya kadar, tamamen Türkçe ve adım adım. LLM ince ayar, görsel modeller ve klasik makine öğrenmesi bir arada.
+  image:
+    file: ../../assets/hero.png
+    alt: Sinir ağı ve eğitim döngüsü illüstrasyonu
+  actions:
+    - text: Rehbere Başla
+      link: /baslangic/giris/
+      icon: right-arrow
+      variant: primary
+    - text: Yol Haritası
+      link: /baslangic/yol-haritasi/
+      icon: right-arrow
+      variant: minimal
+dogrulama: 2026-10-18
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+import MethodWizard from '../../components/MethodWizard.astro';
+
+<div class="home-wizard">
+  <h2>Hangi Yol Sana Uygun?</h2>
+  <p>Üç soruya yanıt ver, sana özel yol haritasını göstereyim.</p>
+  <MethodWizard />
+</div>
+
+<h2>Rehberin Bölümleri</h2>
+
+<CardGrid>
+  <Card title="Başlangıç" icon="book">
+    Bu rehber nedir, nasıl kullanılır? Temel kavramlar sözlüğü ve kişisel
+    [yol haritası](/baslangic/yol-haritasi/).
+  </Card>
+  <Card title="Temeller" icon="puzzle">
+    [Transformer](/temeller/transformer/), [tokenizasyon](/temeller/tokenizasyon/)
+    ve eğitimin nasıl çalıştığı — sezgisel ama sağlam bir temel.
+  </Card>
+  <Card title="RAG" icon="magnifier">
+    [RAG mi ince ayar mı?](/rag/rag-mi-ince-ayar-mi/) ile kararını ver,
+    [değerlendirme metrikleri](/rag/rag-degerlendirme/) ile ölç,
+    [parçalama ve hibrit arama](/rag/parcalama-ve-hibrit-arama/) ile iyileştir,
+    [gömme modeli eğitimi](/rag/gomme-egitimi/) ile indeksi kendi verinize uydurun.
+  </Card>
+  <Card title="Ajanlar ve Araç Çağırma" icon="robot">
+    [Ajan mı sabit hat mı?](/ajan/ajan-mi-sabit-hat-mi/) ile karar ver,
+    [mekanik ve MCP](/ajan/arac-cagirma-ve-mcp/) ile kur,
+    [ölçüm](/ajan/ajan-olcumu/) ile faturayı,
+    [prompt enjeksiyonu](/ajan/prompt-enjeksiyonu/) ile riski gör.
+  </Card>
+  <Card title="Donanım ve Ortam" icon="laptop">
+    [VRAM hesabı](/donanim/vram-hesabi/), Windows'ta [yerel kurulum](/donanim/yerel-kurulum/)
+    ve [bulut seçenekleri](/donanim/bulut-secenekleri/).
+  </Card>
+  <Card title="Veri" icon="document">
+    Veri nereden bulunur, hangi format kullanılır, nasıl temizlenir? Türkçe veri
+    kaynakları dahil: [Veri Rehberi](/veri/veri-nereden-bulunur/).
+  </Card>
+  <Card title="LLM Eğitimi" icon="rocket">
+    LoRA, QLoRA, SFT, DPO ve araç karşılaştırmaları. [Adım adım ilk
+    eğitim](/llm/adim-adim-egitim/) ile kendi modelini eğit.
+  </Card>
+  <Card title="Görsel Modeller" icon="star">
+    Difüzyon modelleri nasıl çalışır, kendi [görsel LoRA'nı](/gorsel/lora-egitimi/)
+    nasıl eğitirsin?
+  </Card>
+  <Card title="Klasik Makine Öğrenmesi" icon="list-format">
+    Her şey LLM değil: [temeller](/klasik-ml/temeller/) ve scikit-learn ile
+    [ilk model](/klasik-ml/ilk-model/).
+  </Card>
+  <Card title="Değerlendirme" icon="information">
+    [Loss eğrileri](/degerlendirme/loss-ve-metrikler/) nasıl okunur, hangi
+    [benchmark](/degerlendirme/benchmarklar/) neyi ölçer?
+  </Card>
+  <Card title="Kullanım ve Yayınlama" icon="play">
+    [Nicemleme](/kullanim/quantization/), [Ollama](/kullanim/ollama/),
+    [çıkarım parametreleri](/kullanim/cikarim-parametreleri/),
+    [API sunumu](/kullanim/sunma-api/) ve [paylaşım](/kullanim/huggingface-paylasim/).
+    Yerel gecikmenin ölçülmüş dökümü: [Hız ve Maliyet](/kullanim/hiz-ve-maliyet/).
+    Aynı soru on kez sorulsa ne olur: [Tekrarlanabilirlik](/kullanim/tekrarlanabilirlik/).
+    Modelin "çok eminim"ine güvenilir mi: [Eminlik ve Kalibrasyon](/kullanim/eminlik-ve-kalibrasyon/).
+    Yayınlamadan önce izin ve veri sızıntısı denetimi: [Lisans, Kişisel Veri ve Model
+    Kartı](/kullanim/lisans-ve-model-karti/).
+  </Card>
+  <Card title="Örnek Projeler" icon="hammer">
+    Baştan sona **çalıştırılabilir** sekiz proje: [tablo verisiyle
+    ML](/ornekler/klasik-ml/), [veri temizleme](/ornekler/veri-temizleme/),
+    [Türkçe asistan](/ornekler/turkce-asistan/), [görsel
+    LoRA](/ornekler/gorsel-lora/), [yerel RAG](/ornekler/yerel-rag/),
+    [Vikipedi'den Türkçe RAG](/ornekler/viki-rag/),
+    [ajan döngüsü](/ornekler/ajan-dongusu/) ve
+    [prompt enjeksiyonu deneyi](/ornekler/enjeksiyon-deni/).
+  </Card>
+  <Card title="Kaynaklar" icon="pencil">
+    [SSS](/kaynaklar/sss/), [sözlük](/kaynaklar/sozluk/) ve
+    [faydalı linkler](/kaynaklar/faydali-linkler/).
+  </Card>
+</CardGrid>
+
+<h2>Nasıl Kullanılır?</h2>
+
+Bu rehber tek bir doğrusal kitap değil; dört farklı okuma yolu var:
+
+1. **Hızlı başlangıç:** Elinde GPU var ve bir an önce kendi modelini eğitmek istiyorsan → [VRAM hesabı](/donanim/vram-hesabi/) → [LoRA/QLoRA](/llm/lora-qlora/) → [adım adım eğitim](/llm/adim-adim-egitim/).
+2. **Sağlam temel:** Konuyu baştan sona anlamak istiyorsan → [Giriş](/baslangic/giris/) sayfasından başla ve bölümleri sırayla oku.
+3. **İhtiyaca göre:** Aklında belirli bir soru varsa → [SSS](/kaynaklar/sss/) ve [sözlükten](/kaynaklar/sozluk/) başla, oradan derinleş.
+4. **Uygulamalı öğrenme:** Okuyarak değil yaparak öğrenmek istiyorsan → [örnek projeler](/ornekler/genel-bakis/) sayfasından sana uygun olanı seç; beşi GPU'suz makinede bile çalışır.
+
+:::tip
+Bu site yerelde çalışır durumda. Herhangi bir sayfada takılırsan `Ctrl+K` ile arama yapabilirsin.
+:::

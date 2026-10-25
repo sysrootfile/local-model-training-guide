@@ -1,0 +1,48 @@
+
+==============================================================
+MODEL: bge-m3
+==============================================================
+  [bge-m3] indeks: 8 belge, boyut=1024, 3.9 sn
+
+  Orijinal sorular  : hit@1=1.00  MRR=1.000  (n=6)
+  benzerlik bandı   : 0.632 - 0.740
+  Parafraz sorular  : hit@1=1.00  MRR=1.000  (n=6)
+  benzerlik bandı   : 0.580 - 0.718
+
+  Kapsam dışı (n=5) en iyi benzerlikler:
+    0.372  Ankara'da hava nasıl?
+    0.274  Dünyanın en uzun nehri hangisidir?
+    0.329  Pilav nasıl yapılır?
+    0.375  İstanbul'un nüfusu kaç milyondur?
+    0.408  Gitar öğrenmek ne kadar sürer?
+  kapsam dışı bandı : 0.274 - 0.408
+  ayırma payı       : 0.172 (en düşük kapsam içi eksi en yüksek kapsam dışı)
+
+==============================================================
+MODEL: nomic-embed-text
+==============================================================
+  [nomic-embed-text] indeks: 8 belge, boyut=768, 5.4 sn
+
+  Orijinal sorular  : hit@1=0.83  MRR=0.917  (n=6)
+  benzerlik bandı   : 0.660 - 0.784
+  Parafraz sorular  : hit@1=0.50  MRR=0.667  (n=6)
+  benzerlik bandı   : 0.671 - 0.745
+  [MISS] 'Ürünü geri gönderebilir miyim, süresi ne kadar?' -> beklenen iade, ilk sırada ek-hizmet
+  [MISS] 'Elimdeki gönderi ne zaman bana ulaşır?' -> beklenen teslimat, ilk sırada hasar
+  [MISS] 'Teslimatta ödeme yaparsam fazladan bir bedel öder miyim?' -> beklenen odeme, ilk sırada teslimat
+
+  Kapsam dışı (n=5) en iyi benzerlikler:
+    0.675  Ankara'da hava nasıl?
+    0.637  Dünyanın en uzun nehri hangisidir?
+    0.651  Pilav nasıl yapılır?
+    0.586  İstanbul'un nüfusu kaç milyondur?
+    0.664  Gitar öğrenmek ne kadar sürer?
+  kapsam dışı bandı : 0.586 - 0.675
+  ayırma payı       : -0.015 (en düşük kapsam içi eksi en yüksek kapsam dışı)
+
+==============================================================
+KARŞILAŞTIRMA ÖZETİ
+==============================================================
+  model                hit@1(ory)   hit@1(para)   MRR(para)   ayırma
+  bge-m3               1.00         1.00          1.000       +0.172
+  nomic-embed-text     0.83         0.50          0.667       -0.015

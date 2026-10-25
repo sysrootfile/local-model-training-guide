@@ -1,0 +1,31 @@
+EMINLIK OLCUM KAFESI
+  baslangic: 2026-10-17 23:12:27
+  python 3.12.10 | Windows 11
+  ollama 0.40.5 | sohbet qwen2.5:3b-instruct-q4_K_M | gomme bge-m3
+  mod: TAM | kol: g
+  sozlesme notu: eval_count logprob kayindan 1 fazladir (probda olculen off-by-one); ortalamalar KAYIT sayisina alinir
+
+=========================================================
+KOL G - SOZLU GUVEN (0-100) | sayi YALNIZ GUVEN: etiketinden okunur
+=========================================================
+  istem kalibi (bir kerelik):
+  'e dagarcigi (tokenizer sozlugui) kactir?\nSIKKLAR:\nA) 128.256\nB) 151.936\nC) 262.208\nD) 50.257\n\nBirinci satira secigin metnini yaz. Ikinci satir tam olarak GUVEN: ile baslasin ve sonrasinda 0 ile 100 arasinda tek bir tam sayi olsun.'
+G1  |  4.49 sn | guven 26   | GUVEN etiketi 1 | cevap dogru mu HAYIR | "Birinci Satır: Llama 3'un kelime dagarcigi (tokenizer sozlugui) kaçtır"
+G2  |  4.05 sn | guven 85   | GUVEN etiketi 1 | cevap dogru mu HAYIR | "Birinci Satır: Qwen3'un kelime dagacığı hangi değerdir? /  / İkinci Sa"
+G3  |  6.57 sn | guven YOK  | GUVEN etiketi 0 | cevap dogru mu HAYIR | "Gemma 3'un kelime dagarcigi hangi değerdir? Bu soruyu cevaplayan doğru"
+G4  |  3.65 sn | guven 85   | GUVEN etiketi 1 | cevap dogru mu HAYIR | 'BAAI/bge-m3 embedding modeli 768 boyutlu vektor üretir. Güven: 85'
+G5  |  6.29 sn | guven YOK  | GUVEN etiketi 0 | cevap dogru mu HAYIR | 'Birinci satır: MiniLM-L12 modelinin çıktı verimizi kaç boyutlu olduğun'
+G6  |  5.04 sn | guven 0    | GUVEN etiketi 1 | cevap dogru mu HAYIR | "Birinci satırın metni: /  / TRL'de DPO egitiminin varsayilan beta dege"
+G7  |  4.25 sn | guven YOK  | GUVEN etiketi 0 | cevap dogru mu HAYIR | 'Birinci satır: "TRL kütüphanesinde SimPO karsiligi olan kayip turu han'
+G8  |  5.53 sn | guven 85   | GUVEN etiketi 1 | cevap dogru mu EVET | 'Birinci satırın metni: /  / FineWeb-2 derlemesinin tur_Latn bolümü, to'
+G9  |  4.88 sn | guven 88   | GUVEN etiketi 1 | cevap dogru mu HAYIR | 'Birinci satır: / OpenAssistant oasst1 derlemesinin Türkçe kısım kaç me'
+G10 |  4.59 sn | guven 7    | GUVEN etiketi 1 | cevap dogru mu HAYIR | "Birinci satır: / RunPod'da ag volume'unun fiyati (1 TB altinda) nedir?"
+
+  G ozet: ayristirilabilen 7/10
+  genel guven ortalamasi 53.7 | min 0 | max 88
+  dogru cevaplarin guveni: n=1 ort 85.0 (min 85 max 85)
+  yanlis cevaplarin guveni: n=6 ort 48.5 (min 0 max 88)
+  [UYARI] 3 soruda GUVEN: etiketi (veya etiketten okunabilir 0-100 sayisi) YOK -> bu sorular yukaridaki ortalamalara GIRMEZ, ayri sayilir
+  -> g.json yazildi (10 kayit)
+
+bitti: 2026-10-17 23:13:16

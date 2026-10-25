@@ -1,0 +1,178 @@
+---
+---
+<div class="vc-card">
+  <div class="vc-grid">
+    <label>
+      <span>Model boyutu</span>
+      <select id="vc-params">
+        <option value="0.5">0,5B — ör. Qwen3-0.6B</option>
+        <option value="1">1B — ör. Llama 3.2-1B</option>
+        <option value="1.7">1,7B — ör. Qwen3-1.7B</option>
+        <option value="3">3B — ör. Llama 3.2-3B</option>
+        <option value="4" selected>4B — ör. Qwen3-4B</option>
+        <option value="8">8B — ör. Qwen3-8B</option>
+        <option value="14">14B — ör. Phi-4 / Qwen3-14B</option>
+        <option value="32">32B</option>
+        <option value="70">70B</option>
+      </select>
+    </label>
+    <label>
+      <span>Senaryo</span>
+      <select id="vc-mode">
+        <option value="infer4">Çıkarım — 4-bit</option>
+        <option value="infer16">Çıkarım — fp16 (tam hassasiyet)</option>
+        <option value="qlora" selected>Eğitim — QLoRA (4-bit + adaptör)</option>
+        <option value="lora">Eğitim — LoRA (fp16 taban)</option>
+        <option value="full">Eğitim — Full fine-tuning (fp16 + AdamW)</option>
+      </select>
+    </label>
+  </div>
+  <div class="vc-result">
+    <div class="vc-number" id="vc-number">—</div>
+    <div class="vc-caption">tahmini gereken VRAM</div>
+  </div>
+  <div class="vc-breakdown" id="vc-breakdown"></div>
+  <p class="vc-note">
+    Kaba bir tahmindir: dizi uzunluğu (max_seq_length), batch boyutu, gradyan checkpointing ve
+    sürücü payı sonucu yaklaşık %20-30 değiştirebilir. Gerçek kullanımı <code>nvidia-smi</code>
+    ile izleyin.
+  </p>
+</div>
+
+<script>
+  const vcParams = document.getElementById('vc-params');
+  const vcMode = document.getElementById('vc-mode');
+  const vcNumber = document.getElementById('vc-number');
+  const vcBreakdown = document.getElementById('vc-breakdown');
+
+  function vcFormat(n) {
+    return n.toFixed(1).replace('.', ',') + ' GB';
+  }
+
+  function vcUpdate() {
+    const p = parseFloat(vcParams.value);
+    const mode = vcMode.value;
+    let parts = [];
+
+    if (mode === 'infer4') {
+      parts = [
+        ['Ağırlıklar (4-bit)', p * 0.55],
+        ['KV önbelleği + çalışma payı', 1.4],
+      ];
+    } else if (mode === 'infer16') {
+      parts = [
+        ['Ağırlıklar (fp16)', p * 2.1],
+        ['KV önbelleği + çalışma payı', 1.5],
+      ];
+    } else if (mode === 'qlora') {
+      parts = [
+        ['Taban model (4-bit, dondurulmuş)', p * 0.55],
+        ['Adaptör + optimizer + aktivasyon', 2.6],
+      ];
+    } else if (mode === 'lora') {
+      parts = [
+        ['Taban model (fp16, dondurulmuş)', p * 2.1],
+        ['Gradyan + optimizer + aktivasyon', 3.5],
+      ];
+    } else {
+      parts = [
+        ['Ağırlıklar (fp16)', p * 2],
+        ['Gradyanlar', p * 2],
+        ['AdamW durumları + fp32 kopya', p * 12],
+        ['Aktivasyon + pay', 2],
+      ];
+    }
+
+    const total = parts.reduce((acc, part) => acc + part[1], 0);
+    vcNumber.textContent = vcFormat(total);
+    vcBreakdown.innerHTML = parts
+      .map(
+        (part) =>
+          '<div class="vc-row"><span>' +
+          part[0] +
+          '</span><span>' +
+          vcFormat(part[1]) +
+          '</span></div>',
+      )
+      .join('');
+  }
+
+  vcParams.addEventListener('change', vcUpdate);
+  vcMode.addEventListener('change', vcUpdate);
+  vcUpdate();
+</script>
+
+<style is:global>
+  .vc-card {
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.75rem;
+    padding: 1.25rem 1.25rem 1rem;
+    background: var(--sl-color-gray-6);
+    margin: 1rem 0 1.5rem;
+  }
+  :root[data-theme='light'] .vc-card {
+    background: var(--sl-color-gray-7);
+  }
+  .vc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  @media (max-width: 640px) {
+    .vc-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .vc-grid label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+  }
+  .vc-grid select {
+    padding: 0.5rem 0.6rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--sl-color-gray-5);
+    background: var(--sl-color-black);
+    color: var(--sl-color-white);
+    font-size: var(--sl-text-sm);
+  }
+  .vc-result {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin-top: 1.1rem;
+  }
+  .vc-number {
+    font-size: 2.1rem;
+    font-weight: 700;
+    color: var(--sl-color-accent-high);
+    line-height: 1;
+  }
+  :root[data-theme='light'] .vc-number {
+    color: var(--sl-color-accent);
+  }
+  .vc-caption {
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-3);
+  }
+  .vc-breakdown {
+    margin-top: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .vc-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-2);
+  }
+  .vc-note {
+    margin-top: 1rem;
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+  }
+</style>

@@ -1,0 +1,74 @@
+TEKRARLANABILIRLIK OLCUM KAFESI
+  baslangic: 2026-10-17 10:45:13
+  python 3.12.10 | Windows 11
+  ollama 0.40.4 | model qwen2.5:3b-instruct-q4_K_M | tekrar 2 | num_predict 48
+  DUMAN TESTI: ilk uc hucre kosulacak
+
+K0 - VARSAYILAN NUM_PREDICT ARAMASI
+   gonderim: options = {temperature: 0} (num_predict YOK)
+  K0.1: duvar 106.60 sn | ctki token 1060 | bitis stop
+  K0.2: duvar 121.20 sn | ctki token 1460 | bitis stop
+  K0.3: duvar 120.73 sn | ctki token 1460 | bitis stop
+
+A1 | kapali | T=0.0 | seed=- | 2 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yanitiniz tek kelime olsun, yildan bask
+   1. [7b7a53e239] duvar  1.64 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2020'
+   2. [7b7a53e239] duvar  0.37 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+
+A2 | kapali | T=0.0 | seed=1234 | 2 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yanitiniz tek kelime olsun, yildan bask
+   1. [7b7a53e239] duvar  0.37 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2020'
+   2. [7b7a53e239] duvar  0.37 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+
+A3 | kapali | T=0.8 | seed=- | 2 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yanitiniz tek kelime olsun, yildan bask
+   1. [05a5cf0698] duvar  0.38 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2021'
+   2. [7b7a53e239] duvar  0.41 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2020'
+
+=========================================================
+OZET (kol A)
+=========================================================
+hucre  n  benzersiz  en-sik-oran  uz-ort  uz-min/max  ctki-ort  duvar
+A1      2          1         1.00     4.0    4/4         5.0     2.0 sn
+A2      2          1         1.00     4.0    4/4         5.0     0.7 sn
+A3      2          2         0.50     4.0    4/4         5.0     0.8 sn
+
+A1     bitis: {'stop': 2} | not: sicaklik 0, tohum yok
+A2     bitis: {'stop': 2} | not: sicaklik 0, tohum 1234
+A3     bitis: {'stop': 2} | not: sicaklik 0,8, tohum yok
+
+=========================================================
+KOL B - SCIKIT-LEARN TOHUM VARYANSI
+=========================================================
+   veri: breast_cancer.csv | satir 569 | özellik 30
+
+B1 | bolme + model tohumu birlikte degisir
+  tohum 0   | egitim 455 test 114 | RF 0.9474 | Lojistik 0.9825
+  tohum 1   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9912
+  tohum 2   | egitim 455 test 114 | RF 0.9825 | Lojistik 0.9825
+  tohum 7   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9649
+  tohum 42  | egitim 455 test 114 | RF 0.9474 | Lojistik 0.9825
+
+B2 | bolme SABIT (42), yalniz model tohumu degisir
+  tohum 0   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9825
+  tohum 1   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9825
+  tohum 2   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9825
+  tohum 7   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9825
+  tohum 42  | egitim 455 test 114 | RF 0.9474 | Lojistik 0.9825
+
+B3 | model tohumu SABIT (42), yalniz bolme degisir
+  tohum 0   | egitim 455 test 114 | RF 0.9386 | Lojistik 0.9825
+  tohum 1   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9912
+  tohum 2   | egitim 455 test 114 | RF 0.9825 | Lojistik 0.9825
+  tohum 7   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9649
+  tohum 42  | egitim 455 test 114 | RF 0.9474 | Lojistik 0.9825
+
+OZET (kol B, bes tohum)
+B1-rf    min 0.9474 | ort 0.9579 | max 0.9825 | acik 0.0351
+B1-lr    min 0.9649 | ort 0.9807 | max 0.9912 | acik 0.0263
+B2-rf    min 0.9474 | ort 0.9544 | max 0.9561 | acik 0.0088
+B2-lr    min 0.9825 | ort 0.9825 | max 0.9825 | acik 0.0000
+B3-rf    min 0.9386 | ort 0.9561 | max 0.9825 | acik 0.0439
+B3-lr    min 0.9649 | ort 0.9807 | max 0.9912 | acik 0.0263
+
+bitti: 2026-10-17 10:51:44

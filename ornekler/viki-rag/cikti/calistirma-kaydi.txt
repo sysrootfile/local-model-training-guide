@@ -1,0 +1,56 @@
+[veri] korpus Vikipedi'den indiriliyor: 8 madde...
+[veri] İstanbul ilinde toplu ulaşım: 16,740 karakter -> 25 parça
+[veri] İstanbul Metrosu: 29,235 karakter -> 42 parça
+[veri] Marmaray: 12,099 karakter -> 17 parça
+[veri] Tünel (İstanbul): 4,390 karakter -> 6 parça
+[veri] T1 (İstanbul Tramvayı): 6,767 karakter -> 7 parça
+[veri] Metrobüs: 2,463 karakter -> 3 parça
+[veri] İETT: 13,148 karakter -> 19 parça
+[veri] İstanbul Deniz Otobüsleri: 4,019 karakter -> 6 parça
+[veri] toplam: 125 parça, 88,861 karakter
+[veri] Maddeler CC BY-SA lisansıyla yayımlanır; kaynak göstermeden yeniden kullanılamaz.
+[indeks] 25/125 parça...
+[indeks] 50/125 parça...
+[indeks] 75/125 parça...
+[indeks] 100/125 parça...
+[indeks] 125/125 parça...
+[indeks] 125 parça vektörleştirildi (501.8 sn, boyut=1024)
+==============================================================
+DEMO — iki örnek soru (ikincisi kapsam dışı)
+==============================================================
+[arama] en iyi benzerlik: 0.670 -> Marmaray#9, Marmaray#1, Marmaray#10, İstanbul ilinde toplu ulaşım#17
+[üretim] 68.6 sn
+[cevap] Marmaray, İstanbul Boğazı'nı Kazlıçeşme ile Ayrılık Çeşmesi arasında bağlar.
+
+==============================================================
+KAPSAM DIŞI TEST — İstanbul ulaşımıyla ilgisiz soru
+==============================================================
+[arama] en iyi benzerlik: 0.344 -> İETT#13, Marmaray#9, Tünel (İstanbul)#3, Marmaray#13
+[uyarı] en iyi benzerlik 0.35 eşiğinin altında — model 'yok' demelidir.
+[üretim] 57.6 sn
+[cevap] Bu konuda belgelerde bilgi yok [İETT#13], [Marmaray#9], [Tünel (İstanbul)#3], [Marmaray#13] belgelerde pizza hamuru nasıl yapılır hakkında bilgi yok.
+
+==============================================================
+GETİRİM TESTİ — doğru maddeden parça ilk k'ta geldi mi?
+==============================================================
+  [OK |OK ] Marmaray hangi yıl açıldı?
+        beklenen: Marmaray
+        bulunan: Marmaray, İstanbul ilinde toplu ulaşım, Marmaray, Marmaray
+  [OK |OK ] Tünel hangi iki semt arasında çalışır?
+        beklenen: Tünel (İstanbul)
+        bulunan: Tünel (İstanbul), İstanbul ilinde toplu ulaşım, Tünel (İstanbul), Tünel (İstanbul)
+  [MISS|OK ] Metrobüs hangi güzergâhı izler?
+        beklenen: Metrobüs
+        bulunan: İstanbul ilinde toplu ulaşım, Metrobüs, İstanbul ilinde toplu ulaşım, Metrobüs
+  [OK |OK ] İETT ne zaman kuruldu?
+        beklenen: İETT
+        bulunan: İETT, İETT, İETT, İETT
+  [OK |OK ] İstanbul'un ilk metro hattı hangisidir?
+        beklenen: İstanbul Metrosu
+        bulunan: İstanbul Metrosu, İstanbul Metrosu, İstanbul Metrosu, İstanbul ilinde toplu ulaşım
+  [OK |OK ] T1 tramvay hattı hangi güzergâhta çalışır?
+        beklenen: T1 (İstanbul Tramvayı)
+        bulunan: T1 (İstanbul Tramvayı), T1 (İstanbul Tramvayı), T1 (İstanbul Tramvayı), T1 (İstanbul Tramvayı)
+
+  hit@1: 5/6   hit@4: 6/6
+

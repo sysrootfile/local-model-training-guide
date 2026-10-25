@@ -1,0 +1,166 @@
+---
+title: "Örnek 2: Veri Temizleme Atölyesi"
+description: Gerçek bir Türkçe talimat veri setini Hugging Face'ten indirip normalizasyon, PII maskeleme, kalite filtreleme ve tekrar temizliğinden geçirerek SFT formatına çeviren uçtan uca betik. Gerçek çalıştırma çıktılarıyla.
+dogrulama: 2026-10-17
+---
+
+import kod from '../../../../ornekler/veri-temizleme/atolye.py?raw';
+import { Code } from 'astro-expressive-code/components';
+
+Bu, ikinci **çalıştırılabilir örnek projemiz**: internetteki gerçek bir Türkçe talimat veri setini indirip, [Veri Temizleme](/veri/veri-temizleme/) ve [Kendi Verini Oluştur](/veri/kendi-verini-olustur/) sayfalarında anlattığımız adımları **tek bir betikte, gerçek veri üzerinde** uyguluyoruz. Sonuç: doğrudan bir SFT (fine-tuning) eğitiminde kullanılabilecek `.jsonl` dosyası.
+
+:::note[Bu makinede çalıştırıldı]
+Betik bu projede **gerçekten çalıştırıldı**: Hugging Face'ten 3000 kayıt canlı olarak çekildi ve temizleme hattından geçirildi (Python 3.12, `datasets` 5.1.0, `ftfy` 6.3.1, `datasketch` 2.0.0). Aşağıdaki tüm sayılar bu çalıştırmadan alındı. Çalıştırmak internet bağlantısı gerektirir (~birkaç MB indirme); GPU gerekmez.
+:::
+
+## 1) Temizleme hattı (pipeline)
+
+Betik şu sırayı izliyor — sıra önemli, çünkü her adım bir sonrakini kolaylaştırır:
+
+```text
+Hugging Face (streaming) ──► Alan eşleme ──► Normalizasyon ──► PII maskeleme
+                                                                     │
+        temiz_veri.jsonl (SFT formatı) ◄── Yakın tekrar ◄── Tam tekrar ◄── Kalite filtreleri
+```
+
+- **Önce normalize, sonra PII:** maskesiz düşünülemez, çünkü mojibake'li bir metinde `ali@example.com` "Ã¼" gibi bozuk görünmez ama telefon/TCKN kalıpları bozulabilir. Araçlar temiz metinde daha güvenilir çalışır.
+- **Önce kalite filtresi, sonra tekrar:** tamamen bozuk bir kaydın tekrarını tespit etmek anlamsızdır — önce işe yaramaz kayıtlardan kurtuluruz.
+- **Tekrar temizliği en sonda:** hem tam tekrarlar (birebir aynı) hem yakın tekrarlar (MinHash + LSH ile benzerlik ≥ 0.8) çıkarılır.
+
+## 2) Kurulum
+
+```bash
+pip install datasets ftfy datasketch
+```
+
+Sonra bu projenin klasöründen çalıştırın:
+
+```bash
+cd ornekler/veri-temizleme
+python atolye.py                    # varsayılan: 3000 örnek
+python atolye.py --ornek 500        # hızlı deneme
+python atolye.py --veri-seti atasoglu/instruction-turkish   # başka veri seti (327 satır)
+```
+
+## 3) Betiğin tamamı
+
+<Code code={kod} lang="python" title="ornekler/veri-temizleme/atolye.py" />
+
+## 4) Gerçek çalıştırma çıktısı (3000 kayıt)
+
+Özet tablo ve kayda değer bölümler — tam çıktı: `cikti/calistirma-kaydi.txt`:
+
+```text title="ÖZET: Öncesi -> Sonrası (gerçek çalıştırma)"
+  Çekilen ham kayıt                      3000
+  Normalizasyon sonrası                  3000
+  PII maskeleme sonrası                  3000
+  Kalite filtreleri sonrası              2747
+  Tam tekrar temizliği sonrası           2747
+  Yakın tekrar temizliği sonrası         2747
+
+Temiz veri oranı: 91.6%
+
+Kalite filtreleri detayı:
+  elenen -> çıktı çok kısa: 235
+  elenen -> alfanümerik oran düşük (gürültü): 18
+```
+
+```text title="Mini test bölümü: araçların çalıştığının kanıtı"
+Girdi       : Bana 0532 123 45 67'den ulaşın; e-posta: ali@example.com, TCKN: 10000000146.
+Maskelenmiş : Bana [TELEFON]'den ulaşın; e-posta: [E-POSTA], TCKN: [TC-KIMLIK].  (maskeleme: 3)
+
+Girdi       : Ä°stanbul'da hava Ã§ok gÃ¼zel, yarÄ±n da gÃ¼zel olacak.
+Normalize   : İstanbul'da hava çok güzel, yarın da güzel olacak.
+
+Girdi       : çok çok çok çok çok güzel güzel güzel güzel bir gün
+Tekrar oranı: 0.33  (eşik: 0.3)   -> kalite filtresinden ELENİR
+```
+
+## 5) Sayıların dürüst yorumu
+
+Bu bölümü özellikle açık yazıyoruz, çünkü "temizleme betiği" demolarında sık yapılan bir yanıltma var: **veri seti zaten temizse betik hiçbir şey yapmıyormuş gibi görünür.**
+
+**Gerçek çalıştırmada ne oldu?**
+
+| Adım | Sonuç | Yorum |
+| --- | --- | --- |
+| Normalizasyon | **5.732 alan düzeltildi** | Görünmez karakterler, fazla boşluklar, HTML kalıntıları — veri setinde bolca var |
+| PII maskeleme | **1 kayıt, 2 maskeleme** | `merve/turkish_instructions` büyük ölçüde temiz; gerçek dünya verisinde bu sayı çok daha yüksektir. Sayı 2026-10-17'deki denetimden sonra 1'den 2'ye çıktı — nedeni aşağıda (§6 d). |
+| Kalite filtresi | **253 kayıt elendi (%8.4)** | Elenenler 20 karakterden kısa çıktılar: `'Tıp : Sağlık'`, `'göç'`, `'Güneş doğdu.'`, `'52.'` gibi tek kelimelik ya da yarım cevaplar |
+| Tam tekrar | **0** | Veri seti birebir tekrar içermiyor |
+| Yakın tekrar | **0** | Eşik 0.8; bu sette benzer kayıt çıkmadı |
+
+Yani: PII ve tekrar adımlarında sayı sıfır çıktı diye o kodu silmemek gerekir — **farklı bir veri setinde ilk patlayacak yer orasıdır.** Kanıt için betiğe 3. bölümü (mini test) ekledik: bilerek bozuk üç metin üzerinde maskeleyici gerçekten 3 maske uyguluyor, mojibake gerçekten onarılıyor, tekrar oranı gerçekten eşiği aşıyor. Araçların çalıştığını, temiz verinin gizlediği sayılarla değil, bilerek kirletilmiş örneklerle doğruluyoruz.
+
+:::tip[Peki 0 tekrar çıkması normal mi?]
+Evet — küçük ve bakımlı bir veri setinde beklenen sonuç bu. Web kazıması (crawl) kaynaklı büyük veri setlerinde (ör. [FineWeb-2](https://huggingface.co/datasets/HuggingFaceFW/fineweb-2) gibi) aynı kod genelde verinin **yüzde 10-40'ını** tekrar olarak atar. Tekrar temizliğinin değeri, hedef veri setinizin kirlilik seviyesine bağlıdır — ölçmeden bilemeyiz.
+:::
+
+## 6) Kodda dikkat edilecek dört incelik
+
+Betiğin [tamamını](#3-betiğin-tamamı) yukarıda gördünüz; burada satır aralarındaki dört kritik detayı açıyoruz.
+
+### a) Türkçe küçük harf tuzağı (`tr_kucult`)
+
+Python'ın `lower()` fonksiyonu Türkçe'yi bilmez:
+
+```python
+"İ".lower()   # -> "i̇"  (i + birleşik nokta — İKİ karakter!)
+"I".lower()   # -> "i"   (Türkçe'de doğrusu "ı")
+```
+
+Tekrar tespitinde metinleri karşılaştırmadan önce küçük harfe çeviririz — yanlış çevirirsek "İSTANBUL" ile "istanbul" eşleşmez, gözden kaçan tekrarlar oluşur. Çözüm: `metin.replace("İ", "i").replace("I", "ı").lower()` — önce Türkçe'ye özgü eşlemeler, sonra genel `lower()`. Bu fonksiyonun ürettiği metin yalnızca **karşılaştırma anahtarıdır**; verinin kendisini asla değiştirmeyiz.
+
+### b) TCKN sağlama kontrolü (`tckn_gecerli_mi`)
+
+`\d{11}` deseni her 11 haneli sayıyı yakalar — sipariş numarası, fatura no, hatta telefon parçası bile olabilir. Bu yüzden desenle bulduktan sonra **sağlama algoritmasını** da doğruluyoruz: 10. hane, ilk 9 hanenin doğrulama hanesi; 11. hane, ilk 10 hanenin toplamının son basamağı. Test metnimizdeki `10000000146` bu kontrolü geçtiği için maskeleniyor; rastgele bir 11 haneli sayı genelde geçemez ve dokunulmaz.
+
+### c) Neden MinHash + LSH? (`yakın tekrar`)
+
+İki metnin "%80'den fazla benzer" olup olmadığını her çift için karşılaştırmak, N kayıtta N² iş demektir — 100.000 kayıtta milyarlarca karşılaştırma. **MinHash**, her metni küçük bir "parmak izine" indirger; **LSH** (Locality-Sensitive Hashing), benzer parmak izlerini aynı kovaya düşürerek yalnızca aday çiftleri karşılaştırır. Bu projede `datasketch` kütüphanesiyle ~15 satırda çözüyoruz; [Veri Temizleme](/veri/veri-temizleme/) sayfasında yöntemin teorisi var.
+
+### d) Maskeleme alan listesi: üç alan varsa üçünü de maskele (2026-10-17 düzeltmesi)
+
+Bu betiğin kendi çıktısında bir sızıntı bulundu; bulduğumuz şey, [Lisans, Kişisel Veri ve Model Kartı](/kullanim/lisans-ve-model-karti/) sayfasındaki depo taramasının ölçümüdür. Sorun maskeleyicinin içinde değil, **hangi alanlara uygulandığındaydı**: normalizasyon `talimat`, `giris`, `cikti` üçünün üzerine çalışıyordu; PII maskeleme yalnızca `talimat` ve `cikti`'ye uygulanıyordu. Oysa betiğin SFT yazıcısı (`atolye.py:332`) `giris` alanını kullanıcı mesajına `"Bağlam: "` ekleyerek gömüyor. Sonuç: maskelenmiş bir boru hattının *yayınlanmış çıktısında* maskelenmemiş bir e-posta kalıyordu.
+
+Aynı kaydın düzeltme öncesi ve sonrası satırı (`cikti/temiz_veri-eski.jsonl` → `cikti/temiz_veri.jsonl`, kayıt 1995):
+
+```text title="Öncesi (giris maskelenmemiş)"
+Bağlam: Ad: John Doe Telefon: (123) 456-7890 E-posta: jdoe@email.com Şu anki rolü: ...
+```
+
+```text title="Sonrası (üç alan da maskeleniyor)"
+Bağlam: Ad: John Doe Telefon: (123) 456-7890 E-posta: [E-POSTA] Şu anki rolü: ...
+```
+
+Düzeltme tek satır: maskeleme döngüsüne `giris` alanını eklemek. Koşumun geri kalanı birebir aynı kaldı (3.000 → 2.747, 5.732 düzeltilen alan, aynı eleme sebepleri); yalnızca `rapor.json`'daki `pii_maskeleme` 1 → 2 oldu ve yayınlanmış çıktıda kalan tek e-posta vuruşu 1 → 0'a indi.
+
+:::caution[Satır hâlâ temiz değil]
+İki satırda da **Ad: John Doe** ve **(123) 456-7890** duruyor. Ad-soyad hiçbir düzenli ifadenin işi değil; ABD biçimli telefon da `5xx`/`2xx-4xx` kalıbındaki Türk telefon kuralının kapsamı dışına düşüyor. Maske sayacı "2" derken satır kişisel veri taşımaya devam ediyor — maskeleme adımının *başarı ölçüsü* olmaması gereken bir sayı.
+:::
+
+:::note[Aynı ad, iki ayrı anlam]
+Çıktıda "John Doe" iki kayıtta geçiyor: 1995. satırda bir iletişim bloğunun parçası (Ad/Telefon/E-posta), 2456. satırda ise bir hikâye karakteri ("John Doe, onu takip eden garip bir adam fark ettiğinde..."). İkincisi kişisel veri değil, biri öyle görünüyor. Bu ayrımı otomatik yapan bir kural yok; taranacak küçüklükte bir veride elle bakmak, büyük veride ise bu sınıfı **kapsam dışı** olarak belgelemek doğrusu. Ölçümün tamamı: [Lisans, Kişisel Veri ve Model Kartı](/kullanim/lisans-ve-model-karti/).
+:::
+
+## 7) Çıktıyı kontrol edin
+
+```bash
+# Kaç kayıt çıktı?
+wc -l cikti/temiz_veri.jsonl
+
+# İlk kaydı oku (Türkçe karakterler için Python ile):
+python -c "import json; print(json.dumps(json.loads(open('cikti/temiz_veri.jsonl', encoding='utf-8').readline()), ensure_ascii=False, indent=2))"
+```
+
+`cikti/rapor.json` ise tüm sayıları yapılandırılmış biçimde saklar — birden çok veri setini karşılaştırmak istediğinizde buradan okursunuz.
+
+:::caution[PII maskeleme bir güvenlik ağıdır, sihir değil]
+Bu betikteki kalıplar (telefon, e-posta, IBAN, TCKN) Türkiye bağlamında en sık karşılaşılanları yakalar. Ama: ad-soyad, adres, plaka gibi kalıpsız kişisel veriler yakalanmaz. **Verinizi yayınlamadan veya paylaşmadan önce** [KVKK](https://www.kvkk.gov.tr/) kapsamındaki yükümlülüklerinizi değerlendirin; otomatik araçlar yardımcıdır, sorumluluğu üstlenmez. Ayrıntılar: [Veri Temizleme](/veri/veri-temizleme/).
+:::
+
+## 8) Buradan sonrası
+
+- Ürettiğiniz `temiz_veri.jsonl` tam olarak **SFT eğitimi formatıdır** (`messages` dizisi). [SFT](/llm/sft/) sayfasındaki eğitim betikleri bu dosyayı doğrudan okur — sıradaki adım [Adım Adım Eğitim](/llm/adim-adim-egitim/).
+- Farklı veri setlerini karşılaştırın: `--veri-seti` parametresiyle [Veri Nereden Bulunur](/veri/veri-nereden-bulunur/) sayfasındaki setleri deneyin; `cikti/rapor.json` dosyalarını yan yana koyunca setlerin "ham kirlilik profili" ortaya çıkar.
+- Kendi verinizi sıfırdan üretmek isterseniz [Kendi Verini Oluştur](/veri/kendi-verini-olustur/) sayfasına, hukuki boyut için aynı sayfadaki KVKK ve lisans bölümüne bakın.

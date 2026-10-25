@@ -1,0 +1,314 @@
+---
+title: "Örnek 4: Görsel Stil LoRA"
+description: ai-toolkit ile SDXL'e kendi görsellerinizle stil LoRA'sı eğitme rehberi — veri denetim betiği, hazır YAML config, ComfyUI'da kullanım ve gerçek denetim çıktısı.
+dogrulama: 2026-10-15
+---
+
+import veri from '../../../../ornekler/gorsel-lora/veri_kontrol.py?raw';
+import config from '../../../../ornekler/gorsel-lora/sdxl-lora-config.yaml?raw';
+import { Code } from 'astro-expressive-code/components';
+
+Bu, sitedeki dördüncü **çalıştırılabilir örnek proje**. [Görsel LoRA Eğitimi](/gorsel/lora-egitimi/) sayfası işin teorisini ve kohya hattını anlatıyordu; burada aynı işi 2026'nın araçlarından **ai-toolkit** ile uçtan uca kuruyoruz: veri setini eğitimden **önce** denetleyen bir betik, hazır bir SDXL LoRA config'i ve eğitilmiş LoRA'nın ComfyUI'da kullanımı. Hedef yeni kavram öğretmek değil; "veri toplama → caption → eğitim → test" hattını kopyalayıp kendi görsellerinizle çalıştırabileceğiniz dosyalara dönüştürmek.
+
+:::note[Bu makinede hangi kısım çalıştırıldı?]
+**veri_kontrol.py gerçekten çalıştırıldı.** Aşağıdaki denetim çıktısı, `cikti/test-gorseller/` klasörüne PIL ile üretilmiş 6 **sahte** görselden alınan gerçek çıktıdır (Python 3.12, Pillow 12.3.0). O görseller kasten kusurludur ve **gerçek bir veri setini temsil etmez**; amaç, betiğin kusurları yakaladığının kanıtlanmasıdır. **Eğitimin kendisi çalıştırılmadı:** ai-toolkit eğitimi GPU gerektirir, bu makinede GPU yoktur. Bu sayfada eğitim logu, örnek üretim veya süre gibi "gerçekmiş gibi" hiçbir sayı yok — ilgili yerlerde yalnızca "ne göreceksiniz" anlatılır. Sürüm ve fiyat bilgileri 2026 itibarıyladır.
+:::
+
+## 1) Ne yapıyoruz?
+
+Senaryo: kendi stilinizde (ör. suluboya, kömür kalem, kendinize özgü bir renk paleti) çizilmiş **15-30 görseliniz** var ve SDXL'e bu stili öğretip istediğiniz sahnede üretmek istiyorsunuz. İş hattı beş duraklı:
+
+```text
+1. Veri toplama     2. Caption              3. Denetim            4. Eğitim             5. Kullanım
+15-30 görsel  ───►  aynı adlı .txt  ───►  veri_kontrol.py  ───►  ai-toolkit   ───►  ComfyUI
+(1024px+)           + tetikleyici          (CPU, saniyeler)       (YAML config)      LoraLoader
+                                                                    └──► LoRA .safetensors
+```
+
+Veri kuralları (ayrıntısı [Görsel LoRA Eğitimi](/gorsel/lora-egitimi/) sayfasında):
+
+- **Sayı:** 15-30 görsel yeterli; çeşitlilik — açı, arka plan, kompozisyon — sayıdan önemli.
+- **Çözünürlük:** kısa kenar en az 1024px (SDXL standardı). Küçük görsel eğitimde büyütülür ve bulanıklık öğretir.
+- **Tekrar yok:** yan yana çekilmiş neredeyse aynı kareler aslında **tek görseldir**; bunu 4. bölümdeki denetim betiği otomatik bulur.
+- **Caption:** her görselin yanına **aynı adlı** `.txt`; tetikleyici kelime (ör. `stilim`) caption başına eklenir. Otomatik etiketleme için **WD14 tagger**, **Florence-2** veya **JoyCaption** kullanılabilir; makine etiketiyle üretip son hâlini gözle düzeltmek en verimli yol.
+- **Dil:** SDXL'in CLIP metin kodlayıcısı İngilizce ağırlıklı eğitildi; caption'ları İngilizce yazmak isabeti belirgin artırır. Tetikleyici kelime Türkçe kalabilir — o zaten "anlamsız" bir dize olmalıdır.
+
+## 2) Taban model ve lisans seçimi
+
+Taban model kararı, LoRA'nızın **nerelerde kullanılabileceğini** de belirler: taban modelin lisansı LoRA'nızı da bağlar. 2026 itibarıyla manzara şöyle:
+
+| Taban model | Lisans | Eğitim için yaklaşık VRAM | Not |
+| --- | --- | --- | --- |
+| **SDXL** (base 1.0) | CreativeML Open RAIL++-M | 12 GB rahat, 8 GB sınırda | Bu projenin seçimi: ticari kullanıma açık, araç desteği en olgun |
+| Z-Image 6B | Apache-2.0 | ~16 GB | Yeni nesil; izinler esnek, ekosistem SDXL kadar geniş değil |
+| FLUX.2 klein 4B | Apache-2.0 | ~12 GB (nicemlenmiş) | FLUX ailesinin küçük, izinleri esnek sürümü |
+| Qwen-Image | Apache-2.0 | ~24 GB (nicemlenmiş) | Metin/afiş ağırlıklı işlerde güçlü; resmî örnekleri "24gb" adıyla gelir |
+
+SDXL ile başlamamızın üç nedeni: **ticari kullanıma açık** ve köklü bir lisans, LoRA eğitim araçlarının (ai-toolkit, kohya, OneTrainer) en iyi desteklediği mimari olması ve 1024px kalitesiyle bu rehberdeki VRAM bütçelerine oturması.
+
+:::danger[Lisans uyarısı: FLUX.2-dev ile eğitilen LoRA ticari kullanılamaz]
+FLUX.2-dev, **non-commercial** (ticari olmayan) bir lisansla dağıtılıyor. Dev varyantıyla eğittiğiniz bir LoRA'yı, siz eğitmiş olsanız bile ticari bir işte kullanamaz veya ticari ürünle birlikte dağıtamazsınız — taban modelin lisansı türev çalışmanıza geçer. Ticari planınız varsa FLUX.2 **klein** (Apache-2.0), SDXL (Open RAIL++-M) veya listelenen diğer Apache-2.0 modellerden birini seçin. Modeli paylaşacaksanız model kartına taban modeli ve lisansı yazmayı da unutmayın: [Hugging Face'te Paylaşım](/kullanim/huggingface-paylasim/).
+:::
+
+## 3) Kurulum: ai-toolkit
+
+Bu projede eğitim tarafı **ai-toolkit** ile yapılıyor (MIT lisansı, [ostris/ai-toolkit](https://github.com/ostris/ai-toolkit)). YAML config ile çalışır, hem SDXL hem Flux LoRA eğitimini destekler; web arayüzü de vardır ama biz komut satırını kullanacağız. 2026 itibarıyla resmî kurulum adımları:
+
+```bash
+git clone https://github.com/ostris/ai-toolkit.git
+cd ai-toolkit
+python -m venv venv
+.\venv\Scripts\activate          # Windows
+# source venv/bin/activate       # Linux
+
+# Önce PyTorch kurulur; sürüm ve CUDA dizini zamanla değişir,
+# resmî README'deki komutu esas alın:
+pip install --no-cache-dir torch==2.13.0 torchvision==0.28.0 torchaudio==2.11.0 --index-url https://download.pytorch.org/whl/cu130
+pip install -r requirements.txt
+```
+
+Windows'ta derleme sorunları yaşarsanız topluluğun kolay kurulum scripti ([Tavris1/AI-Toolkit-Easy-Install](https://github.com/Tavris1/AI-Toolkit-Easy-Install)) işi tek tuşa indiriyor.
+
+| Alternatif araç | Arayüz | Kimin için |
+| --- | --- | --- |
+| ai-toolkit | YAML config + web UI | Bu projenin seçimi; SDXL ve Flux'u aynı yapıda destekler |
+| OneTrainer | Masaüstü GUI | Tıklamayla denemeyi sevenler; kohya benzeri bir deneyim |
+| SimpleTuner | YAML config | İleri kullanıcı; geniş model listesi ve ince ayar seçenekleri |
+
+:::tip[Veri denetim betiği eğitim ortamı istemez]
+Denetim betiği yalnızca Pillow ister ve GPU'suz her makinede çalışır. Eğitim ortamını (yukarıdaki ağır kurulum) hazırlamadan önce veri setini denetlemek, saatler sürecek eğitimden önce dakikalar içinde kusurları göstermenizi sağlar.
+:::
+
+## 4) Betikler ve config
+
+### veri_kontrol.py — eğitimden önceki kapı bekçisi
+
+Betik şunları denetler: format/boyut dağılımı, 1024px altı görseller, sha1 ile **birebir aynı** dosyalar, dHash ile **neredeyse aynı** kareler, eksik/fazla/boş caption'lar ve caption'lardaki tetikleyici kelime sayısı. Özeti `cikti/denetim-raporu.json` dosyasına yazar.
+
+<Code code={veri} lang="python" title="ornekler/gorsel-lora/veri_kontrol.py" />
+
+Kullanım:
+
+```bash
+cd ornekler/gorsel-lora
+pip install pillow            # sanal ortamda bir kez
+python veri_kontrol.py --klasor veri/stilim
+python veri_kontrol.py --klasor veri/stilim --tetikleyici stilim --cikti-klasoru cikti
+```
+
+### sdxl-lora-config.yaml — ai-toolkit config'i
+
+Config'teki tüm anahtar adları ai-toolkit'in resmî deposundan doğrulandı (2026 sürümü; `config/examples/` altındaki örnek config'ler ve `jobs/process/BaseSDTrainProcess.py`). Dosyayı ai-toolkit deposundaki `config/` klasörüne kopyalayıp işaretli iki yeri (veri klasörü ve test prompt'ları) doldurmanız yeterli:
+
+<Code code={config} lang="yaml" title="ornekler/gorsel-lora/sdxl-lora-config.yaml" />
+
+Config'teki kritik değerlerin özeti:
+
+| Ayar | Değer | Neden bu değer? |
+| --- | --- | --- |
+| `linear` (rank) | 32 | SDXL üslup işi için yeterli kapasite; 16 zayıf, 64 gereksiz büyük başlangıç |
+| `linear_alpha` | 32 | ai-toolkit resmî örnekleri alpha=rank kullanır |
+| `lr` | 1e-4 | SDXL LoRA için tipik başlangıç; örnek görseller bozulursa ilk düşürülecek değer |
+| `steps` | 1500 | SDXL stil için 1000-2000 aralığının ortası; ara kayıtlarla erken checkpoint'e dönülebilir |
+| `resolution` | 1024 | SDXL'in eğitildiği çözünürlük; diğer oranlar otomatik bucket'lanır |
+| `save_every` | 250 | Aşırı öğrenmeyi (overfit) erken yakalamanın yolu: eğitim sürerken ara dosyaları test et |
+| `train_text_encoder` | false | SDXL'de metin kodlayıcı eğitimi VRAM'i ciddi büyütür, üslup için genelde gereksiz |
+| `noise_scheduler` / `sampler` | `ddpm` | İkisi eşleşmek zorunda; SDXL'in gürültü programı ddpm |
+
+## 5) Gerçek denetim çıktısı: sahte kusurlu veri seti
+
+Betiği "her kusuru yakalıyor mu?" sorusuyla sınamak için `cikti/test-gorseller/` altına PIL ile 6 görsel ürettik ve **kasten altı kusur** yerleştirdik: 512x512 küçük bir görsel, bir görselin birebir kopyası, bir görselin birkaç pikseli değişik hâli, caption'ı olmayan bir görsel, karşılığı olmayan bir `.txt` ve tetikleyicisi silinmiş bir caption. Betiğin bu klasördeki **gerçek** çıktısı:
+
+```text title="Gerçek çalıştırma (sahte test görselleri): python veri_kontrol.py --klasor cikti/test-gorseller"
+============================================================
+1) Klasör taraması
+============================================================
+Klasör          : cikti\test-gorseller
+Görsel dosyası  : 6
+Caption (.txt)  : 6
+Tetikleyici     : 'stilim'
+
+============================================================
+2) Format ve boyut dağılımı
+============================================================
+Format dağılımı:
+  PNG   : 5 dosya
+  JPEG  : 1 dosya
+
+Boyut dağılımı (genişlik x yükseklik):
+  1024 x 1024 : 4 görsel
+   512 x  512 : 1 görsel
+  1536 x 1024 : 1 görsel
+
+En küçük kısa kenar: 512 px | Medyan: 1024 px
+
+============================================================
+3) Çok küçük görseller (kısa kenar < 1024px)
+============================================================
+  UYARI  sahne_02.jpg             512 x 512
+
+1 görsel 1024px altı. SDXL eğitiminde bu
+görseller büyütülerek kullanılır; bulanıklık ve detay kaybı üretir.
+Öneri: en az 1024 kısa kenarlı sürümlerle değiştirin.
+
+============================================================
+4) Birebir tekrarlar (sha1: bayt bayt aynı dosyalar)
+============================================================
+  Grup (sha1: sahne_01...): sahne_01.png, sahne_03.png
+
+1 tekrar grubu, toplam 1 fazladan kopya.
+Kopyalardan birini silmek yeterlidir.
+
+============================================================
+5) Yakın tekrarlar (dHash Hamming mesafesi <= 6/64)
+============================================================
+  sahne_01.png             <-> sahne_04.png             mesafe: 0/64
+  sahne_03.png             <-> sahne_04.png             mesafe: 0/64
+
+2 çift görsel olarak neredeyse aynı. Bunlar aynı
+pozu/frame'i iki kez sayar; birini eleyin. (Mesafe 0, gözle aynı
+dosyaların yeniden kaydedilmiş sürümleri anlamına gelir.)
+
+============================================================
+6) Caption (.txt) denetimi
+============================================================
+Eşleşme kuralı: her görselin yanında AYNI ADLI .txt dosyası olmalı.
+  Caption eksik : 1 görsel
+    sahne_05.png             -> beklenen: sahne_05.txt
+  Fazla caption : 1 dosya (karşılık görsel yok)
+    notlar.txt
+  Boş caption   : 0 dosya
+
+============================================================
+7) Tetikleyici kelime denetimi: 'stilim'
+============================================================
+Değerlendirilen caption     : 5 (görselsiz .txt'ler hariç)
+Tetikleyici içeren caption : 4 / 5
+Toplam geçiş sayısı        : 4
+Tetikleyici içermeyen caption'lar:
+  UYARI  sahne_06.txt
+
+Bu caption'lardaki görseller üslubu kelimeye bağlamaz; eğitimden
+önce tetikleyiciyi ekleyin (ör. caption başına: 'stilim, ...').
+
+============================================================
+ÖZET: Denetim sonucu
+============================================================
+  Toplam görsel dosyası                  6
+  Okunamayan dosya                       0
+  Kısa kenarı 1024px altı görsel         1
+  Birebir tekrar grubu (sha1)            1
+  Neredeyse aynı çift (dHash <= 6)       2
+  Caption eksik / fazla / boş            1 / 1 / 0
+  Tetikleyici içermeyen caption          1
+
+UYARILAR (eğitimden önce ele alın):
+  - 1 görselin kısa kenarı 1024px altında (SDXL için bulanıklık riski)
+  - 1 birebir tekrar grubu (sha1) var
+  - 2 çift neredeyse aynı görsel (dHash <= 6)
+  - 1 görselin caption'ı eksik
+  - 1 fazladan caption dosyası (görselsiz)
+  - 1 caption tetikleyici kelimeyi içermiyor
+
+Rapor yazıldı: D:\projects\model-egitimi-rehberi\ornekler\gorsel-lora\cikti\denetim-raporu.json
+```
+
+Aynı çalıştırmadan `cikti/denetim-raporu.json` (özet bölümü):
+
+```json title="cikti/denetim-raporu.json — gerçek çıktıdan alıntı"
+{
+  "ozet": {
+    "toplam_gorsel": 6,
+    "kucuk_gorsel": 1,
+    "tam_tekrar_grup": 1,
+    "yakin_tekrar_cift": 2,
+    "caption_eksik": 1,
+    "caption_fazla": 1,
+    "tetikleyici_iceren_caption": 4,
+    "tetikleyici_toplam_gecis": 4
+  }
+}
+```
+
+**Peki betik ne yakaladı?** Yerleştirilen altı kusurun altısı da rapora girdi:
+
+| Yerleştirilen kusur | Betiğin bulduğu yer |
+| --- | --- |
+| 512x512 görsel (SDXL için küçük) | Bölüm 3 uyarısı: `sahne_02.jpg 512 x 512` |
+| Birebir kopya dosya | Bölüm 4: `sahne_01.png` ve `sahne_03.png` aynı sha1 grubunda |
+| Birkaç pikseli değişik kopya | Bölüm 5: `sahne_01 <-> sahne_04` ve `sahne_03 <-> sahne_04`, mesafe 0/64 |
+| Caption'ı olmayan görsel | Bölüm 6: `sahne_05.png -> beklenen: sahne_05.txt` |
+| Karşılığı olmayan `.txt` | Bölüm 6: `notlar.txt` fazla caption olarak listelendi |
+| Tetikleyicisi silinmiş caption | Bölüm 7: `sahne_06.txt` işaretlendi |
+
+Özet tablonun ilk bakışta söylediği şey çarpıcı: **6 dosyalık "veri seti" aslında 4 farklı karedir.** Birebir kopya (01 = 03) ve kopyaya yakın kare (04) ayıklandığında elde kalan 4 görseldir. Gerçek veri setinizde bu kusurlar genelde daha gizlidir — kopyalar farklı sıkıştırmayla kaydedilmiştir, tetikleyici bir görselde unutulmuştur — ve dHash tam olarak bu gizli tekrarları yakalamak için vardır.
+
+:::caution[Sahte görsel uyarısı]
+Bu bölümdeki `cikti/test-gorseller/` klasörü **PIL ile çizilmiş, gerçek olmayan test görselleridir**. Kasten kusurlu üretilmişlerdir ve betiğin sınandığını göstermek dışında bir amaç taşımazlar. Gerçek bir eğitim veri setiyle çalışırken betiğin başlıkları aynıdır; sadece sayılar sizin klasörünüze göre çıkar.
+:::
+
+## 6) Eğitim ve izleme
+
+Config hazır olduğunda eğitim tek komutla başlar (ai-toolkit deposunun kökünden):
+
+```bash
+python run.py config/stilim-sdxl-lora.yaml
+```
+
+Çıktılar oturum adıyla `output/` altına yazılır:
+
+```text
+ai-toolkit/output/stilim-sdxl-lora-v1/
+├── *.safetensors    → LoRA kayıtları (save_every: 250'de bir ara kayıt + son kayıt)
+└── örnek görseller  → eğitim sürerken üretilen test üretimleri
+```
+
+Dosya adı kalıbı ai-toolkit sürümüne göre değişebilir; önemli olan `safetensors` uzantılı LoRA dosyasıdır — ComfyUI'ye giden tek şey budur. Eğitimi `Ctrl+C` ile durdurup aynı komutla devam ettirebilirsiniz; ancak **kayıt anında** keserseniz o checkpoint bozulur (resmî README'nin açık uyarısı).
+
+**Eğitim logunda ne görürsünüz?** Terminalde düzenli aralıklarla adım numarası ve kayıp (loss) değeri içeren satırlar akar; tam biçim sürüme göre değiştiği için burada örnek bir log koymuyoruz — bu sayfada eğitim çalıştırılmadı. İzlerken iki kaynağı birlikte okuyun:
+
+| Ne izlenir | Neye bakılır |
+| --- | --- |
+| Kayıp (loss) satırları | Düşüyor mu, dalgalanıyor mu? Sıfıra yakınsaması iyi haber değil, ezber işareti olabilir |
+| Örnek görseller (her 250 adım) | Aynı prompt ve sabit `seed` ile ara kayıtların üretimleri karşılaştırılır |
+
+:::caution[Tuzak 1: aşırı öğrenme (overfit)]
+İzlerken şu üç sinyal ezberi gösterir: (1) üretimler eğitim görsellerinin kopyasına yaklaşıyorsa, (2) arka planı değiştirseniz de sahne değişmiyorsa, (3) tetikleyici kelime olmadan da stil zorla beliriyorsa. Çözüm tek: **daha erken bir ara kayda dönün**. Az eğitilmiş bir LoRA her zaman kurtarılabilir; fazla eğilmiş olan kurtarılamaz. Bu yüzden `save_every: 250` ve adımları 1500'de tutuyoruz — kuramı [Görsel LoRA Eğitimi](/gorsel/lora-egitimi/) sayfasında derinleştirdik.
+:::
+
+:::caution[Tuzak 2: caption kalitesi]
+Eğitim "görselin tamamı" değil, "caption'ın **anlatmadığı** kısım" üzerinden öğrenir. Tetikleyicisiz bir caption, üslubu kelimeye bağlamayı imkânsızlaştırır (bölüm 5'teki `sahne_06.txt` gibi). Fazla ayrıntılı veya yanlış caption ise stille içeriği karıştırır. Altın kural: **neyi öğretiyorsanız onu etiketleyin, gerisini modelin bildiğine bırakın.**
+:::
+
+:::note[Tuzak 3: lisans]
+Küçük ama pahalı bir hata: 8 GB'lık bir kartla FLUX.2-dev eğitmek teknik olarak mümkün olabilir ama o LoRA ticari kullanılamaz (bkz. bölüm 2). VRAM sıkışıksanız önce [VRAM Hesabı](/donanim/vram-hesabi/) sayfasındaki tablolarla bütçe yapın, yetmiyorsa [Bulut Seçenekleri](/donanim/bulut-secenekleri/) sayfasından kiralık GPU değerlendirin.
+:::
+
+## 7) ComfyUI'da kullanım
+
+Eğitim bittiğinde elinizde MB'lar mertebesinde tek bir `.safetensors` dosyası olur. ComfyUI'da üç adım:
+
+1. Dosyayı `ComfyUI/models/loras/` klasörüne kopyalayın.
+2. Checkpoint Loader (SDXL base) ile KSampler arasına **LoraLoader** düğümünü ekleyin; `model` ve `clip` girişlerini zincirleyin.
+3. Gücü (strength) başlangıçta **0.8** yapın; 0.6-1.0 aralığını tarayarak karşılaştırın.
+
+Test prompt'unda tetikleyici kelime mutlaka geçmeli:
+
+```text title="örnek test prompt'u (CLIP tabanlı SDXL İngilizce anlar)"
+stilim, watercolor landscape, misty mountains and a lake, pastel colors
+```
+
+Test ederken iki soru sorun:
+
+- **Genelleme testi:** Eğitimde hiç görülmemiş sahneler (başka mevsim, kalabalık şehir) isteyin; stil hâlâ geliyorsa model ezberlememiş, öğrenmiştir.
+- **Tetikleyicisiz test:** Tetikleyici yazmadan da stil beliriyorsa aşırı öğrenmiş olabilir; daha erken checkpoint'e dönün.
+
+LoRA tek başına çalışmaz; SDXL base üzerine uygulanan bir **yamadır**. Yükleyip kalıcı hâle getirmek isterseniz (tek dosya hâlinde taşımak için) [LoRA Birleştirme](/kullanim/lora-birlestirme/) sayfasındaki yöntem işinizi görür — birleştirilmiş model de taban modelin lisansını taşır.
+
+## 8) Sonraki adımlar
+
+- **Kuramı tazeleyin:** Stil mi karakter mi öğrettiğiniz, caption stratejisi ve kohya alternatifi için [Görsel LoRA Eğitimi](/gorsel/lora-egitimi/); difüzyonun nasıl çalıştığı için [Difüzyon Temelleri](/gorsel/diffusion-temelleri/).
+- **Flux'a geçin:** Aynı ai-toolkit altyapısıyla Flux LoRA eğitmek isterseniz config'te `is_flux: true` + `quantize: true` + `noise_scheduler: flowmatch` değişiklikleri ve rank 16-32, 1000-2500 adım aralığı yeterli — 16 GB ve üzeri VRAM gerekir.
+- **Veri tarafında kalın:** Denetim çıktısında uyarılar bitsin istiyorsanız [Örnek 2: Veri Temizleme Atölyesi](/ornekler/veri-temizleme/)'ndeki yaklaşımın kardeşidir bu betik; her ikisi de "eğitimden önce ucuz denetim" ilkesiyle çalışır.
+- **Paylaşın:** LoRA'nızı topluluğa açacaksanız model kartında taban modeli, lisansı ve tetikleyici kelimeyi yazmayı unutmayın: [Hugging Face'te Paylaşım](/kullanim/huggingface-paylasim/).
+- **Serinin diğer örnekleri:** LLM tarafına geçmek isterseniz [Örnek 3: Türkçe Sohbet Asistanı](/ornekler/turkce-asistan/); dört projenin karşılaştırması ve önerilen sıra için [Örnek Projeler: Genel Bakış](/ornekler/genel-bakis/).

@@ -1,0 +1,51 @@
+EMINLIK OLCUM KAFESI
+  baslangic: 2026-10-17 23:04:00
+  python 3.12.10 | Windows 11
+  ollama 0.40.5 | sohbet qwen2.5:3b-instruct-q4_K_M | gomme bge-m3
+  mod: DUMAN | kol: b
+  sozlesme notu: eval_count logprob kayindan 1 fazladir (probda olculen off-by-one); ortalamalar KAYIT sayisina alinir
+
+=========================================================
+KOL B - CEVAP-HARF OLASILIGI (P(True) kalibi, T=0, num_predict=1)
+=========================================================
+  istem kalibi (bir kerelik):
+  'cigi (tokenizer sozlugui) kactir?\nSIKKLAR:\nA) 128.256\nB) 151.936\nC) 262.208\nD) 50.257\n\nYalnizca dogru sikkin harfini yaz. Baska hicbir karakter yazma.'
+B1  | 21.23 sn | bilgi     | altin A secim C    | P(altin) 0.0000   | en yuksek C
+     P vektoru  A=0.0000 B=0.0364 C=0.9634 D=0.0002
+B2  |  2.42 sn | bilgi     | altin B secim C    | P(altin) 0.0000   | en yuksek C
+     P vektoru  A=0.0000 B=0.0000 C=1.0000 D=0.0000
+B3  |  2.33 sn | bilgi     | altin C secim C    | P(altin) 1.0000   | en yuksek C
+     P vektoru  A=0.0000 B=0.0000 C=1.0000 D=0.0000
+B4  |  2.16 sn | bilgi     | altin D secim B    | P(altin) 0.0000   | en yuksek B
+     P vektoru  A=0.0006 B=0.9993 C=0.0000 D=0.0000
+B5  |  2.35 sn | bilgi     | altin A secim C    | P(altin) 0.0000   | en yuksek C
+     P vektoru  A=0.0000 B=0.0000 C=1.0000 D=0.0000
+B6  |  2.25 sn | bilgi     | altin B secim C    | P(altin) 0.0059   | en yuksek C
+     P vektoru  A=0.0000 B=0.0059 C=0.9941 D=0.0000
+
+---------------------------------------------------------
+KOL B OZETI
+  onemli: esik, SECILEN harfin olasiligi uzerinden taranir (uretimde altin
+  etiket bilinmez). P(altin) satirlari YALNIZ analiz degeridir, esik kurmaz.
+  bilgi sorulari: toplam 6 | olculen 6 | aday-eksik (metrik disi) 0 | harf disi secim (bicim kirilmasi) 0
+  dogru secim 1/6 (0.17)
+  secim harfi dagilimi: A:0 B:1 C:5 D:0 | en sik 0.83
+  [GECERSIZLIK KAPISI] tek bir harf secimlerin yarisindan cogunu aldi: bu kolda P(secilen) konum yanliliginin olcusudur, bilginin degil. Esik/risk tablolaru bu durumda ayirici sayilmaz; serbest metin kolu (D/G) ayni sorularin icerik kontroludur.
+  dogru secimlerin P(secilen): min 1.0000 | ort 1.0000 | max 1.0000
+  yanlis secimlerin P(secilen): min 0.9634 | ort 0.9914 | max 1.0000
+  ayrisma payi (en kotu dogru - en iyi yanlis): -0.0000
+  [analiz] P(altin) dogrularda: ort 1.0000 (min 1.0000 max 1.0000)
+  [analiz] P(altin) yanlislarda: ort 0.0012 (min 0.0000 max 0.0059)
+  esik tarasi (P(secilen) >= tau -> cevap ver; yoksa cekil):
+    tau 0.30  | kapsama 1.00 ( 6/6) | risk 0.833
+    tau 0.40  | kapsama 1.00 ( 6/6) | risk 0.833
+    tau 0.50  | kapsama 1.00 ( 6/6) | risk 0.833
+    tau 0.60  | kapsama 1.00 ( 6/6) | risk 0.833
+    tau 0.70  | kapsama 1.00 ( 6/6) | risk 0.833
+    tau 0.80  | kapsama 1.00 ( 6/6) | risk 0.833
+    tau 0.90  | kapsama 1.00 ( 6/6) | risk 0.833
+    tau 0.95  | kapsama 1.00 ( 6/6) | risk 0.833
+    tau 0.99  | kapsama 0.83 ( 5/6) | risk 0.800
+  -> b.json yazildi (6 kayit)
+
+bitti: 2026-10-17 23:04:33

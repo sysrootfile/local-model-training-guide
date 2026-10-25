@@ -1,0 +1,222 @@
+koşum başlangıcı: 2026-10-17 14:21:44
+denetlenen araç: ornekler/veri-temizleme/atolye.py içindeki pii_maskele + regex sabitleri
+tarama maskesiz yapılır (neyi gördüğü sayılır); maskeleme ayrı bir geçişte denenir
+
+==============================================================================
+KOL A: KALİBRASYON KÜMESİ (sentetik, elle etiketli)
+==============================================================================
+vaka sayısı: 30   tohum=20261017
+tur dağılımı: POZİTİF=12, KUYRUK=9, KÖR NOKTA=9
+
+[01] POZİTİF     tckn          -> yakalandı
+     sağlaması tutan kimlik no
+     vuruşlar: {'tckn': ['50721788862']}
+
+[02] POZİTİF     tckn          -> yakalandı
+     ikinci geçerli, noktalı bağlam
+     vuruşlar: {'tckn': ['98592786846']}
+
+[03] KUYRUK      tckn          -> doğru red
+     geçerlinin tek hanesi kaydırıldı -> sağlama düşer
+
+[04] KUYRUK      tckn          -> doğru red
+     sıfırla başlayan 11 hane
+
+[05] KUYRUK      tckn          -> doğru red
+     şans eseri yazılmış 11 hanelik diziler
+
+[06] KÖR NOKTA   tckn          -> kapsam dışı (kabul)
+     ayraç gruplu geçerli kimlik no
+
+[07] KÖR NOKTA   tckn          -> kapsam dışı (kabul)
+     nokta gruplu geçerli kimlik no
+
+[08] POZİTİF     eposta        -> yakalandı
+     klasik
+     vuruşlar: {'eposta': ['veli.yilmaz@ornek.org']}
+
+[09] POZİTİF     eposta        -> yakalandı
+     büyük harf
+     vuruşlar: {'eposta': ['VELI.YILMAZ@ORNEK.ORG']}
+
+[10] POZİTİF     eposta        -> yakalandı
+     artı etiketi, çok noktalı alan adı
+     vuruşlar: {'eposta': ['veli+liste@alt-alan.com.tr']}
+
+[11] POZİTİF     eposta        -> yakalandı
+     HTML mailto bağlantısı
+     vuruşlar: {'eposta': ['veli@ornek.org', 'veli@ornek.org']}
+
+[12] KUYRUK      eposta        -> doğru red
+     et içermeyen düz ad
+
+[13] KÖR NOKTA   eposta        -> kapsam dışı (kabul)
+     sözcükle obfuscate edilmiş
+
+[14] POZİTİF     telefon       -> yakalandı
+     başında sıfır, boşluklu
+     vuruşlar: {'telefon': ['0532 123 45 67']}
+
+[15] POZİTİF     telefon       -> yakalandı
+     ülke kodlu
+     vuruşlar: {'telefon': ['+90 532 123 45 67']}
+
+[16] POZİTİF     telefon       -> yakalandı
+     sabit hat, parantez+tire
+     vuruşlar: {'telefon': ['0212) 345-67-89']}
+
+[17] POZİTİF     telefon       -> yakalandı
+     boşluksuz, sıfırsız
+     vuruşlar: {'telefon': ['5321234567']}
+
+[18] KUYRUK      telefon       -> doğru red
+     sürüm numarası
+
+[19] KUYRUK      telefon       -> doğru red
+     14 hanelik dizi (iki koşut alan adı)
+
+[20] KUYRUK      telefon       -> doğru red
+     tek grup eksik yazılmış (10 değil 9 hane)
+
+[21] KÖR NOKTA   telefon       -> kapsam dışı (kabul)
+     ikişerli gruplı numara
+
+[22] POZİTİF     iban          -> yakalandı
+     mod-97 tutan IBAN
+     vuruşlar: {'iban': ['TR680001234567890123456789']}
+
+[23] POZİTİF     iban          -> yakalandı
+     boşluklu; mod-97 tutmasa da biçim IBAN
+     vuruşlar: {'iban': ['TR33 0001 0001 2345 6789 0123 45']}
+
+[24] KUYRUK      iban          -> doğru red
+     IBAN biçimi olmayan TR + 2 hane
+
+[25] KUYRUK      iban          -> yanlış pozitif
+     TR + 24 özdeş hane
+     vuruşlar: {'iban': ['TR111111111111111111111111']}
+
+[26] KÖR NOKTA   ad-soyad      -> kapsam dışı (kabul)
+     adres + ad soyad
+
+[27] KÖR NOKTA   dogum-tarihi  -> kapsam dışı (kabul)
+     doğum tarihi
+
+[28] KÖR NOKTA   konum         -> kapsam dışı (kabul)
+     GPS koordinatı
+
+[29] KÖR NOKTA   plaka         -> kapsam dışı (kabul)
+     plaka
+
+[30] KÖR NOKTA   saglik        -> kapsam dışı (kabul)
+     sağlık bilgisi (özel nitelikli veri)
+
+--- özet ---
+yakalandı                12
+KAPSAM İÇİ KAÇIRILDI     0
+yanlış pozitif           1
+doğru red                8
+kapsam dışı (kabul)      9
+sürpriz vuruş            0
+
+tutma (recall, kapsam içi) : 12/12 = 1.00
+yanlış pozitif              : 1/9 kuyruk vakası işaretlendi
+kapsam dışı kişisel veri  : 9/9 kaçırıldı (tarayıcının gördüğü dilim bu)
+
+--- biçim mi, geçerlilik mi? ---
+IBAN mod-97 tutan    : TR680001234567890123456789  -> sağlayıcı: True
+IBAN mod-97 tutmayan : TR690001234567890123456789  -> sağlayıcı: False
+maskeleyici ikisini de IBAN sayıyor mu: True
+IBAN biçimli sahte dizi TR111111111111111111111111: maskeleyici VURUYOR, mod-97 False
+11 haneli rakam dizisi 12345678901: yalın regex VURUYOR, sağlama False
+pozitiflerin hepsi tek geçişte: 13 maske
+maske örneği: Müşteri kaydımızda [TC-KIMLIK] numarası ile açılmış bir dosya var.
+
+==============================================================================
+KOL B: DEPO TARAMASI (bu sitenin kendi yayınları + örnek kütlevi)
+==============================================================================
+grup                    dosya    karakter  TCKN-aday  TCKN-geçerli  e-posta  telefon  IBAN  IBAN-mod97
+yayındaki sayfalar         58      862300          4             3        4        1     3           1
+örnek veri kümeleri         3    47049122         20             0      149       68     1           0
+koşum günlükleri           33      192645          4             4        4        4     0           0
+betikler ve README         28      274187          6             1        6        5     3           0
+TOPLAM                    122    48378254         34             8      163       78     7           1
+koşum süresi: 12.68 sn (tek süreç, CPU)
+11 haneli rakam dizilerinin sağlama tutan oranı: 8/34 = 0.235  -> yalın '\d{11}' kullansaydık 26 yanlış maske
+
+--- vuruş örnekleri ---
+tckn_gecerli: 8 örnek
+   - lisans-ve-model-karti.md: 10000000146
+   - veri-temizleme.mdx: 10000000146
+   - veri-temizleme.mdx: 10000000146
+   - calistirma-kaydi-oncesi-2026-10-15.txt: 10000000146
+   - calistirma-kaydi-oncesi-2026-10-15.txt: 10000000146
+   - calistirma-kaydi.txt: 10000000146
+   - calistirma-kaydi.txt: 10000000146
+eposta: 18 örnek
+   - lisans-ve-model-karti.md: jdoe@email.com
+   - veri-temizleme.mdx: ali@example.com
+   - veri-temizleme.mdx: ali@example.com
+   - veri-temizleme.mdx: jdoe@email.com
+   - egitim.jsonl: support@etkinlik.com
+   - egitim.jsonl: etik@tmmob.org.tr
+   - egitim.jsonl: etik.kilavuz@saglik.gov.tr
+telefon: 15 örnek
+   - veri-temizleme.mdx: 0532 123 45 67
+   - egitim.jsonl: 0212 555 00 00
+   - egitim.jsonl: +90 555 123 4567
+   - egitim.jsonl: +90 555 123 4567
+   - test.jsonl: +90 531 123 4567
+   - test.jsonl: +90 531 123 4567
+   - test.jsonl: +90 555 000 00 00
+iban: 7 örnek
+   - lisans-ve-model-karti.md: TR111111111111111111111111
+   - lisans-ve-model-karti.md: TR680001234567890123456789
+   - lisans-ve-model-karti.md: TR00 0000 0000 0000 0000 0000 01
+   - egitim.jsonl: TR00 0000 0000 0000 0000 0000 01
+   - pii_denetim.py: TR33 0001 0001 2345 6789 0123 45
+   - pii_denetim.py: TR111111111111111111111111
+   - pii_denetim.py: TR111111111111111111111111
+iban_mod97: 1 örnek
+   - lisans-ve-model-karti.md: TR680001234567890123456789
+
+--- örnek veri kümelerinde dosya bazında döküm ---
+  egitim.jsonl           karakter  43422352  e-posta  130  telefon  61  IBAN  1  TCKN-aday  14  geçerli  0  hazır-maske-token 4
+  test.jsonl             karakter   2305986  e-posta   19  telefon   7  IBAN  0  TCKN-aday   2  geçerli  0  hazır-maske-token 0
+  temiz_veri.jsonl       karakter   1320784  e-posta    0  telefon   0  IBAN  0  TCKN-aday   4  geçerli  0  hazır-maske-token 2
+
+--- yayındaki sayfalarda en çok vuruş ---
+  biçim:   4  geçerli-TCKN:  2  src\content\docs\ornekler\veri-temizleme.mdx
+  biçim:   4  geçerli-TCKN:  1  src\content\docs\kullanim\lisans-ve-model-karti.md
+  biçim:   0  geçerli-TCKN:  0  src\content\docs\veri\veri-turleri.md
+  biçim:   0  geçerli-TCKN:  0  src\content\docs\veri\veri-temizleme.md
+  biçim:   0  geçerli-TCKN:  0  src\content\docs\veri\veri-nereden-bulunur.md
+  biçim:   0  geçerli-TCKN:  0  src\content\docs\veri\veri-formatlari.md
+  biçim:   0  geçerli-TCKN:  0  src\content\docs\veri\kendi-verini-olustur.md
+  biçim:   0  geçerli-TCKN:  0  src\content\docs\temeller\transformer.md
+  ... 56/58 sayfada sıfır biçim vuruşu
+
+==============================================================================
+KOL C: AGRESİF NORMALİZASYONUN FATURASI (ayraç silme)
+==============================================================================
+kalibrasyondaki kör noktalar ayraç silinince:
+  - tckn          ayraç gruplu geçerli kimlik no                 -> {'tckn': ['50721788862']}
+  - tckn          nokta gruplu geçerli kimlik no                 -> {'tckn': ['98592786846']}
+  - eposta        sözcükle obfuscate edilmiş                     -> yine yok
+  - telefon       ikişerli gruplı numara                         -> {'telefon': ['05321234567']}
+  - ad-soyad      adres + ad soyad                               -> yine yok
+  - dogum-tarihi  doğum tarihi                                   -> yine yok
+  - konum         GPS koordinatı                                 -> yine yok
+  - plaka         plaka                                          -> yine yok
+  - saglik        sağlık bilgisi (özel nitelikli veri)           -> yine yok
+
+deponun tümünde ayraç silme öncesi/sonrası:
+  yayındaki sayfalar     TCKN-aday     4 ->     7   |  geçerli TCKN   3 ->   3   | telefon     1 ->     5   | IBAN   3 ->   3   | mod97   1 ->   1
+  örnek veri kümeleri    TCKN-aday    20 ->    32   |  geçerli TCKN   0 ->   0   | telefon    68 ->    71   | IBAN   1 ->   1   | mod97   0 ->   0
+  koşum günlükleri       TCKN-aday     4 ->     8   |  geçerli TCKN   4 ->   4   | telefon     4 ->    18   | IBAN   0 ->   0   | mod97   0 ->   0
+  betikler ve README     TCKN-aday     6 ->    10   |  geçerli TCKN   1 ->   1   | telefon     5 ->    13   | IBAN   3 ->   3   | mod97   0 ->   0
+koşum süresi: 26.84 sn
+
+yorum: ayraç silme bitişik-hane kuralını gevşetir; kazandığı her gerçek vuruş için arka planda birleşen rakam dizileri kadar da YENİ ADAY üretir. Aday artışı sağlama filtresiyle bastırılabilir, telefon/IBAN artışı bastırılamaz.
+
+koşum bitişi: 2026-10-17 14:22:36

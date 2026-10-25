@@ -1,0 +1,232 @@
+TEKRARLANABILIRLIK OLCUM KAFESI
+  baslangic: 2026-10-17 11:04:59
+  python 3.12.10 | Windows 11
+  ollama 0.40.4 | model qwen2.5:3b-instruct-q4_K_M | tekrar 10 | varsayilan num_predict 48
+
+K0 - VARSAYILAN NUM_PREDICT ARAMASI
+   gonderim: options = {temperature: 0} (num_predict YOK)
+  K0.1: duvar 80.58 sn | ctki token 1060 | bitis stop
+  K0.2: duvar 111.88 sn | ctki token 1460 | bitis stop
+  K0.3: duvar 111.79 sn | ctki token 1460 | bitis stop
+
+A1 | kapali | T=0.0 | seed=- | format=yok | num_predict=48 | 10 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yanitiniz tek kelime olsun, yildan bask
+   1. [7b7a53e239] duvar  1.07 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2020'
+   2. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   3. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   4. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   5. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   6. [7b7a53e239] duvar  0.34 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   7. [7b7a53e239] duvar  0.36 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   8. [7b7a53e239] duvar  0.34 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   9. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+  10. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+
+A2 | kapali | T=0.0 | seed=1234 | format=yok | num_predict=48 | 10 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yanitiniz tek kelime olsun, yildan bask
+   1. [7b7a53e239] duvar  0.41 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2020'
+   2. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   3. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   4. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   5. [7b7a53e239] duvar  0.34 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   6. [7b7a53e239] duvar  0.36 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   7. [7b7a53e239] duvar  0.40 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   8. [7b7a53e239] duvar  0.34 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   9. [7b7a53e239] duvar  0.34 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+  10. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+
+A3 | kapali | T=0.8 | seed=- | format=yok | num_predict=48 | 10 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yanitiniz tek kelime olsun, yildan bask
+   1. [05a5cf0698] duvar  0.38 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2021'
+   2. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2020'
+   3. [05a5cf0698] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2021'
+   4. [7b7a53e239] duvar  0.34 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2020'
+   5. [05a5cf0698] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2021'
+   6. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2020'
+   7. [65d2ea0342] duvar  0.37 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2015'
+   8. [c8758b5170] duvar  0.40 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2011'
+   9. [c8758b5170] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2011'
+  10. [8038da89e4] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2013'
+
+A4 | kapali | T=0.8 | seed=1234 | format=yok | num_predict=48 | 10 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yanitiniz tek kelime olsun, yildan bask
+   1. [7b7a53e239] duvar  0.37 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2020'
+   2. [7b7a53e239] duvar  0.34 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   3. [7b7a53e239] duvar  0.39 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   4. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   5. [7b7a53e239] duvar  0.36 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   6. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   7. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   8. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   9. [7b7a53e239] duvar  0.41 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+  10. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+
+A5 | kapali | T=0.8 | seed=1234 | format=yok | num_predict=48 | 10 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yanitiniz tek kelime olsun, yildan bask
+   1. [7b7a53e239] duvar  0.36 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2020'
+   2. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   3. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   4. [7b7a53e239] duvar  0.34 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   5. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   6. [7b7a53e239] duvar  0.36 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   7. [7b7a53e239] duvar  0.36 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   8. [7b7a53e239] duvar  0.34 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   9. [7b7a53e239] duvar  0.36 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+  10. [7b7a53e239] duvar  0.34 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+
+A6 | kapali | T=0.8 | seed=9999 | format=yok | num_predict=48 | 10 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yanitiniz tek kelime olsun, yildan bask
+   1. [7b7a53e239] duvar  0.36 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2020'
+   2. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   3. [7b7a53e239] duvar  0.34 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   4. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   5. [7b7a53e239] duvar  0.36 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   6. [7b7a53e239] duvar  0.40 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   7. [7b7a53e239] duvar  0.34 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   8. [7b7a53e239] duvar  0.36 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+   9. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+  10. [7b7a53e239] duvar  0.34 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+
+C1 | acik | T=0.8 | seed=- | format=yok | num_predict=200 | 10 tekrar
+   istem: Kadıköy'de bir kahve dükkânı için üç slogan öner. Her slogan bir satırda olsun
+   1. [134e2e6ea5] duvar  4.32 sn | girdi   59 | ctki  54 | bitis stop   | FARKLI | "1. Kadıköy'deki özel kahve senedi. 2. Sıcak içecekler ve güzellikler Kadık"
+   2. [3fab6ce63c] duvar  3.30 sn | girdi   59 | ctki  51 | bitis stop   | FARKLI | "1. Kadıköy'in duygusuna uygun kahve. 2. Her gün, Kadıköy kahvesi. 3. Kadık"
+   3. [099944bc42] duvar  3.64 sn | girdi   59 | ctki  55 | bitis stop   | FARKLI | "1. Kadıköy'ün kokusuna uyan kahve. 2. Kadıköy kahvesi, geceleri yarattık. "
+   4. [f3ddcc4823] duvar  3.04 sn | girdi   59 | ctki  46 | bitis stop   | FARKLI | "1. Kadıköy'in temel hikayesini sertler. 2.每一杯都是对生活的敬意。 3. Kadıköy'de, her "
+   5. [125047de3f] duvar  3.88 sn | girdi   59 | ctki  59 | bitis stop   | FARKLI | "1. Kadıköy'in güllerini boya: Kadıköy Kahvesi 2. Kadıköy'deki yaşam, Kadık"
+   6. [a53a645cbd] duvar  3.46 sn | girdi   59 | ctki  52 | bitis stop   | FARKLI | "1. Kadıköy'deki eski tarz kahve. 2. Tarihi güzellikler, taze kahve için. 3"
+   7. [3704df6064] duvar  4.02 sn | girdi   59 | ctki  59 | bitis stop   | FARKLI | "1. Kadıköy'in etkileyici kokusuna indirim! 2. Kadıköy kahvesi, sevinçlerin"
+   8. [e52b593349] duvar  3.65 sn | girdi   59 | ctki  55 | bitis stop   | FARKLI | "1. Kadıköy'sün kahve kraliyetini! 2. Kadıköy'de doğrudan, doğroya! 3. Kadı"
+   9. [4a69d516fb] duvar  3.82 sn | girdi   59 | ctki  58 | bitis stop   | FARKLI | "1. Kadıköy'in güzelliklerini içine koyun. 2. Koca mete'nin güzelliklerini "
+  10. [1d9c330e98] duvar  3.84 sn | girdi   59 | ctki  58 | bitis stop   | FARKLI | "1. Kadıköy'un tadına uygun kahve. 2. Her zamanki Kadıköy kahvesi, her zama"
+
+C2 | acik | T=0.8 | seed=1234 | format=yok | num_predict=200 | 10 tekrar
+   istem: Kadıköy'de bir kahve dükkânı için üç slogan öner. Her slogan bir satırda olsun
+   1. [9aa574474d] duvar  4.52 sn | girdi   59 | ctki  68 | bitis stop   | FARKLI | "1. Kadıköy'in sohbeti, kahve dükkânımıza gir. 2. Kadıköy kahvesini, her gü"
+   2. [9aa574474d] duvar  4.72 sn | girdi   59 | ctki  68 | bitis stop   | AYNI | "1. Kadıköy'in sohbeti, kahve dükkânımıza gir. 2. Kadıköy kahvesini, her gü"
+   3. [9aa574474d] duvar  4.48 sn | girdi   59 | ctki  68 | bitis stop   | AYNI | "1. Kadıköy'in sohbeti, kahve dükkânımıza gir. 2. Kadıköy kahvesini, her gü"
+   4. [9aa574474d] duvar  4.54 sn | girdi   59 | ctki  68 | bitis stop   | AYNI | "1. Kadıköy'in sohbeti, kahve dükkânımıza gir. 2. Kadıköy kahvesini, her gü"
+   5. [9aa574474d] duvar  4.54 sn | girdi   59 | ctki  68 | bitis stop   | AYNI | "1. Kadıköy'in sohbeti, kahve dükkânımıza gir. 2. Kadıköy kahvesini, her gü"
+   6. [9aa574474d] duvar  4.51 sn | girdi   59 | ctki  68 | bitis stop   | AYNI | "1. Kadıköy'in sohbeti, kahve dükkânımıza gir. 2. Kadıköy kahvesini, her gü"
+   7. [9aa574474d] duvar  4.51 sn | girdi   59 | ctki  68 | bitis stop   | AYNI | "1. Kadıköy'in sohbeti, kahve dükkânımıza gir. 2. Kadıköy kahvesini, her gü"
+   8. [9aa574474d] duvar  4.48 sn | girdi   59 | ctki  68 | bitis stop   | AYNI | "1. Kadıköy'in sohbeti, kahve dükkânımıza gir. 2. Kadıköy kahvesini, her gü"
+   9. [9aa574474d] duvar  4.45 sn | girdi   59 | ctki  68 | bitis stop   | AYNI | "1. Kadıköy'in sohbeti, kahve dükkânımıza gir. 2. Kadıköy kahvesini, her gü"
+  10. [9aa574474d] duvar  4.59 sn | girdi   59 | ctki  68 | bitis stop   | AYNI | "1. Kadıköy'in sohbeti, kahve dükkânımıza gir. 2. Kadıköy kahvesini, her gü"
+
+C3 | acik | T=0.8 | seed=1234 | format=yok | num_predict=200 | 10 tekrar
+   istem: Kadıköy'de bir kahve dükkânı için üç slogan öner. Her slogan bir satırda olsun
+   1. [9aa574474d] duvar  4.48 sn | girdi   59 | ctki  68 | bitis stop   | FARKLI | "1. Kadıköy'in sohbeti, kahve dükkânımıza gir. 2. Kadıköy kahvesini, her gü"
+   2. [9aa574474d] duvar  4.53 sn | girdi   59 | ctki  68 | bitis stop   | AYNI | "1. Kadıköy'in sohbeti, kahve dükkânımıza gir. 2. Kadıköy kahvesini, her gü"
+   3. [9aa574474d] duvar  4.53 sn | girdi   59 | ctki  68 | bitis stop   | AYNI | "1. Kadıköy'in sohbeti, kahve dükkânımıza gir. 2. Kadıköy kahvesini, her gü"
+   4. [9aa574474d] duvar  4.49 sn | girdi   59 | ctki  68 | bitis stop   | AYNI | "1. Kadıköy'in sohbeti, kahve dükkânımıza gir. 2. Kadıköy kahvesini, her gü"
+   5. [9aa574474d] duvar  4.54 sn | girdi   59 | ctki  68 | bitis stop   | AYNI | "1. Kadıköy'in sohbeti, kahve dükkânımıza gir. 2. Kadıköy kahvesini, her gü"
+   6. [9aa574474d] duvar  4.53 sn | girdi   59 | ctki  68 | bitis stop   | AYNI | "1. Kadıköy'in sohbeti, kahve dükkânımıza gir. 2. Kadıköy kahvesini, her gü"
+   7. [9aa574474d] duvar  4.50 sn | girdi   59 | ctki  68 | bitis stop   | AYNI | "1. Kadıköy'in sohbeti, kahve dükkânımıza gir. 2. Kadıköy kahvesini, her gü"
+   8. [9aa574474d] duvar  4.45 sn | girdi   59 | ctki  68 | bitis stop   | AYNI | "1. Kadıköy'in sohbeti, kahve dükkânımıza gir. 2. Kadıköy kahvesini, her gü"
+   9. [9aa574474d] duvar  4.53 sn | girdi   59 | ctki  68 | bitis stop   | AYNI | "1. Kadıköy'in sohbeti, kahve dükkânımıza gir. 2. Kadıköy kahvesini, her gü"
+  10. [9aa574474d] duvar  4.43 sn | girdi   59 | ctki  68 | bitis stop   | AYNI | "1. Kadıköy'in sohbeti, kahve dükkânımıza gir. 2. Kadıköy kahvesini, her gü"
+
+D1 | json | T=0.8 | seed=- | format=json | num_predict=300 | 10 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yalnizca iki alanli JSON yaz: yil (sayi
+   1. [9f0abebab6] duvar  3.35 sn | girdi   74 | ctki  38 | bitis stop   | FARKLI | JSON ok yil=2022 alanlar=gercekce,yil | '{ "yil": 2022, "gercekce": "Marmaray 2022 yılında hizmete alınmıştır." }'
+   2. [0bdee0b83a] duvar  1.51 sn | girdi   74 | ctki  23 | bitis stop   | FARKLI | JSON ok yil=2022 alanlar=gereke,yil | '{ "yil": 2022, "gereke": "Ayet" }'
+   3. [253becebd8] duvar  2.57 sn | girdi   74 | ctki  38 | bitis stop   | FARKLI | JSON ok yil=2020 alanlar=gereken,yil | '{ "yil": 2020, "gereken": "Marmaray, 2020 yılında hizmete açıldı." }'
+   4. [8409abd471] duvar  1.61 sn | girdi   74 | ctki  24 | bitis stop   | FARKLI | JSON ok yil=2022 alanlar=gercekce,yil | '{ "yil": 2022, "gercekce": "Ayet" }'
+   5. [8409abd471] duvar  1.58 sn | girdi   74 | ctki  24 | bitis stop   | FARKLI | JSON ok yil=2022 alanlar=gercekce,yil | '{ "yil": 2022, "gercekce": "Ayet" }'
+   6. [27a7225d5a] duvar  4.16 sn | girdi   74 | ctki  62 | bitis stop   | FARKLI | JSON ok yil=2022 alanlar=gerekce,yil | '{ "yil": 2022, "gerekce": "Ayeti, Marmaray hizmeti, Türkiye\'nin ilk deniz '
+   7. [e78649512f] duvar  2.18 sn | girdi   74 | ctki  32 | bitis stop   | FARKLI | JSON ok yil=2011 alanlar=gereke,yil | '{ "yil": 2011, "gereke": "Hava yolu hizmetine acilmis" }'
+   8. [153b61a327] duvar  2.63 sn | girdi   74 | ctki  40 | bitis stop   | FARKLI | JSON ok yil=2023 alanlar=gereken,yil | '{ "yil": 2023, "gereken": "Aile Vakfı tarafından 2023 yılında hizmete açıl'
+   9. [a09ed5fccf] duvar  2.77 sn | girdi   74 | ctki  41 | bitis stop   | FARKLI | JSON ok yil=2022 alanlar=gereken,yil | '{ "yil": 2022, "gereken": "Ayet: Marmaray hizmeti 2022 yılında acildi." }'
+  10. [20561e34d5] duvar  2.53 sn | girdi   74 | ctki  39 | bitis stop   | FARKLI | JSON ok yil=2022 alanlar=gercekce,yil | '{ "yil": 2022, "gercekce": "Marmaray, 2022 yılında hizmete atanmıştır." }'
+
+D2 | json | T=0.8 | seed=- | format=sema | num_predict=300 | 10 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yalnizca iki alanli JSON yaz: yil (sayi
+   1. [4688aecb4c] duvar  2.68 sn | girdi   74 | ctki  39 | bitis stop   | FARKLI | JSON ok yil=2022 alanlar=gerekce,yil | '{ "yil": 2022, "gerekce": "Açılış tarihi 2022 yılında belirlenmiştir." }'
+   2. [39c22802fe] duvar  4.23 sn | girdi   74 | ctki  63 | bitis stop   | FARKLI | JSON ok yil=2017 alanlar=gerekce,yil | '{ "yil": 2017, "gerekce": "Marmaray, İstanbul\'un Akçabehçe ve Sisli bölgel'
+   3. [9f725ac6b7] duvar  5.29 sn | girdi   74 | ctki  79 | bitis stop   | FARKLI | JSON ok yil=2020 alanlar=gerekce,yil | '{ "yil": 2020, "gerekce": "Marmaray, İstanbul\'un Beleviçe ve Balıkpak\'tan '
+   4. [d73c78fe43] duvar  1.64 sn | girdi   74 | ctki  24 | bitis stop   | FARKLI | JSON ok yil=2022 alanlar=gerekce,yil | '{ "yil": 2022, "gerekce": "Ayet" }'
+   5. [cfd0ac6694] duvar  6.84 sn | girdi   74 | ctki 103 | bitis stop   | FARKLI | JSON ok yil=2020 alanlar=gerekce,yil | '{ "yil": 2020, "gerekce": "Marmaray, İstanbul\'un Sarayburnu ve Çanakkale\'n'
+   6. [f96b515cab] duvar  2.55 sn | girdi   74 | ctki  38 | bitis stop   | FARKLI | JSON ok yil=2022 alanlar=gerekce,yil | '{ "yil": 2022, "gerekce": "Alibaba Cloud tarafından 2022 yılında hizmete a'
+   7. [a0d76257ab] duvar  4.26 sn | girdi   74 | ctki  63 | bitis stop   | FARKLI | JSON ok yil=2019 alanlar=gerekce,yil | '{ "yil": 2019, "gerekce": "Marmaray, Türkiye\'nin İstanbul Havalimanı ile M'
+   8. [976dc9ec99] duvar  3.14 sn | girdi   74 | ctki  47 | bitis stop   | FARKLI | JSON ok yil=2020 alanlar=gerekce,yil | '{ "yil": 2020, "gerekce": "Marmaray, yani İstanbul Marmaray, 2020 yılında '
+   9. [d73c78fe43] duvar  1.62 sn | girdi   74 | ctki  24 | bitis stop   | FARKLI | JSON ok yil=2022 alanlar=gerekce,yil | '{ "yil": 2022, "gerekce": "Ayet" }'
+  10. [28f09fb7cf] duvar  2.04 sn | girdi   74 | ctki  30 | bitis stop   | FARKLI | JSON ok yil=2022 alanlar=gerekce,yil | '{ "yil": 2022, "gerekce": "Aşağıda tanımlanmıştır." }'
+
+D3 | json | T=0.8 | seed=- | format=sema | num_predict=48 | 10 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yalnizca iki alanli JSON yaz: yil (sayi
+   1. [69486d9d67] duvar  3.27 sn | girdi   74 | ctki  48 | bitis length | FARKLI | JSON BOZUK yil=None alanlar=- | '{ "yil": 2019, "gerekce": "Marmaray (İngilizce: Marmaray) İstanbul\'unuz\'da'
+   2. [c9a41e8807] duvar  3.26 sn | girdi   74 | ctki  48 | bitis length | FARKLI | JSON BOZUK yil=None alanlar=- | '{ "yil": 2022, "gerekce": "Ayet: Marmaray, 2022 yılında Akdeniz Bölgesi il'
+   3. [eafa72f703] duvar  3.19 sn | girdi   74 | ctki  48 | bitis length | FARKLI | JSON BOZUK yil=None alanlar=- | '{ "yil": 2021, "gerekce": "Marmaray, Türkiye\'nin İstanbul\'un newa Hatırapr'
+   4. [364de0f413] duvar  3.26 sn | girdi   74 | ctki  48 | bitis length | FARKLI | JSON BOZUK yil=None alanlar=- | '{ "yil": 2019, "gerekce": "Marmaray, Türkiye\'nin ilk metro hattı olarak hi'
+   5. [a4421f4f91] duvar  3.26 sn | girdi   74 | ctki  48 | bitis length | FARKLI | JSON BOZUK yil=None alanlar=- | '{ "yil": 2021, "gerekce": "Marmaray, Türkiye\'nin ilk deniz yolu istasyonud'
+   6. [28e5d0a50c] duvar  3.19 sn | girdi   74 | ctki  48 | bitis length | FARKLI | JSON BOZUK yil=None alanlar=- | '{ "yil": 2021, "gerekce": "Marmaray, Türkiye\'nin ana ulaşım projesinden bi'
+   7. [de576b34c5] duvar  3.26 sn | girdi   74 | ctki  48 | bitis length | FARKLI | JSON BOZUK yil=None alanlar=- | '{ "yil": 2010, "gerekce": "Marmaray, yol ambcilerinden biridir. Yol, Türki'
+   8. [d326a53ffe] duvar  3.20 sn | girdi   74 | ctki  48 | bitis length | FARKLI | JSON BOZUK yil=None alanlar=- | '{ "yil": 2020, "gerekce": "Marmaray, Türkiye\'nin İstanbul\'unun Kapı Burnu\''
+   9. [8a3c4f915d] duvar  2.57 sn | girdi   74 | ctki  37 | bitis stop   | FARKLI | JSON ok yil=2022 alanlar=gerekce,yil | '{ "yil": 2022, "gerekce": "Aralık 2022 yılında hizmete açıldı" }'
+  10. [d73c78fe43] duvar  1.68 sn | girdi   74 | ctki  24 | bitis stop   | FARKLI | JSON ok yil=2022 alanlar=gerekce,yil | '{ "yil": 2022, "gerekce": "Ayet" }'
+
+=========================================================
+OZET (kol A)
+=========================================================
+hucre  n  benzersiz  en-sik-oran  uz-ort  uz-min/max  ctki-ort  duvar
+A1     10          1         1.00     4.0    4/4         5.0     4.2 sn
+A2     10          1         1.00     4.0    4/4         5.0     3.6 sn
+A3     10          5         0.30     4.0    4/4         5.0     3.6 sn
+A4     10          1         1.00     4.0    4/4         5.0     3.6 sn
+A5     10          1         1.00     4.0    4/4         5.0     3.5 sn
+A6     10          1         1.00     4.0    4/4         5.0     3.6 sn
+C1     10         10         0.10   119.0   91/142      54.7    37.0 sn
+C2     10          1         1.00   146.0  146/146      68.0    45.4 sn
+C3     10          1         1.00   146.0  146/146      68.0    45.0 sn
+D1     10          9         0.20    66.7   33/143      36.1    24.9 sn
+D2     10          9         0.20   118.2   34/272      51.0    34.3 sn
+D3     10         10         0.10    95.6   34/124      44.5    30.1 sn
+
+A1     bitis: {'stop': 10} | not: sicaklik 0, tohum yok
+A2     bitis: {'stop': 10} | not: sicaklik 0, tohum 1234
+A3     bitis: {'stop': 10} | not: sicaklik 0,8, tohum yok
+A4     bitis: {'stop': 10} | not: sicaklik 0,8, tohum 1234
+A5     bitis: {'stop': 10} | not: A4 ile ayni ayar, ikinci diz
+A6     bitis: {'stop': 10} | not: sicaklik 0,8, tohum 9999
+C1     bitis: {'stop': 10} | not: acik istem, sicaklik 0,8, tohum yok
+C2     bitis: {'stop': 10} | not: acik istem, tohum 1234
+C3     bitis: {'stop': 10} | not: C2 ile ayni ayar, ikinci diz
+D1     bitis: {'stop': 10} | JSON okunan 10/10 | yil kodlari: 2011,2020,2022,2023 | alan setleri: 4 cesit | not: format=json, sicaklik 0,8, tohum yok
+D2     bitis: {'stop': 10} | JSON okunan 10/10 | yil kodlari: 2017,2019,2020,2022 | alan setleri: 1 cesit | not: format=sema, sicaklik 0,8, tohum yok
+D3     bitis: {'length': 8, 'stop': 2} | JSON okunan 2/10 | yil kodlari: 2022,None | alan setleri: 2 cesit | not: format=sema AMA num_predict 48
+
+=========================================================
+KOL B - SCIKIT-LEARN TOHUM VARYANSI
+=========================================================
+   veri: breast_cancer.csv | satir 569 | özellik 30
+
+B1 | bolme + model tohumu birlikte degisir
+  tohum 0   | egitim 455 test 114 | RF 0.9474 | Lojistik 0.9825
+  tohum 1   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9912
+  tohum 2   | egitim 455 test 114 | RF 0.9825 | Lojistik 0.9825
+  tohum 7   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9649
+  tohum 42  | egitim 455 test 114 | RF 0.9474 | Lojistik 0.9825
+
+B2 | bolme SABIT (42), yalniz model tohumu degisir
+  tohum 0   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9825
+  tohum 1   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9825
+  tohum 2   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9825
+  tohum 7   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9825
+  tohum 42  | egitim 455 test 114 | RF 0.9474 | Lojistik 0.9825
+
+B3 | model tohumu SABIT (42), yalniz bolme degisir
+  tohum 0   | egitim 455 test 114 | RF 0.9386 | Lojistik 0.9825
+  tohum 1   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9912
+  tohum 2   | egitim 455 test 114 | RF 0.9825 | Lojistik 0.9825
+  tohum 7   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9649
+  tohum 42  | egitim 455 test 114 | RF 0.9474 | Lojistik 0.9825
+
+OZET (kol B, bes tohum)
+B1-rf    min 0.9474 | ort 0.9579 | max 0.9825 | acik 0.0351
+B1-lr    min 0.9649 | ort 0.9807 | max 0.9912 | acik 0.0263
+B2-rf    min 0.9474 | ort 0.9544 | max 0.9561 | acik 0.0088
+B2-lr    min 0.9825 | ort 0.9825 | max 0.9825 | acik 0.0000
+B3-rf    min 0.9386 | ort 0.9561 | max 0.9825 | acik 0.0439
+B3-lr    min 0.9649 | ort 0.9807 | max 0.9912 | acik 0.0263
+
+bitti: 2026-10-17 11:14:18

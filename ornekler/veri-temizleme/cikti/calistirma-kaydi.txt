@@ -1,0 +1,109 @@
+
+============================================================
+1) Veri çekme: merve/turkish_instructions (ilk 3000 kayıt, streaming)
+============================================================
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Çekilen ham kayıt: 3000
+Sütunlar: ['Unnamed: 0', 'talimat', ' giriş', ' çıktı']
+
+============================================================
+2) Alan eşleme ve ön istatistik
+============================================================
+Alan eşlemesi başarılı: 3000 | eşlenemeyip atılan: 0
+Ortalama çıktı uzunluğu (ham): 282 karakter
+
+============================================================
+3) Araçların mini testi (bilerek bozuk örnek metinler)
+============================================================
+Girdi       : Bana 0532 123 45 67'den ulaşın; e-posta: ali@example.com, TCKN: 10000000146.
+Normalize   : Bana 0532 123 45 67'den ulaşın; e-posta: ali@example.com, TCKN: 10000000146.
+Maskelenmiş : Bana [TELEFON]'den ulaşın; e-posta: [E-POSTA], TCKN: [TC-KIMLIK].  (maskeleme: 3)
+Tekrar oranı: 0.12  (eşik: 0.3)
+----------------------------------------
+Girdi       : Ä°stanbul'da hava Ã§ok gÃ¼zel, yarÄ±n da gÃ¼zel olacak.
+Normalize   : İstanbul'da hava çok güzel, yarın da güzel olacak.
+Maskelenmiş : İstanbul'da hava çok güzel, yarın da güzel olacak.  (maskeleme: 0)
+Tekrar oranı: 0.17  (eşik: 0.3)
+----------------------------------------
+Girdi       : çok çok çok çok çok güzel güzel güzel güzel bir gün
+Normalize   : çok çok çok çok çok güzel güzel güzel güzel bir gün
+Maskelenmiş : çok çok çok çok çok güzel güzel güzel güzel bir gün  (maskeleme: 0)
+Tekrar oranı: 0.33  (eşik: 0.3)
+----------------------------------------
+
+============================================================
+4) Normalizasyon (mojibake onarımı, NFC, HTML temizliği, boşluklar)
+============================================================
+Düzeltilen alan sayısı: 5732
+
+============================================================
+5) PII maskeleme (e-posta, telefon, TCKN, IBAN)
+============================================================
+Maskelenen kişisel veri: 2 adet (1 kayıtta)
+
+============================================================
+6) Kalite filtreleri (uzunluk, tekrar, gürültü)
+============================================================
+  elenen -> çıktı çok kısa: 235
+  elenen -> alfanümerik oran düşük (gürültü): 18
+Kalan kayıt: 2747
+
+============================================================
+7) Tam tekrar temizliği (aynı metinler)
+============================================================
+Tam tekrar olarak atılan: 0
+Kalan kayıt: 2747
+
+============================================================
+8) Yakın tekrar temizliği (MinHash + LSH, eşik=0.8)
+============================================================
+Yakın tekrar olarak atılan: 0
+Kalan kayıt: 2747
+
+============================================================
+9) SFT formatına çevirme ve kaydetme
+============================================================
+Temiz veri yazıldı: D:\projects\model-egitimi-rehberi\ornekler\veri-temizleme\cikti\temiz_veri.jsonl (2747 kayıt)
+Rapor yazıldı: D:\projects\model-egitimi-rehberi\ornekler\veri-temizleme\cikti\rapor.json
+
+============================================================
+10) Örnek çıktı (ilk 2 kayıt)
+============================================================
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "Aşağıdaki bağlamda orijinal bir şey söyleyin: Bir iş görüşmesini yeni bitirdiniz ve işverene bu pozisyona olan ilginizi göstermek istiyorsunuz."
+    },
+    {
+      "role": "assistant",
+      "content": "Ekibe katkıda bulunmaya başlamak ve bu alandaki becerilerimi daha da geliştirmek için çok istekliyim."
+    }
+  ]
+}
+----------------------------------------
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "Aşağıdaki makale için bir başlık önerin: Bu makale, işletmelerin müşterilerle iletişim kurma biçiminde devrim yaratmada internetin oynadığı rolü incelemektedir."
+    },
+    {
+      "role": "assistant",
+      "content": "\"Dijital İletişimin Gücü: İnternet İş Ortamını Nasıl Dönüştürüyor\""
+    }
+  ]
+}
+----------------------------------------
+
+============================================================
+ÖZET: Öncesi -> Sonrası
+============================================================
+  Çekilen ham kayıt                      3000
+  Normalizasyon sonrası                  3000
+  PII maskeleme sonrası                  3000
+  Kalite filtreleri sonrası              2747
+  Tam tekrar temizliği sonrası           2747
+  Yakın tekrar temizliği sonrası         2747
+
+Temiz veri oranı: 91.6%

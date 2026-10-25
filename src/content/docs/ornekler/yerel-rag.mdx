@@ -1,0 +1,160 @@
+---
+title: "Örnek 5: Yerel RAG Asistanı"
+description: Ollama üzerinde bge-m3 embedding ve qwen2.5:3b ile çalışan uçtan uca bir RAG boru hattı — vektörleştirme, kosinüs arama, belgeye dayalı cevap, getirim testi ve kapsam dışı soru testi. Tamamı CPU'da, gerçek çalıştırma çıktılarıyla.
+dogrulama: 2026-10-25
+---
+
+import ragKod from '../../../../ornekler/yerel-rag/rag.py?raw';
+import { Code } from 'astro-expressive-code/components';
+
+Bu, beşinci **çalıştırılabilir örnek projemiz**: [RAG mi İnce Ayar mı?](/rag/rag-mi-ince-ayar-mi/) sayfasının anlattığı kararın **elle tutulur hâli**. Kurgusal bir kargo şirketinin 8 politika belgesini vektörleştirip, kullanıcı sorusuna en ilgili belgeleri getiriyor ve cevabı **yalnızca bu belgelere dayanarak** üretiyoruz. Hiç GPU yok; her şey CPU'da, Ollama üzerinde çalışıyor.
+
+:::note[Bu makinede çalıştırıldı]
+Betik bu projede **gerçekten çalıştırıldı** ve sayfadaki tüm çıktılar bu çalıştırmadan alındı. Ortam: Ollama 0.40.4 (makine 2026-10-19'da 0.40.6; bu sayfadaki sayılar o sürümde yeniden ölçülmedi), `bge-m3` (embedding, 1024 boyut), `qwen2.5:3b-instruct-q4_K_M` (cevap üretimi), Python 3.12. Betik **hiçbir harici Python paketi gerektirmez** — yalnızca standart kütüphane ve Ollama API'si kullanılır; GPU gerekmez. Tam günlük: `cikti/calistirma-kaydi-127.txt` (2026-10-16; önceki `localhost` koşumu `cikti/calistirma-kaydi.txt` içinde duruyor).
+:::
+
+## 1) Ne yapıyoruz?
+
+**Hedef:** "Bulut Kargo A.Ş." (tamamen kurgusal) müşteri hizmetleri için, şirket politikalarını bilen bir destek asistanı. Modelin kendi bilgisi bu politikaları **içermiyor** — cevaplar yalnızca getirilen belgelere dayanıyor, yani [RAG](/rag/rag-mi-ince-ayar-mi/).
+
+Boru hattı dört adımlı:
+
+```text
+8 politika belgesi ──► bge-m3 ile vektörleştirme (/api/embeddings)
+        │
+        ▼
+    vektör indeksi (hafızada)
+        │   soru gelince:
+        ▼
+soru vektörü × belge vektörleri ──► kosinüs benzerliği ──► en iyi 2 belge
+        │
+        ▼
+bağlam + soru ──► qwen2.5:3b (/api/chat) ──► belgeye dayalı cevap + kaynak
+```
+
+Bilinçli bir basitleştirme: bu örnekte **her belge tek parçadır**. Gerçek projelerde uzun belgeler önce parçalara bölünür (256-1024 token) — parçalama kararları [RAG karar sayfasındaki](/rag/rag-mi-ince-ayar-mi/) "Yerel RAG Yığını" bölümünde, parça boyutu ile arama kolu seçiminin ölçülmüş sonuçlarıysa [Parçalama ve Hibrit Arama](/rag/parcalama-ve-hibrit-arama/) sayfasında. Bu basitleştirmenin bedelini Örnek 6 gösteriyor: aynı boru hattı 125 parçalık bir korpusda CPU'da ~8 dakikada indeksleniyor (8 belge ~20 saniye).
+
+## 2) Kurulum
+
+Pip'a ihtiyaç yok; yalnızca Ollama ve iki model:
+
+```bash
+ollama pull bge-m3                        # embedding modeli (~1,2 GB)
+ollama pull qwen2.5:3b-instruct-q4_K_M    # cevap üretimi (~1,9 GB)
+
+python rag.py                     # tüm demo: indeks + 3 soru + iki test
+python rag.py --soru "iade süresi ne kadar?"   # tek soru sor
+python rag.py --test              # yalnızca getirim testi (üretim yok, hızlıdır)
+```
+
+## 3) Betiğin tamamı
+
+<Code code={ragKod} lang="python" title="ornekler/yerel-rag/rag.py" />
+
+## 4) Gerçek çalıştırma çıktısı
+
+```text title="İndeksleme (CPU, Ollama) — 2026-10-16 koşumu, adres http://127.0.0.1:11434"
+[indeks] 8 belge vektörleştirildi (4.1 sn, boyut=1024)
+```
+
+Aynı satır 2026-10-15'te, betik `http://localhost:11434` kullanırken **20.3 sn** ölçmüştü. 8 istek × ~2,03 sn isim çözümleme gideri ≈ 16 sn; kalan fark koşumlar arası makine yükü. Ayrıntı: [Hız ve Maliyet](/kullanim/hiz-ve-maliyet/).
+
+```text title="Demo: kapsam içi iki soru"
+[arama] en iyi benzerlik: 0.709 -> iade, hasar
+[üretim] 12.2 sn
+[cevap] [iade] İade süreniz 14 gün olup, teslimatta 14 gün içinde iade
+yapmanız gerekmektedir.
+
+[arama] en iyi benzerlik: 0.663 -> hasar, iade
+[üretim] 12.4 sn
+[cevap] [hasar] Belirttiğim politika, hasarlı paket teslim aldığınızda
+48 saat içinde müşteri hizmetlerimize fotoğrafıyla birlikte bildirimde
+bulunmanızı sağlıyor. Ayrıca, tazminat, gönderinin beyan edilen değeriyle
+sınırlıdır.
+```
+
+```text title="Kapsam dışı test: 'Ankara'da hava nasıl?'"
+[arama] en iyi benzerlik: 0.372 -> teslimat, ek-hizmet
+[üretim] 7.6 sn
+[cevap] Bu konuda belgelerde bilgi yok [iade] [ek-hizmet]
+```
+
+Benzerlik skorları ve cevap metinleri iki koşumda **birebir aynı**; üretim süreleri ise farklı (önceki koşum 32,9 / 14,7 / 10,1 sn). Bu düşüşün tamamını adres değişikliğine yazmayın: adresin tasarrufu istek başına ~2 sn, yani üç soruluk demoda en fazla ~6 sn. Kalan fark model sıcaklığı: eski koşum sohbet modelini belleğe ilk kez yüklüyordu, bu koşum ise aynı oturumda Örnek 6'nın koşumundan hemen sonra geldi. Bu sayfadaki üretim satırları fazlara ayrılmış zamanlamaları basmıyor, dolayısıyla ayrımı burada **ölçülü değil tahmini**; faz faz ölçüm [Hız ve Maliyet](/kullanim/hiz-ve-maliyet/) sayfasında.
+
+```text title="Getirim testi (6 soru, beklenen belgeyle karşılaştırma)"
+  [OK |OK ] İade sürem var mı, ne kadar sürede iade edebilirim?
+        beklenen: iade  bulunan: ['iade', 'hasar', 'kvkk']
+  [OK |OK ] Kargom hasarlı geldi, ne yapmalıyım?
+        beklenen: hasar  bulunan: ['hasar', 'iade', 'teslimat']
+  [OK |OK ] Siparişim kaç günde teslim olur?
+        beklenen: teslimat  bulunan: ['teslimat', 'iade', 'hasar']
+  [OK |OK ] Kişisel verilerimin silinmesini isteyebilir miyim?
+        beklenen: kvkk  bulunan: ['kvkk', 'iade', 'hasar']
+  [OK |OK ] Kapıda ödeme ek ücret gerektiriyor mu?
+        beklenen: odeme  bulunan: ['odeme', 'ek-hizmet', 'kampanya']
+  [OK |OK ] Öğrencilere indirim var mı?
+        beklenen: kampanya  bulunan: ['kampanya', 'odeme', 'ek-hizmet']
+
+  hit@1: 6/6   hit@3: 6/6
+```
+
+## 5) Sayıların dürüst yorumu
+
+| Sayı | Değer | Dürüst okuma |
+| --- | --- | --- |
+| Getirim isabeti | hit@1 **6/6**, hit@3 **6/6** | Küçük ve ayrıştırılmış bir korpus için beklenen sonuç; **genellemeyin** |
+| Benzerlik aralığı (kapsam içi) | 0,66-0,71 | Soru-belge çiftleri aynı konuyu paylaşıyor |
+| Benzerlik (kapsam dışı) | 0,372 | Belirgin şekilde aşağıda — eşik belirlemeye elverişli boşluk |
+| Cevap üretim süresi (CPU) | **7,6-12,4 sn** (2026-10-16, model sıcaktı) — modelin belleğe ilk yüklendiği koşumda 32,9 sn | 3B q4 model, dizüstü CPU'su. Fazlara ayrılmış hâli: [Hız ve Maliyet](/kullanim/hiz-ve-maliyet/) |
+| Embedding süresi | **4,1 sn / 8 belge** (2026-10-16) — aynı betik `localhost` ile 20,3 sn, `olc.py` içinde 28,1 → **3,9 sn** | Fark büyük ölçüde istek başına ~2 sn'lik Windows isim çözümleme gideri; sıralama ve skorlar hiç değişmedi |
+
+:::note[Görünmez 2 saniye artık görünür: betik 127.0.0.1 kullanıyor]
+Bu betik 2026-10-15'te `http://localhost:11434` ile ölçülmüştü; [Hız ve Maliyet](/kullanim/hiz-ve-maliyet/) sayfasındaki ölçüm Windows'ta `localhost` adının her istekte ~2,03 sn sürdüğünü, `127.0.0.1` ile **0,00 sn**ye indiğini buldu. 2026-10-16'da betiklerin adresi değiştirilip yeniden koşulunca 8 belgelik indeks **20,3 → 4,1 sn**'ye indi (`olc.py`'de 28,1 → 3,9 sn), benzerlik skorları ve hit@k satırları ise **birebir aynı** kaldı. Tek kelimelik kazanç, ama asıl ders şu: **çok istekli döngülerde duvar süresi ile modelin işi ayrı raporlanır** — aksi hâlde 8 belgelik bir indeks "yavaş embedding modeli" diye yorumlanır.
+:::
+
+**hit@1 = %100 sizi yanıltmasın.** 8 belgelik bir korpus, embedding modeli için kolay bir sınavdır; belge sayısı yüzleri binleri bulduğunda isabet düşer ve "doğru parça ilk 5'te var mı?" (hit@5) gibi daha toleranslı ölçülerle çalışmanız gerekir. Bu betikteki test çerçevesi, kendi belgelerinizle aynı ölçümü yapmanız için var: `TEST_SORULARI` listesine kendi soru-beklenen çiftlerinizi ekleyin.
+
+**En öğretici hata, kapsam dışı testte çıktı.** Model, belgelerde bulunmayan soruya doğru şekilde "Bu konuda belgelerde bilgi yok" dedi — sistem talimatı işe yaradı. Ama kaynak gösterirken `[iade]` yazdı; oysa bağlama eklenen belgeler `teslimat` ve `ek-hizmet` idi. Yani **1,9 GB'lık küçük bir model alıntıyı da uydurabiliyor.** Ders: gerçek sistemlerde modelin söylediği kaynağa güvenilmez; hangi belgelerin getirildiğini siz kaydedersiniz ve cevabın yanında *sizin* kaydınız gösterilir. Modelin alıntısı yalnızca bir ipucudur, kanıt değil.
+
+:::caution[Zayıf benzerlik eşiği bu korpusa özeldir]
+Betiğin içindeki `ZAYIF_ESIK = 0.35` değeri, bu korpus üzerindeki ölçümden seçildi: kapsam içi sorular 0,66'nın altına inmezken kapsam dışı soru 0,372'de kaldı. Farklı bir embedding modeli veya farklı belgelerle bu boşluk bambaşka olur — **eşik kendi verinizde ölçülmeden kopyalanmaz.** Betik eşik altında uyarı basar ama cevabı engellemez; kritik sistemlerde cevabı durdurmayı sizin seçiminizdir.
+:::
+
+## 6) Kodda dikkat edilecek dört incelik
+
+### a) Neden kosinüs benzerliği?
+
+İki vektörün kosinüsü, yalnızca **yönlerini** karşılaştırır, uzunluklarını değil. Uzun bir belge ile kısa bir soru aynı konudaysa yönleri benzerdir; kosinüs bunu 1'e yakın bulur, alakasız konular 0'a yakın çıkar. Betik bunu saf Python'da 10 satırda hesaplar — 8 belge için yeterli. Belge sayısı binlere çıktığında `N × N` karşılaştırma pahalılaşır; o noktada vektör veritabanları (Chroma, Qdrant) yaklaşık en yakın komşu (ANN) indeksleriyle devreye girer: [RAG karar sayfası](/rag/rag-mi-ince-ayar-mi/).
+
+### b) Bağlam formatı ve sistem talimatı
+
+Modelin cevabın kaynağını gösterebilmesi için bağlam her parçaya `[id]` etiketiyle eklenir (`[iade] İade Politikası: ...`). Sistem talimatı üç sert kural koyar: yalnızca belgeleri kullan, belgelerde yoksa "yok" de, kaynağı belirt. Kapsam dışı testin "yok" cevabı bu talimatın işe yaradığını kanıtlıyor — ama aynı testin yanlış alıntısı, (a)'daki dersi veriyor.
+
+### c) `stream: False` ve `temperature: 0`
+
+`/api/chat` çağrısında akış kapatılır — betik cevabın tamamını tek parça alıp yazdırır (arayüz uygulamalarında akış açılır, token token gösterilir). `temperature: 0` ise örnekleme rastgeleliğini kapatır: aynı soru, aynı bağlam, aynı model → tekrarlanabilir demo. Yaratıcılık istenen ürünlerde bu ayar gevşetilir.
+
+### d) Ön kontrol kullanıcıya zaman kazandırır
+
+`ön_kontrol()` başta Ollama sunucusuna ve iki modele bakar; eksikse Türkçe, uygulanabilir hata verir (`ollama pull ...`). 30 satırlık bir betikte bile arızanın **nerede** olduğunu net söylemek, sizi "neden çalışmıyor?" labirentinden kurtarır: [Sorun Giderme](/llm/sorun-giderme/).
+
+## 7) Kendi belgelerinizle deneyin
+
+Üç adım yeterli:
+
+1. `BELGELER` listesini kendi belgelerinizle değiştirin (her parça 256-1024 token; uzun belgeleri parçalayın).
+2. `TEST_SORULARI` listesine kendi sorularınızı ve doğru parçanın kimliğini yazın; `python rag.py --test` ile hit@1/hit@3 ölçün.
+3. İsimler düşük geldiyse embedding modelini değiştirin (örn. çok dilli alternatifler) veya parçalama boyutunu oynatın — [Ollama](/kullanim/ollama/) gömme modellerini aynı uçtan çalıştırır.
+
+Belgeler büyüyünce aynı mantık bir vektör veritabanına taşınır; sorgu tarafındaki kod neredeyse hiç değişmez. Sistemi ölçme tarafı (hit@k, MRR, parafraz, eşik ayırma) — bu betiği genişleten `olc.py` ile: [RAG Değerlendirmesi](/rag/rag-degerlendirme/).
+
+:::tip[Üç model, üç iş]
+Bu örnekte iki model var ve görevleri farklıdır: `bge-m3` **anlamayı** yapar (hangi belge ilgili?), `qwen2.5:3b` **üretmeyi** (cevabı nasıl söyleyelim?). RAG'ın gücü bu ayrımdan gelir — üretici modelin bilgisiyle değil, aramanın bulduğu bilgiyle cevap verirsiniz. Bu yüzden üretici modeli değiştirmek (daha büyük/küçük) arama kalitesini etkilemez; embedding modelini değiştirmek **tüm indeksi yeniden oluşturmayı** gerektirir.
+:::
+
+## 8) Buradan sonrası
+
+- Kararın tam haritası: [RAG mi İnce Ayar mı?](/rag/rag-mi-ince-ayar-mi/)
+- Ollama kurulumu, OpenAI uyumlu uç ve Open WebUI ile arayüzlü RAG: [Ollama](/kullanim/ollama/)
+- Getirim kalitesini ölçmek ve iyileştirmek: [Loss ve Metrikler](/degerlendirme/loss-ve-metrikler/)
+- RAG yetmeyip davranış değişikliği gerektiğinde: [SFT](/llm/sft/) ve [Adım Adım Eğitim](/llm/adim-adim-egitim/)

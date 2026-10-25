@@ -1,0 +1,37 @@
+{
+  "veri_seti": "merve/turkish_instructions",
+  "cekilen": 3000,
+  "asamalar": [
+    [
+      "Çekilen ham kayıt",
+      3000
+    ],
+    [
+      "Normalizasyon sonrası",
+      3000
+    ],
+    [
+      "PII maskeleme sonrası",
+      3000
+    ],
+    [
+      "Kalite filtreleri sonrası",
+      2747
+    ],
+    [
+      "Tam tekrar temizliği sonrası",
+      2747
+    ],
+    [
+      "Yakın tekrar temizliği sonrası",
+      2747
+    ]
+  ],
+  "pii_maskeleme": 2,
+  "pii_olan_kayit": 1,
+  "elenen_sebepler": {
+    "çıktı çok kısa": 235,
+    "alfanümerik oran düşük (gürültü)": 18
+  },
+  "son_kayit": 2747
+}

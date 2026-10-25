@@ -1,0 +1,90 @@
+[veri] korpus indiriliyor...
+[veri] İstanbul ilinde toplu ulaşım: 16,740 karakter -> 25 parça
+[veri] İstanbul Metrosu: 29,235 karakter -> 42 parça
+[veri] Marmaray: 12,099 karakter -> 17 parça
+[veri] Tünel (İstanbul): 4,390 karakter -> 6 parça
+[veri] T1 (İstanbul Tramvayı): 6,767 karakter -> 7 parça
+[veri] Metrobüs: 2,463 karakter -> 3 parça
+[veri] İETT: 13,148 karakter -> 19 parça
+[veri] İstanbul Deniz Otobüsleri: 4,019 karakter -> 6 parça
+[veri] toplam: 125 parça, 88,861 karakter
+[veri] Maddeler CC BY-SA lisansıyla yayımlanır; kaynak göstermeden yeniden kullanılamaz.
+
+==========================================================================
+LEKSIK PROBLER — terimin korpusta geçtiği maddeler
+==========================================================================
+  'batırma' -> Marmaray  (hedef tek madde)
+  'Ayrılık Çeşmesi' -> Marmaray, İstanbul Metrosu, İstanbul ilinde toplu ulaşım  (birden çok madde)
+  'M11' -> İstanbul Metrosu, İstanbul ilinde toplu ulaşım  (birden çok madde)
+  'Seyrantepe' -> İstanbul Metrosu, İstanbul ilinde toplu ulaşım  (birden çok madde)
+  '1869' -> Tünel (İstanbul), İETT, İstanbul ilinde toplu ulaşım  (birden çok madde)
+  'vapur' -> Marmaray, T1 (İstanbul Tramvayı), İETT, İstanbul Deniz Otobüsleri, İstanbul ilinde toplu ulaşım  (birden çok madde)
+[önbellek] 125 gömme vektörü okundu, vektörleştirme atlandı
+[bm25] 3114 benzersiz terim, ortalama parça 160 sözcük
+
+==========================================================================
+ORİJİNAL SORULAR — hücreler: beklenen maddenin ilk parçasının rütbesi
+==========================================================================
+  soru                                          vektör    bm25  hibrit
+  Marmaray hangi yıl açıldı?                         1       2       1
+  Tünel hangi iki semt arasında çalışır?             1       2       2
+  Metrobüs hangi güzergâhı izler?                    2       1       1
+  İETT ne zaman kuruldu?                             1       4       2
+  İstanbul'un ilk metro hattı hangisidir?            1       1       1
+  T1 tramvay hattı hangi güzergâhta çalışır?         1       1       1
+                                                  hit@1    hit@4
+  vektör                                            5/6      6/6
+  bm25                                              3/6      6/6
+  hibrit                                            4/6      6/6
+
+==========================================================================
+PARAFRAZ SORULAR — hücreler: beklenen maddenin ilk parçasının rütbesi
+==========================================================================
+  soru                                          vektör    bm25  hibrit
+  Marmaray servise ne zaman girdi?                   1       9       2
+  Tünel füniküleri hangi iki istasyonu birbi…        1       2       3
+  Metrobüs hattı nereden nereye gidiyor?            10       8       5
+  İETT'nin kuruluş yılı hangisidir?                  1       1       1
+  İstanbul metrosundaki en eski hat hangisi?         2       2       2
+  T1 tramvay hattı hangi duraklardan geçiyor?        1       1       1
+                                                  hit@1    hit@4
+  vektör                                            4/6      5/6
+  bm25                                              2/6      4/6
+  hibrit                                            2/6      5/6
+
+==========================================================================
+LEKSIK SORULAR — hücreler: beklenen maddenin ilk parçasının rütbesi
+==========================================================================
+  soru                                          vektör    bm25  hibrit
+  Marmaray'da batırma tüp tünel nasıl çalışı…        1       1       1
+  Ayrılık Çeşmesi istasyonu hangi hatta?             3       1       2
+  M11 hattı hangi istasyonlardan geçiyor?            1       4       2
+  Seyrantepe'ye hangi metro hattıyla gidilir?        3       3       3
+  İETT hangi yıl kuruldu?                            1       1       1
+  Vapur seferleri hangi iskeleye uğrar?             14       2       5
+                                                  hit@1    hit@4
+  vektör                                            3/6      5/6
+  bm25                                              3/6      6/6
+  hibrit                                            2/6      5/6
+
+==========================================================================
+SORGU GECİKMESİ — 12 deneme ortalaması (6 benzersiz soru, tekrarlı)
+==========================================================================
+  vektör (gömme çağrısı + kosinus, Ollama CPU): 0.145 sn
+  bm25   (saf Python, bellek içi indeks):       0.0001 sn
+
+==========================================================================
+KAPSAM DIŞI SORULAR (ilk 4) — sözlükte eşik kavramı yok
+==========================================================================
+  Evde pizza hamuru nasıl yapılır?
+    vektör: en iyi benzerlik 0.344 -> İETT#13
+    bm25  : eşleşen parça yok (sözcükler korpusta değil)
+  Ankara'da hangi müzeler gezilir?
+    vektör: en iyi benzerlik 0.416 -> İstanbul Metrosu#16
+    bm25  : 2/5 sözcük korpusta var, ilk sırada İETT#8 (puan 4.07)
+  Türkiye'nin en uzun nehri hangisidir?
+    vektör: en iyi benzerlik 0.485 -> Marmaray#9
+    bm25  : 4/6 sözcük korpusta var, ilk sırada İstanbul Metrosu#11 (puan 7.08)
+  Kedi yavrusu bakımı için nelere dikkat edilmeli?
+    vektör: en iyi benzerlik 0.321 -> İETT#17
+    bm25  : 1/7 sözcük korpusta var, ilk sırada Metrobüs#2 (puan 1.81)

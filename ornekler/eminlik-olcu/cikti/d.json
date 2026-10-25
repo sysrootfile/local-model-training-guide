@@ -1,0 +1,122 @@
+[
+ {
+  "no": 1,
+  "duvar": 5.619776010513306,
+  "ctki": 64,
+  "kayit": 64,
+  "eksik_kayit": 0,
+  "ort_logprob": -0.46201611392942477,
+  "entropi_ort": 0.8223130271542171,
+  "entropi_max": 2.6290853561039946,
+  "icerik": "D) 50.257\n\nLlama 3'un kelime dairagiği (tokenizer sozcuk sayısı) 50.257'tir. Bu değer, Llama 3 modelinin giriş verilerinin ve çıktı verilerinin her bir kelime için ayrı ayrı d",
+  "dogru_metin": "128.256"
+ },
+ {
+  "no": 2,
+  "duvar": 1.71323823928833,
+  "ctki": 11,
+  "kayit": 10,
+  "eksik_kayit": 1,
+  "ort_logprob": -0.1388587179720176,
+  "entropi_ort": 0.3050075388106329,
+  "entropi_max": 1.7166444183356533,
+  "icerik": "B) 151.936",
+  "dogru_metin": "151.936"
+ },
+ {
+  "no": 3,
+  "duvar": 3.7391843795776367,
+  "ctki": 42,
+  "kayit": 41,
+  "eksik_kayit": 1,
+  "ort_logprob": -0.4680145226768628,
+  "entropi_ort": 0.8391478059885011,
+  "entropi_max": 2.7540546492805644,
+  "icerik": "Gemma 3'un kelime dagarcigi 262.208'dır. Bu değer, belirli bir platform veya sistemdeki belirli bir özellik olabilir.",
+  "dogru_metin": "262.208"
+ },
+ {
+  "no": 4,
+  "duvar": 2.431100368499756,
+  "ctki": 24,
+  "kayit": 23,
+  "eksik_kayit": 1,
+  "ort_logprob": -0.0705573529369847,
+  "entropi_ort": 0.17969425039047002,
+  "entropi_max": 0.9418379261024045,
+  "icerik": "BAAI/bge-m3 embedding modeli 768 boyutlu vektör üretir.",
+  "dogru_metin": "1024"
+ },
+ {
+  "no": 5,
+  "duvar": 1.6523818969726562,
+  "ctki": 14,
+  "kayit": 13,
+  "eksik_kayit": 1,
+  "ort_logprob": -0.049618784009138696,
+  "entropi_ort": 0.1565555497685476,
+  "entropi_max": 0.7471555087311313,
+  "icerik": "C) 768 boyutlu çıkış verir.",
+  "dogru_metin": "384"
+ },
+ {
+  "no": 6,
+  "duvar": 3.7328526973724365,
+  "ctki": 40,
+  "kayit": 39,
+  "eksik_kayit": 1,
+  "ort_logprob": -0.36539989589767014,
+  "entropi_ort": 0.714838464354195,
+  "entropi_max": 2.066763630197612,
+  "icerik": "Bulunduğu metinde bulunulamadı, ancak DPO eğitiminin varsayılan beta değeri genellikle 0,5 olarak kabul edilir.",
+  "dogru_metin": "0,1"
+ },
+ {
+  "no": 7,
+  "duvar": 1.0536420345306396,
+  "ctki": 5,
+  "kayit": 4,
+  "eksik_kayit": 1,
+  "ort_logprob": -0.1297577701044048,
+  "entropi_ort": 0.3890430562702342,
+  "entropi_max": 0.8079022592125691,
+  "icerik": "A) simpo",
+  "dogru_metin": "sigmoid_norm"
+ },
+ {
+  "no": 8,
+  "duvar": 1.4158239364624023,
+  "ctki": 10,
+  "kayit": 9,
+  "eksik_kayit": 1,
+  "ort_logprob": -0.0807398488557788,
+  "entropi_ort": 0.1336236735546111,
+  "entropi_max": 1.1969082211469686,
+  "icerik": "C) 41.933",
+  "dogru_metin": "95.129.129"
+ },
+ {
+  "no": 9,
+  "duvar": 1.3328945636749268,
+  "ctki": 10,
+  "kayit": 9,
+  "eksik_kayit": 1,
+  "ort_logprob": -0.002815549805319506,
+  "entropi_ort": 0.01733910674557596,
+  "entropi_max": 0.0791582033455533,
+  "icerik": "C) 88.838",
+  "dogru_metin": "37"
+ },
+ {
+  "no": 10,
+  "duvar": 1.5922174453735352,
+  "ctki": 12,
+  "kayit": 11,
+  "eksik_kayit": 1,
+  "ort_logprob": -0.0018252360504259389,
+  "entropi_ort": 0.011954561685921378,
+  "entropi_max": 0.10056070171022806,
+  "icerik": "B) $0,07/GB-ay",
+  "dogru_metin": "$0,07/GB-ay"
+ }
+]

@@ -1,0 +1,37 @@
+model: qwen2.5:3b-instruct-q4_K_M | embedding: bge-m3 | cpu (%100), Ollama yerel
+süreler Ollama'nın döndürdüğü alanlardan; 'duvar' = HTTP dahil gerçek bekleme
+
+==============================================================================
+E8b — EMBEDDING'İN SUNUCU TARAFI (istemci gideri çıkarılmış)
+==============================================================================
+  E8 duvar süresi ölçmüştü; /api/embed de kendi süre alanlarını döndürür.
+  İki faz: sohbet modeli bellekteyken ve boşaltıldıktan sonra.
+
+  --- faz A: sohbet modeli bellekte ---
+  ps: qwen2.5:3b-instruct-q4_K_M 357c53fb659c 2.2 GB 100% CPU 4096 llamacpp 4 minutes from now
+  sorgu 1                    duvar   2.13 | sunucu   0.11 | yük  0.02 | ön-yük    11 tok /  0.00 sn | 1 vektör, boyut 1024
+  sorgu 2                    duvar   2.16 | sunucu   0.10 | yük  0.01 | ön-yük    11 tok /  0.00 sn | 1 vektör, boyut 1024
+  sorgu 3                    duvar   2.15 | sunucu   0.13 | yük  0.01 | ön-yük    11 tok /  0.00 sn | 1 vektör, boyut 1024
+  sorgu 4                    duvar   2.15 | sunucu   0.10 | yük  0.01 | ön-yük    11 tok /  0.00 sn | 1 vektör, boyut 1024
+  1.904 karakterlik parça    duvar   5.16 | sunucu   3.14 | yük  0.01 | ön-yük   450 tok /  0.00 sn | 1 vektör, boyut 1024
+  sorgu gömme medyanı: sunucu 0.11 sn / duvar 2.15 sn
+
+  --- faz B: sohbet boşaltıldı ---
+  ps: (sohbet modeli bellekte degil)
+  sorgu 1                    duvar   2.13 | sunucu   0.11 | yük  0.01 | ön-yük    11 tok /  0.00 sn | 1 vektör, boyut 1024
+  sorgu 2                    duvar   2.13 | sunucu   0.10 | yük  0.01 | ön-yük    11 tok /  0.00 sn | 1 vektör, boyut 1024
+  sorgu 3                    duvar   2.13 | sunucu   0.10 | yük  0.01 | ön-yük    11 tok /  0.00 sn | 1 vektör, boyut 1024
+  sorgu 4                    duvar   2.13 | sunucu   0.10 | yük  0.01 | ön-yük    11 tok /  0.00 sn | 1 vektör, boyut 1024
+  1.904 karakterlik parça    duvar   5.19 | sunucu   3.13 | yük  0.01 | ön-yük   450 tok /  0.00 sn | 1 vektör, boyut 1024
+  sorgu gömme medyanı: sunucu 0.10 sn / duvar 2.13 sn
+
+==============================================================================
+E12 — 2,05 sn'NIN KAYNAĞI: localhost çözümlemesi mi, bağlantı kurma mı?
+==============================================================================
+  E11 vekil sunucuyu eledi. Üç olasılık: DNS/hosts çözümü, TCP el sıkışması,
+  ya da her istekte yeni bağlantı kuran istemci. Bağlantı yeniden kullanımı test edilir.
+  http://localhost:11434 (urllib)    fark medyan  2.03 sn | denemeler 2.05 2.03 2.03 2.03
+  http://127.0.0.1:11434 (urllib)    fark medyan  0.00 sn | denemeler 0.00 0.00 0.00 0.00
+  [atlandı] E12: TypeError: HTTPConnection.request() got an unexpected keyword argument 'data'
+
+bitti.

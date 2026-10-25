@@ -1,0 +1,135 @@
+---
+title: "Örnek 1: Tablo Verisiyle Uçtan Uca ML"
+description: Göğüs kanseri teşhis veri setiyle eksiksiz bir scikit-learn iş akışı — keşif, baseline, çapraz doğrulama, test metrikleri ve model kaydı. Gerçek çalıştırma çıktılarıyla.
+dogrulama: 2026-10-15
+---
+
+import kod from '../../../../ornekler/klasik-ml/tablo_modeli.py?raw';
+import { Code } from 'astro-expressive-code/components';
+
+Bu sayfa, sitedeki ilk **çalıştırılabilir örnek proje**. Amaç yeni bir şey öğretmekten çok, [İlk Modelin](/klasik-ml/ilk-model/) ve [Loss ve Metrikler](/degerlendirme/loss-ve-metrikler/) sayfalarındaki doğru alışkanlıkları **tek bir gerçekçi betikte** birleştirmek: veriyi keşfet, aptal bir taban çizgisi kur, çapraz doğrulamayla model seç, test kümesine son anda dokun, metriği işin maliyetine göre yorumla, modeli kaydet ve yeniden yükle.
+
+:::note[Bu makinede çalıştırıldı]
+Aşağıdaki betik ve çıktılar bu projede **gerçekten çalıştırıldı** (Python 3.12, scikit-learn 1.9.1, pandas 3.0.6). Sabit `random_state=42` sayesinde aynı sürümlerle aynı sonuçları almanız beklenir; farklı sürümlerde küçük sapmalar olabilir. Ayrıca GPU gerekmez — bu örnek herhangi bir dizüstünde saniyeler içinde biter.
+:::
+
+## 1) Ne yapıyoruz?
+
+Senaryo: 30 sayısal ölçümden (hücre çekirdeği ölçüleri) bir tümörün **kötü huylu mu, iyi huylu mu** olduğunu tahmin ediyoruz. Veri seti **Breast Cancer Wisconsin (Diagnostic)** — 569 hasta, 30 özellik, iki sınıf. scikit-learn deposundaki herkese açık CSV dosyasını projeye `veri/breast_cancer.csv` olarak ekledik, yani çalıştırmak için internet bile gerekmiyor.
+
+Veri setini bilerek seçtik çünkü üç klasik tuzağı aynı anda gösteriyor:
+
+| Tuzak | Bu veri setinde karşılığı |
+| --- | --- |
+| Sınıf dengesizliği | 357 iyi huylu / 212 kötü huylu — "hep iyi huylu" desen %63 doğruluk alır |
+| Ölçek farkı | Ortalama yarıçap ~14 iken ortalama alan ~654 — ölçekleyici şart |
+| Pahalı hata asimetrisi | Kanseri kaçırmak (yanlış negatif), yanlış alarmdan çok daha pahalı |
+
+## 2) Kurulum
+
+Sitedeki [Yerel Kurulum](/donanim/yerel-kurulum/) sayfasındaki gibi bir sanal ortam (venv) oluşturup paketleri kurun:
+
+```bash
+# Proje kökünde, üst düzey bir klasörde:
+python -m venv .venv
+.venv\Scripts\activate        # Windows
+# source .venv/bin/activate   # macOS / Linux
+
+pip install pandas scikit-learn joblib
+```
+
+Sonra bu projenin klasöründen betiği çalıştırın:
+
+```bash
+cd ornekler/klasik-ml
+python tablo_modeli.py
+```
+
+## 3) Betiğin tamamı
+
+Tek dosya, dokuz numaralı adım. Yorum satırları her kararın **neden**'ini açıklıyor:
+
+<Code code={kod} lang="python" title="ornekler/klasik-ml/tablo_modeli.py" />
+
+## 4) Gerçek çalıştırma çıktısı
+
+Betik bu makinede çalıştırıldığında terminale dökülen özet (ham kayıt: `cikti/calistirma-cikti.txt`):
+
+```text title="Özet çıktı (gerçek çalıştırma)"
+Sınıf dağılımı:
+  0 (malignant): 212 hasta
+  1 (benign   ): 357 hasta
+  Dengesizlik oranı: 0.59
+
+Eğitim kümesi: 455 hasta
+Test kümesi  : 114 hasta
+
+Baseline test doğruluğu: 0.6316
+
+5-fold çapraz doğrulama (eğitim kümesi üzerinde):
+Lojistik Regresyon     ROC-AUC: 0.9959 (+/- 0.0050)
+Rastgele Orman         ROC-AUC: 0.9904 (+/- 0.0072)
+
+Test değerlendirmesi (hiç görülmemiş veri):
+Doğruluk (accuracy) : 0.9825
+Kesinlik (precision): 0.9861
+Duyarlılık (recall): 0.9861
+F1 skoru            : 0.9861
+ROC-AUC             : 0.9954
+
+Karışıklık matrisi (satır: gerçek, sütun: tahmin):
+[[41  1]
+ [ 1 71]]
+
+Yeni örnek tahmini (kaydedilen modelle):
+Gerçek etiket      : malignant
+Modelin tahmini    : malignant
+Olasılıklar        : malignant 1.000 | benign 0.000
+```
+
+## 5) Çıktıların yorumu — sayı okuma alıştırması
+
+Bu bölüm aslında bir metrik okuma dersi. Her sayının arkasında ne var?
+
+**Baseline 0.6316 neden önemli?** Verinin %63'ü iyi huylu. Hiçbir şey öğrenmeyen bir model "hep iyi huylu" diyerek %63,16 doğruluk alır. Dolayısıyla "%98 doğruluk" cümlesi ancak bu tabanın üzerindeki katkı olarak değer kazanır. Modelin gerçek katkısı: **+35 puan** ve her şeyden önemlisi, kötü huyluların yakalanması.
+
+**Neden iki model denedik?** Lojistik Regresyon ve Rastgele Orman, tablo verisinde birbirinden farklı iki aile. 5-fold çapraz doğrulamada LR `0.9959 ± 0.0050`, RF `0.9904 ± 0.0072` aldı. İkisi de harika ama LR hem daha basit hem biraz daha iyi — bu veri setinde doğrusal bir sınır yetiyor. **Karmaşık modeli varsayılan yapmıyoruz; ölçüyoruz.**
+
+**± işareti ne diyor?** `0.9959 ± 0.0050`, beş katın verdiği skorların ortalaması ve standart sapması. Sapma küçükse model kararlı demektir; farklı veri dilimlerinde çökmüyor.
+
+**Karışıklık matrisi nasıl okunur?**
+
+```text
+              tahmin: kötü    tahmin: iyi
+gerçek: kötü      41              1      <- 1 yanlış negatif
+gerçek: iyi        1             71      <- 1 yanlış pozitif
+```
+
+114 test hastasında 2 hata: bir kanserli hastayı kaçırdık (yanlış negatif), bir sağlıklıya gereksiz alarm verdik. Tıbbi taramada ilki çok daha pahalıdır. Bu yüzden bu problemde **duyarlılık (recall)** birinci bakılacak metriktir — %98,61. Farklı bir uygulamada (ör. spam filtresi) öncelik kesinliğe kayabilir; metrik seçimi işin maliyetine göre yapılır, [Loss ve Metrikler](/degerlendirme/loss-ve-metrikler/) sayfasında derinleştirdik.
+
+**"Olasılıklar: malignant 1.000" ne demek?** Kaydedilen model bir test hastasını neredeyse tam kesinlikle kötü huylu buldu. Ama dikkat: yüksek olasılık, kalibre edilmiş (gerçek frekansa uyan) olasılık demek değildir — Lojistik Regresyon genelde makul kalibre eder ama bunu ayrıca ölçmek gerekir.
+
+:::caution[Sızıntıya (leakage) karşı tek satırlık sigorta]
+`StandardScaler` eğer tüm veriye önce uygulansaydı, test verisinin ortalaması/standart sapması eğitime sızardı. Betikte ölçekleyici ve model bir `Pipeline` içinde: `fit` yalnızca eğitim verisini görüyor, `predict` aşamasında test verisine aynı dönüşüm uygulanıyor. Sızıntı gözle görülmez ama sonuçları şişirir — Pipeline alışkanlık haline getirilmeli.
+:::
+
+## 6) Kendi verinizle denemek için
+
+Bu betiği şablon olarak kullanabilirsiniz. Değiştirmeniz gereken yerler:
+
+1. **Veri yükleme (1. adım):** `pd.read_csv(...)` satırını kendi CSV'nizle değiştirin. Sizin dosyanızda başlık satırı varsa `header=None` ve `skiprows=1` parametrelerini silin.
+2. **Hedef sütun:** `df["hedef"]` adını kendi etiket sütununuzun adıyla değiştirin.
+3. **Sınıf adları (varsa):** `sinif_adi_0 / sinif_adi_1` yalnızca raporu güzelleştirir; 2'den fazla sınıfınız varsa `classification_report` etiketleri otomatik listeler.
+4. **Metrik seçimi:** İkili sınıflandırmada hangi hatanın pahalı olduğunu sorun; `recall`, `precision` veya `f1` tercihinizi ona göre yapın.
+
+:::tip[En sık yapılan üç hata]
+1. **Test kümesine erken bakmak:** Model seçimini çapraz doğrulamayla yapın; test kümesini en sona saklayın (betikte 6. ve 7. adımların sırası tesadüf değil).
+2. **Baseline'ı atlamak:** Taban çizgisi olmayan her yüzde şüphelidir.
+3. **Ölçekleme/eksik değer doldurmayı tüm veriye uygulamak:** Dönüşümler Pipeline'ın içinde, `fit` yalnızca eğitimde.
+:::
+
+## 7) Buradan sonrası
+
+- Veri kalitesi ham verinizde sorunluysa önce [Örnek 2: Veri Temizleme Atölyesi](/ornekler/veri-temizleme/)'ne bakın — PII maskeleme, mojibake onarımı ve tekrar temizliğini uygulamalı gösteriyor.
+- Aynı veriyle farklı modelleri yarıştırmak isterseniz `modeller` sözlüğüne `GradientBoostingClassifier` gibi bir üçüncü aile ekleyip betiği olduğu gibi çalıştırın; karşılaştırma altyapısı hazır.
+- Tablo verisinde derin öğrenmeye geçmeden önce [Klasik ML Temelleri](/klasik-ml/temeller/) sayfasındaki "önce basit model" ilkesini hatırlayın — bu örnekte olduğu gibi çoğu zaman yeterli olur.

@@ -1,0 +1,32 @@
+# Bağımlılıklar
+node_modules/
+
+# Derleme çıktıları
+dist/
+.astro/
+
+# Ortam ve editör
+.env
+.env.*
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+
+# Python (örnek projeler)
+.venv/
+__pycache__/
+*.pyc
+
+# Yerel araç durumları ve indirdiği ağırlıklar
+.hfcache/
+.mimosa/
+
+# cikti/: ölçüm kayıtları (.txt, küçük .json, denetim görselleri) depoya girer;
+# yalnız yeniden üretilebilen veri ve model artefaktları dışarıda kalır
+ornekler/**/cikti/*.jsonl
+ornekler/**/cikti/model.joblib
+ornekler/**/cikti/lora-adapter/
+ornekler/**/cikti/vektor-indeks*.json.gz
+ornekler/**/cikti/korpus.json

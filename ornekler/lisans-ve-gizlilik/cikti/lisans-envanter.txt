@@ -1,0 +1,70 @@
+koşum başlangıcı: 2026-10-17 14:22:37
+==============================================================================
+BÖLÜM 1: YEREL OLLAMA MODEL YIGINI (modelfile LICENSE alani)
+==============================================================================
+Ollama'nın bildirdiği model sayısı: 3
+
+### nomic-embed-text:latest
+  aile=nomic-bert parametre=137M nicemleme=F16 boyut=274 MB (ollama show: 0.09 sn)
+  modelfile bloklari: LICENSE
+  lisans başlığı   : Apache License
+  lisans metni     : 11357 bayt, 201 satır
+  sınıflandırma    : MARKA-KOSULU; ATIF-DOSYASI-ZORUNLU; GORUNUR-IKAR-ZORUNLU; TAZMIN-YUKUMLULUGU
+  şablon artığı    : VAR -> \[name of copyright
+  maddeler ["notice" text file]: (d) If the Work includes a "NOTICE" text file as part of its
+
+### bge-m3:latest
+  aile=bert parametre=566.70M nicemleme=F16 boyut=1158 MB (ollama show: 0.09 sn)
+  modelfile bloklari: LICENSE
+  lisans başlığı   : MIT License
+  lisans metni     : 1068 bayt, 21 satır
+  sınıflandırma    : KISITSIZ
+  şablon artığı    : VAR -> \[year\], \[fullname\]
+
+### qwen2.5:3b-instruct-q4_K_M
+  aile=qwen2 parametre=3.1B nicemleme=Q4_K_M boyut=1930 MB (ollama show: 0.09 sn)
+  modelfile bloklari: TEMPLATE, LICENSE
+  lisans başlığı   : Qwen RESEARCH LICENSE AGREEMENT
+  lisans metni     : 7387 bayt, 54 satır
+  sınıflandırma    : TICARI-KULLANIM-KAPALI; TICARI-ICIN-AYRILI-IZIN; URETIM-DIKEY-ATIF-ZORUNLU; IHRACAT-KONTROLU; MARKA-KOSULU; ATIF-DOSYASI-ZORUNLU; GORUNUR-IKAR-ZORUNLU; TAZMIN-YUKUMLULUGU
+  şablon artığı    : yok
+  maddeler [non-?commercial]: i. "Non-Commercial" shall mean for research or evaluation purposes only.
+  maddeler [non-?commercial]: a. You are granted a non-exclusive, worldwide, non-transferable and royalty-free limited license under Alibaba Cloud's intellectual property or other rights owned by us embodied in the Materials to use, reproduce, distribute, copy, create d
+  maddeler [commercially]: b. If you are commercially using the Materials, you shall request a license from us.
+  maddeler [built with]: b. If you use the Materials or any outputs or results therefrom to create, train, fine-tune, or improve an AI model that is distributed or made available, you shall prominently display “Built with Qwen” or “Improved using Qwen” in the relat
+  maddeler ["notice" text file]: c. You shall retain in all copies of the Materials that you distribute the following attribution notices within a "Notice" text file distributed as a part of such copies: "Qwen is licensed under the Qwen RESEARCH LICENSE AGREEMENT, Copyrigh
+  maddeler [export\s+control]: a. The Materials may be subject to export controls or restrictions in China, the United States or other countries or regions. You shall comply with applicable laws and regulations in your use of the Materials.
+  SYSTEM satırı  : You are Qwen, created by Alibaba Cloud. You are a helpful assistant.
+
+==============================================================================
+BÖLÜM 2: DEPO KAYITLARI (bu rehberin kendi lisans izleri)
+==============================================================================
+taranan dosya      : 83 (py/md/mdx; __pycache__, cikti/ ve lisans-ve-gizlilik/ dışarıda)
+en az bir lisans sözcüğü geçen dosya: 32
+  MIT                    51
+  APACHE-2.0             33
+  CC BY-SA               13
+  QWEN RESEARCH          7
+  CC-BY-SA               3
+  ODC-BY                 3
+  LLAMA COMMUNITY        2
+  CC0                    2
+  APACHE LICENSE         1
+  QWEN-RESEARCH          1
+
+  Örnek 6 (viki_rag.py) atıf/erişim izleri:
+    - # Vikipedi politikası gereği anlamlı bir User-Agent gönderilir.
+    - VIKI_LISANS = "Maddeler CC BY-SA lisansıyla yayımlanır; kaynak göstermeden yeniden kullanılamaz."
+    - istek = urllib.request.Request(url, headers={"User-Agent": VIKI_UA})
+
+  Örnek 3 (hazirla.py) veri kaynağı satırları:
+    - # Kurulum:  pip install datasets
+    - #           python hazirla.py --limit 200            (hızlı deneme)
+    - #           python hazirla.py --veri-seti sayhan/aya_dataset_tur   (alternatif)
+    - #   - AlicanKiraz0/Turkish-SFT-Dataset-v1.0  (~5.579 satır, MIT)   [varsayılan]
+    - #   - sayhan/aya_dataset_tur                 (4.046 train + 250 test, Apache-2.0)
+    - from datasets import load_dataset
+
+  Örnek 3 türetilmiş ürün: ornekler\turkce-asistan\cikti\egitim.jsonl -> 5297 satır
+
+koşum bitişi: 2026-10-17 14:22:38

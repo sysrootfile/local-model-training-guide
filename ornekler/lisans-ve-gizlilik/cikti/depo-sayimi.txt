@@ -1,0 +1,31 @@
+
+==============================================================================
+BÖLÜM 2: DEPO KAYITLARI (bu rehberin kendi lisans izleri)
+==============================================================================
+taranan dosya      : 83 (py/md/mdx; __pycache__, cikti/ ve lisans-ve-gizlilik/ dışarıda)
+en az bir lisans sözcüğü geçen dosya: 32
+  MIT                    51
+  APACHE-2.0             33
+  CC BY-SA               13
+  QWEN RESEARCH          7
+  CC-BY-SA               3
+  ODC-BY                 3
+  LLAMA COMMUNITY        2
+  CC0                    2
+  APACHE LICENSE         1
+  QWEN-RESEARCH          1
+
+  Örnek 6 (viki_rag.py) atıf/erişim izleri:
+    - # Vikipedi politikası gereği anlamlı bir User-Agent gönderilir.
+    - VIKI_LISANS = "Maddeler CC BY-SA lisansıyla yayımlanır; kaynak göstermeden yeniden kullanılamaz."
+    - istek = urllib.request.Request(url, headers={"User-Agent": VIKI_UA})
+
+  Örnek 3 (hazirla.py) veri kaynağı satırları:
+    - # Kurulum:  pip install datasets
+    - #           python hazirla.py --limit 200            (hızlı deneme)
+    - #           python hazirla.py --veri-seti sayhan/aya_dataset_tur   (alternatif)
+    - #   - AlicanKiraz0/Turkish-SFT-Dataset-v1.0  (~5.579 satır, MIT)   [varsayılan]
+    - #   - sayhan/aya_dataset_tur                 (4.046 train + 250 test, Apache-2.0)
+    - from datasets import load_dataset
+
+  Örnek 3 türetilmiş ürün: ornekler\turkce-asistan\cikti\egitim.jsonl -> 5297 satır

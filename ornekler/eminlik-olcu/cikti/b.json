@@ -1,0 +1,886 @@
+[
+ {
+  "duvar": 0.12874245643615723,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "C",
+  "icerik": "C",
+  "secilen": "C",
+  "kitles": {
+   "A": 6.692809348130993e-05,
+   "B": 0.03849758719429094,
+   "C": 0.9613132476244374,
+   "D": 0.00012134181120272087
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 6.692815340051872e-05,
+   "B": 0.03849762166031029,
+   "C": 0.9613141082664519,
+   "D": 0.0001213419198373008
+  },
+  "aday": 20,
+  "etiket": "B1",
+  "no": 1,
+  "soru": "Llama 3'un kelime dagarcigi (tokenizer sozlugui) kactir?",
+  "tip": "bilgi",
+  "dogru": "128.256",
+  "altin_harf": "A",
+  "sekiller": [
+   "128.256",
+   "151.936",
+   "262.208",
+   "50.257"
+  ]
+ },
+ {
+  "duvar": 0.1494300365447998,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "C",
+  "icerik": "C",
+  "secilen": "C",
+  "kitles": {
+   "A": 1.222255236784743e-06,
+   "B": 1.9323272428631643e-05,
+   "C": 0.9999787807470483,
+   "D": 6.637179484942143e-07
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 1.2222552490162642e-06,
+   "B": 1.932327262200616e-05,
+   "C": 0.9999787907541738,
+   "D": 6.637179551362641e-07
+  },
+  "aday": 20,
+  "etiket": "B2",
+  "no": 2,
+  "soru": "Qwen3'un kelime dagarcigi kactir?",
+  "tip": "bilgi",
+  "dogru": "151.936",
+  "altin_harf": "B",
+  "sekiller": [
+   "128.256",
+   "151.936",
+   "262.208",
+   "32.768"
+  ]
+ },
+ {
+  "duvar": 0.10259819030761719,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "C",
+  "icerik": "C",
+  "secilen": "C",
+  "kitles": {
+   "A": 5.4735951944070434e-08,
+   "B": 3.017519752802413e-07,
+   "C": 0.999999523169385,
+   "D": 9.026584673182236e-08
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 5.473595359035501e-08,
+   "B": 3.017519843559878e-07,
+   "C": 0.9999995532462126,
+   "D": 9.026584944673397e-08
+  },
+  "aday": 20,
+  "etiket": "B3",
+  "no": 3,
+  "soru": "Gemma 3'un kelime dagarcigi kactir?",
+  "tip": "bilgi",
+  "dogru": "262.208",
+  "altin_harf": "C",
+  "sekiller": [
+   "128.256",
+   "151.936",
+   "262.208",
+   "200.000"
+  ]
+ },
+ {
+  "duvar": 0.09874176979064941,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "B",
+  "icerik": "B",
+  "secilen": "B",
+  "kitles": {
+   "A": 0.0003724690335085864,
+   "B": 0.999602019782846,
+   "C": 2.3215076149535022e-05,
+   "D": 2.3012007502761506e-06
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 0.00037246903161150687,
+   "B": 0.9996020146916186,
+   "C": 2.3215076031294732e-05,
+   "D": 2.3012007385555494e-06
+  },
+  "aday": 20,
+  "etiket": "B4",
+  "no": 4,
+  "soru": "BAAI/bge-m3 embedding modeli kac boyutlu vektor uretir?",
+  "tip": "bilgi",
+  "dogru": "1024",
+  "altin_harf": "D",
+  "sekiller": [
+   "384",
+   "768",
+   "4096",
+   "1024"
+  ]
+ },
+ {
+  "duvar": 0.09755992889404297,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "C",
+  "icerik": "C",
+  "secilen": "C",
+  "kitles": {
+   "A": 3.9849970356632637e-10,
+   "B": 9.426040292071268e-09,
+   "C": 1.0000000000324658,
+   "D": 6.375521034686177e-09
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 3.9849969709766934e-10,
+   "B": 9.426040139062818e-09,
+   "C": 0.9999999837999392,
+   "D": 6.375520931195362e-09
+  },
+  "aday": 20,
+  "etiket": "B5",
+  "no": 5,
+  "soru": "paraphrase-multilingual-MiniLM-L12-v2 kac boyutlu cikis verir?",
+  "tip": "bilgi",
+  "dogru": "384",
+  "altin_harf": "A",
+  "sekiller": [
+   "384",
+   "1024",
+   "768",
+   "128"
+  ]
+ },
+ {
+  "duvar": 0.10321426391601562,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "C",
+  "icerik": "C",
+  "secilen": "C",
+  "kitles": {
+   "A": 5.7260009275022994e-05,
+   "B": 0.011167993747210992,
+   "C": 0.9887663720187285,
+   "D": 8.381196424826494e-06
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 5.726000887582687e-05,
+   "B": 0.01116799366935177,
+   "C": 0.988766365125406,
+   "D": 8.381196366395817e-06
+  },
+  "aday": 20,
+  "etiket": "B6",
+  "no": 6,
+  "soru": "TRL'de DPO egitiminin varsayilan beta degeri nedir?",
+  "tip": "bilgi",
+  "dogru": "0,1",
+  "altin_harf": "B",
+  "sekiller": [
+   "0,5",
+   "0,1",
+   "0,01",
+   "1,0"
+  ]
+ },
+ {
+  "duvar": 2.185281276702881,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "C",
+  "icerik": "C",
+  "secilen": "C",
+  "kitles": {
+   "A": 0.00041176283449186914,
+   "B": 0.00023716644777419478,
+   "C": 0.9993096589827218,
+   "D": 3.843192122222351e-05
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 0.00041176406147209766,
+   "B": 0.0002371671544881522,
+   "C": 0.9993126367482972,
+   "D": 3.843203574253359e-05
+  },
+  "aday": 20,
+  "etiket": "B7",
+  "no": 7,
+  "soru": "TRL kütüphanesinde SimPO karsiligi olan kayip turu hangisidir?",
+  "tip": "bilgi",
+  "dogru": "sigmoid_norm",
+  "altin_harf": "C",
+  "sekiller": [
+   "simpo",
+   "sigmoid",
+   "sigmoid_norm",
+   "cosine_similarity"
+  ]
+ },
+ {
+  "duvar": 2.7977294921875,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "C",
+  "icerik": "C",
+  "secilen": "C",
+  "kitles": {
+   "A": 0.00015402602488774034,
+   "B": 1.969736303337915e-05,
+   "C": 0.9998241066989486,
+   "D": 2.239653020377762e-06
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 0.00015402601414598303,
+   "B": 1.9697361659687313e-05,
+   "C": 0.9998240369713302,
+   "D": 2.2396528641846176e-06
+  },
+  "aday": 20,
+  "etiket": "B8",
+  "no": 8,
+  "soru": "FineWeb-2 derlemesinin tur_Latn bolümü kac belge icerir?",
+  "tip": "bilgi",
+  "dogru": "95.129.129",
+  "altin_harf": "D",
+  "sekiller": [
+   "88.838",
+   "1.100.000",
+   "41.933",
+   "95.129.129"
+  ]
+ },
+ {
+  "duvar": 2.3017055988311768,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "C",
+  "icerik": "C",
+  "secilen": "C",
+  "kitles": {
+   "A": 1.050865132656661e-06,
+   "B": 1.040671580884202e-06,
+   "C": 0.9999947548020098,
+   "D": 2.1196490235266073e-07
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 1.0508682239919052e-06,
+   "B": 1.040674642233024e-06,
+   "C": 0.9999976964916079,
+   "D": 2.1196552589087972e-07
+  },
+  "aday": 20,
+  "etiket": "B9",
+  "no": 9,
+  "soru": "OpenAssistant oasst1 derlemesinin Turkce kismi kac mesajdir?",
+  "tip": "bilgi",
+  "dogru": "37",
+  "altin_harf": "A",
+  "sekiller": [
+   "37",
+   "3.700",
+   "88.838",
+   "120"
+  ]
+ },
+ {
+  "duvar": 2.7072088718414307,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "B",
+  "icerik": "B",
+  "secilen": "B",
+  "kitles": {
+   "A": 5.579216242576569e-06,
+   "B": 0.999977111816701,
+   "C": 1.2765108424367546e-05,
+   "D": 4.522601451762332e-06
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 5.579216361174976e-06,
+   "B": 0.9999771330733952,
+   "C": 1.2765108695717763e-05,
+   "D": 4.522601547900088e-06
+  },
+  "aday": 20,
+  "etiket": "B10",
+  "no": 10,
+  "soru": "RunPod'da ag volume'unun fiyati (1 TB altinda) nedir?",
+  "tip": "bilgi",
+  "dogru": "$0,07/GB-ay",
+  "altin_harf": "B",
+  "sekiller": [
+   "$0,10/GB-ay",
+   "$0,07/GB-ay",
+   "$0,07/saat",
+   "$1,00/GB-ay"
+  ]
+ },
+ {
+  "duvar": 2.9733636379241943,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "C",
+  "icerik": "C",
+  "secilen": "C",
+  "kitles": {
+   "A": 0.0012600765407170219,
+   "B": 0.3032065878962019,
+   "C": 0.6043108747760271,
+   "D": 0.09121988447060893
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 0.0012600797870812995,
+   "B": 0.3032073690543331,
+   "C": 0.6043124316760827,
+   "D": 0.09122011948250287
+  },
+  "aday": 20,
+  "etiket": "B11",
+  "no": 11,
+  "soru": "CUDA 12 ailesi icin Windows'ta asgari ekran karti surucusu hangisidir?",
+  "tip": "bilgi",
+  "dogru": "527.41",
+  "altin_harf": "C",
+  "sekiller": [
+   "450.80.02",
+   "525.60.13",
+   "527.41",
+   "580.00"
+  ]
+ },
+ {
+  "duvar": 2.741293430328369,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "C",
+  "icerik": "C",
+  "secilen": "C",
+  "kitles": {
+   "A": 0.02123901203785186,
+   "B": 0.04096488725727645,
+   "C": 0.9375137720958814,
+   "D": 0.0002822697239629956
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 0.021239013288511736,
+   "B": 0.040964889669495096,
+   "C": 0.9375138273014086,
+   "D": 0.00028226974058445696
+  },
+  "aday": 20,
+  "etiket": "B12",
+  "no": 12,
+  "soru": "Ollama, 24 GB altindaki VRAM'de varsayilan olarak kac tokenlik baglam acar?",
+  "tip": "bilgi",
+  "dogru": "4096",
+  "altin_harf": "D",
+  "sekiller": [
+   "32768",
+   "256000",
+   "8192",
+   "4096"
+  ]
+ },
+ {
+  "duvar": 2.0936875343322754,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "C",
+  "icerik": "C",
+  "secilen": "C",
+  "kitles": {
+   "A": 0.011095020775406103,
+   "B": 0.016626017371681904,
+   "C": 0.9720178240624003,
+   "D": 0.00026118979941210086
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 0.011095020198366301,
+   "B": 0.016626016506981065,
+   "C": 0.9720177735088247,
+   "D": 0.00026118978582790724
+  },
+  "aday": 20,
+  "etiket": "B13",
+  "no": 13,
+  "soru": "Ollama varsayilan keep_alive degeriyle modeli bellekte ne kadar tutar?",
+  "tip": "bilgi",
+  "dogru": "5 dakika",
+  "altin_harf": "A",
+  "sekiller": [
+   "5 dakika",
+   "30 dakika",
+   "1 saat",
+   "10 saniye"
+  ]
+ },
+ {
+  "duvar": 2.1444058418273926,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "C",
+  "icerik": "C",
+  "secilen": "C",
+  "kitles": {
+   "A": 0.006198104066783401,
+   "B": 0.012155498971115054,
+   "C": 0.9747817510960481,
+   "D": 0.006861395548545359
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 0.0061981242126550465,
+   "B": 0.012155538480474596,
+   "C": 0.9747849194565384,
+   "D": 0.006861417850331927
+  },
+  "aday": 20,
+  "etiket": "B14",
+  "no": 14,
+  "soru": "Bu makinede olculen Turkce metnin karakter/token orani kactir?",
+  "tip": "bilgi",
+  "dogru": "2,99",
+  "altin_harf": "B",
+  "sekiller": [
+   "4,20",
+   "2,99",
+   "1,50",
+   "3,75"
+  ]
+ },
+ {
+  "duvar": 2.2181015014648438,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "C",
+  "icerik": "C",
+  "secilen": "C",
+  "kitles": {
+   "A": 4.315819399769979e-07,
+   "B": 1.2102405041052055e-05,
+   "C": 0.9999872446070944,
+   "D": 8.810826644561056e-08
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 4.315819975058675e-07,
+   "B": 1.210240665427452e-05,
+   "C": 0.99998737790307,
+   "D": 8.81082781902377e-08
+  },
+  "aday": 20,
+  "etiket": "B15",
+  "no": 15,
+  "soru": "Qwen3-30B-A3B modelinin AKTIF parametre miktari nedir?",
+  "tip": "bilgi",
+  "dogru": "3,3B",
+  "altin_harf": "C",
+  "sekiller": [
+   "30,5B",
+   "37B",
+   "3,3B",
+   "8B"
+  ]
+ },
+ {
+  "duvar": 2.1310017108917236,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "C",
+  "icerik": "C",
+  "secilen": "C",
+  "kitles": {
+   "A": 0.00010412236025312857,
+   "B": 0.06816006814804566,
+   "C": 0.9315741084806216,
+   "D": 0.00016156219449290675
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 0.00010412237470704122,
+   "B": 0.06816007760979498,
+   "C": 0.9315742377985775,
+   "D": 0.00016156221692042224
+  },
+  "aday": 20,
+  "etiket": "B16",
+  "no": 16,
+  "soru": "DeepSeek-V3 modelinin TOPLAM parametre miktari nedir?",
+  "tip": "bilgi",
+  "dogru": "671B",
+  "altin_harf": "D",
+  "sekiller": [
+   "37B",
+   "109B",
+   "30,5B",
+   "671B"
+  ]
+ },
+ {
+  "duvar": 2.404665231704712,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "C",
+  "icerik": "C",
+  "secilen": "C",
+  "kitles": {
+   "A": 0.001706012217851476,
+   "B": 0.041700156996331866,
+   "C": 0.9052594898195045,
+   "D": 0.05133434997756093
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 0.0017060122024781755,
+   "B": 0.041700156620561375,
+   "C": 0.9052594816619861,
+   "D": 0.05133434951497433
+  },
+  "aday": 20,
+  "etiket": "B17",
+  "no": 17,
+  "soru": "Ornek 6'nin kodunda ZAYIF_ESIK olcumden sonra hangi degere cekildi?",
+  "tip": "bilgi",
+  "dogru": "0,54",
+  "altin_harf": "A",
+  "sekiller": [
+   "0,54",
+   "0,35",
+   "0,75",
+   "0,41"
+  ]
+ },
+ {
+  "duvar": 2.2076659202575684,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "D",
+  "icerik": "D",
+  "secilen": "D",
+  "kitles": {
+   "A": 0.00013998092928680004,
+   "B": 0.014283339111079015,
+   "C": 0.3419345779323641,
+   "D": 0.643636644319794
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 0.0001399816932659339,
+   "B": 0.01428341706579112,
+   "C": 0.3419364441214516,
+   "D": 0.6436401571194914
+  },
+  "aday": 20,
+  "etiket": "B18",
+  "no": 18,
+  "soru": "MMLU'da ust modellerin yerlestigi doygunluk bandi yaklasik kactir?",
+  "tip": "bilgi",
+  "dogru": "%90",
+  "altin_harf": "B",
+  "sekiller": [
+   "%60",
+   "%90",
+   "%75",
+   "%99"
+  ]
+ },
+ {
+  "duvar": 2.3436222076416016,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "C",
+  "icerik": "C",
+  "secilen": "C",
+  "kitles": {
+   "A": 0.007418704027279596,
+   "B": 0.026239250552602518,
+   "C": 0.702223245002718,
+   "D": 0.229746428892293
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 0.007682779374277697,
+   "B": 0.027173259938766087,
+   "C": 0.7272195039736027,
+   "D": 0.23792445671335358
+  },
+  "aday": 20,
+  "etiket": "B19",
+  "no": 19,
+  "soru": "Qwen3-30B-A3B'de her token icin 128 uzmandan kaci secilir?",
+  "tip": "bilgi",
+  "dogru": "8",
+  "altin_harf": "C",
+  "sekiller": [
+   "2",
+   "16",
+   "8",
+   "128"
+  ]
+ },
+ {
+  "duvar": 2.8316001892089844,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "B",
+  "icerik": "B",
+  "secilen": "B",
+  "kitles": {
+   "A": 0.10130051420729791,
+   "B": 0.6398678961282996,
+   "C": 0.24844953311588733,
+   "D": 0.010382108415601757
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 0.10130050895313564,
+   "B": 0.6398678629402178,
+   "C": 0.24844952022953454,
+   "D": 0.010382107877112069
+  },
+  "aday": 20,
+  "etiket": "B20",
+  "no": 20,
+  "soru": "vLLM icin Ekim 2026'da ulasilan surum hattini hangisidir?",
+  "tip": "bilgi",
+  "dogru": "v0,31",
+  "altin_harf": "D",
+  "sekiller": [
+   "v0,12",
+   "v1,0",
+   "v0,8",
+   "v0,31"
+  ]
+ },
+ {
+  "duvar": 2.911919593811035,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "B",
+  "icerik": "B",
+  "secilen": "B",
+  "kitles": {
+   "A": 0.45808820272691636,
+   "B": 0.5367128264332099,
+   "C": 0.002427286501055876,
+   "D": 0.0027714560838779916
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 0.4580883072878354,
+   "B": 0.5367129489405918,
+   "C": 0.0024272870550961366,
+   "D": 0.0027714567164766777
+  },
+  "aday": 20,
+  "etiket": "B21",
+  "no": 21,
+  "soru": "2031 yilinda duzenlenecek yerel secimin kesin sonucu nedir?",
+  "tip": "bilinemez",
+  "dogru": "Hiçbiri / bilmiyorum",
+  "altin_harf": "A",
+  "sekiller": [
+   "Hiçbiri / bilmiyorum",
+   "Akpartinin adayi kazanacak",
+   "Muhalif aday kazanacak",
+   "Sonuc esitlikle belirlenecek"
+  ]
+ },
+ {
+  "duvar": 2.344782829284668,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "C",
+  "icerik": "C",
+  "secilen": "C",
+  "kitles": {
+   "A": 3.0512687225750665e-06,
+   "B": 0.13831842015219728,
+   "C": 0.8616775898125834,
+   "D": 9.713826535298356e-07
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 3.051268623054411e-06,
+   "B": 0.13831841564078218,
+   "C": 0.861677561707973,
+   "D": 9.713826218470678e-07
+  },
+  "aday": 20,
+  "etiket": "B22",
+  "no": 22,
+  "soru": "Bulut Kargo A.S.'nin iade suresi kac is gunudur?",
+  "tip": "bilinemez",
+  "dogru": "Hiçbiri / bilmiyorum",
+  "altin_harf": "B",
+  "sekiller": [
+   "7 is gunu",
+   "Hiçbiri / bilmiyorum",
+   "14 is gunu",
+   "3 is gunu"
+  ]
+ },
+ {
+  "duvar": 2.3082683086395264,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "C",
+  "icerik": "C",
+  "secilen": "C",
+  "kitles": {
+   "A": 2.197294577241816e-09,
+   "B": 0.00021135784111059723,
+   "C": 0.999788582382526,
+   "D": 8.747364145599655e-08
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 2.1972945115546355e-09,
+   "B": 0.0002113578347921451,
+   "C": 0.9997885524942746,
+   "D": 8.74736388410095e-08
+  },
+  "aday": 20,
+  "etiket": "B23",
+  "no": 23,
+  "soru": "Yildiztepe mahallesinde kac hane yasiyor?",
+  "tip": "bilinemez",
+  "dogru": "Hiçbiri / bilmiyorum",
+  "altin_harf": "C",
+  "sekiller": [
+   "1.240",
+   "860",
+   "Hiçbiri / bilmiyorum",
+   "3.500"
+  ]
+ },
+ {
+  "duvar": 2.446214437484741,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "B",
+  "icerik": "B",
+  "secilen": "B",
+  "kitles": {
+   "A": 0.0003164145381223666,
+   "B": 0.9706416130618878,
+   "C": 0.009205945179956414,
+   "D": 0.019826802852905258
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 0.00031641745687315453,
+   "B": 0.9706505666990681,
+   "C": 0.009206030099757847,
+   "D": 0.019826985744300807
+  },
+  "aday": 20,
+  "etiket": "B24",
+  "no": 24,
+  "soru": "Gomme egitimi kafesinde batch 16 kolunun hit@1 skoru kactir?",
+  "tip": "bilinemez",
+  "dogru": "Hiçbiri / bilmiyorum",
+  "altin_harf": "D",
+  "sekiller": [
+   "8/8",
+   "7/8",
+   "6/8",
+   "Hiçbiri / bilmiyorum"
+  ]
+ },
+ {
+  "duvar": 2.4691786766052246,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "D",
+  "icerik": "D",
+  "secilen": "D",
+  "kitles": {
+   "A": 0.0008080695034847895,
+   "B": 0.0009309839215960493,
+   "C": 0.18954562562233584,
+   "D": 0.8087152819493572
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 0.0008080695350021083,
+   "B": 0.0009309839579074272,
+   "C": 0.18954563301522703,
+   "D": 0.8087153134918634
+  },
+  "aday": 20,
+  "etiket": "B25",
+  "no": 25,
+  "soru": "Bu makinede q4_K_M ile fp16 arasindaki logprob farki olculdu mu?",
+  "tip": "bilinemez",
+  "dogru": "Hiçbiri / bilmiyorum",
+  "altin_harf": "A",
+  "sekiller": [
+   "Hiçbiri / bilmiyorum",
+   "Evet, 0,05",
+   "Evet, 0,23",
+   "Evet, 0,00"
+  ]
+ },
+ {
+  "duvar": 2.2783708572387695,
+  "ctki": 1,
+  "kayit": 1,
+  "token": "B",
+  "icerik": "B",
+  "secilen": "B",
+  "kitles": {
+   "A": 8.847804017272019e-09,
+   "B": 0.9999971389770508,
+   "C": 2.877442100379763e-06,
+   "D": 5.654103500831309e-08
+  },
+  "eksik_harf": [],
+  "renorm": {
+   "A": 8.847803293451014e-09,
+   "B": 0.9999970571693013,
+   "C": 2.877441864982027e-06,
+   "D": 5.654103038280503e-08
+  },
+  "aday": 20,
+  "etiket": "B26",
+  "no": 26,
+  "soru": "2027'de yayimlanacak bir modelin MMLU skoru ne olacak?",
+  "tip": "bilinemez",
+  "dogru": "Hiçbiri / bilmiyorum",
+  "altin_harf": "B",
+  "sekiller": [
+   "%95",
+   "Hiçbiri / bilmiyorum",
+   "%88",
+   "%70"
+  ]
+ }
+]

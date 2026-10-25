@@ -1,0 +1,86 @@
+
+============================================================
+1) Veri yükleme
+============================================================
+Kaynak dosya : breast_cancer.csv
+Satır sayısı : 569 (metadata: 569 hasta, 30 özellik)
+Sınıflar     : 0 = malignant, 1 = benign
+
+İlk 3 satır (ilk 5 sütun):
+   mean radius  mean texture  mean perimeter  mean area  mean smoothness
+0        17.99         10.38           122.8     1001.0          0.11840
+1        20.57         17.77           132.9     1326.0          0.08474
+2        19.69         21.25           130.0     1203.0          0.10960
+
+============================================================
+2) Keşif: sınıf dengesi ve eksik değerler
+============================================================
+Sınıf dağılımı:
+  0 (malignant): 212 hasta
+  1 (benign   ): 357 hasta
+  Dengesizlik oranı: 0.59
+
+Toplam eksik değer: 0
+
+============================================================
+3) Eğitim ve test kümelerine ayırma
+============================================================
+Eğitim kümesi: 455 hasta
+Test kümesi  : 114 hasta
+
+============================================================
+4) Modelleri pipeline olarak tanımlama
+============================================================
+  - Lojistik Regresyon hazır
+  - Rastgele Orman hazır
+
+============================================================
+5) Baseline (taban çizgisi) model
+============================================================
+Baseline test doğruluğu: 0.6316
+(Bu, verideki en sık sınıfın oranıdır; bunun üzeri katkı demektir.)
+
+============================================================
+6) 5-fold çapraz doğrulama (eğitim kümesi üzerinde)
+============================================================
+Lojistik Regresyon     ROC-AUC: 0.9959 (+/- 0.0050)
+Rastgele Orman         ROC-AUC: 0.9904 (+/- 0.0072)
+
+============================================================
+7) Test değerlendirmesi (hiç görülmemiş veri)
+============================================================
+Doğruluk (accuracy) : 0.9825
+Kesinlik (precision): 0.9861
+Duyarlılık (recall): 0.9861
+F1 skoru            : 0.9861
+ROC-AUC             : 0.9954
+
+Karışıklık matrisi (satır: gerçek, sütun: tahmin):
+[[41  1]
+ [ 1 71]]
+
+Sınıf bazlı rapor:
+              precision    recall  f1-score   support
+
+   malignant       0.98      0.98      0.98        42
+      benign       0.99      0.99      0.99        72
+
+    accuracy                           0.98       114
+   macro avg       0.98      0.98      0.98       114
+weighted avg       0.98      0.98      0.98       114
+
+
+============================================================
+8) Modeli kaydetme
+============================================================
+Model kaydedildi: D:\projects\model-egitimi-rehberi\ornekler\klasik-ml\cikti\model.joblib
+Özet rapor kaydedildi: D:\projects\model-egitimi-rehberi\ornekler\klasik-ml\cikti\rapor.txt
+
+============================================================
+9) Yeni örnek tahmini (kaydedilen modelle)
+============================================================
+Gerçek etiket      : malignant
+Modelin tahmini    : malignant
+Olasılıklar        : malignant 1.000 | benign 0.000
+
+Bitti. cikti/ klasöründeki model.joblib dosyasını yeni verilerle kullanabilirsiniz.

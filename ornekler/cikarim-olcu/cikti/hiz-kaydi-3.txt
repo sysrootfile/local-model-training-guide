@@ -1,0 +1,44 @@
+model: qwen2.5:3b-instruct-q4_K_M | embedding: bge-m3 | cpu (%100), Ollama yerel
+süreler Ollama'nın döndürdüğü alanlardan; 'duvar' = HTTP dahil gerçek bekleme
+
+==============================================================================
+E11 — DUVAR-SUNUCU FARKI: ~2 sn'nin kaynağı (vekil sunucu algılama?)
+==============================================================================
+  E1/E9'da her sıcak çağrıda duvar, sunucu süresinden ~2,0 sn büyüktü.
+  varsayılan   duvar  3.36 | sunucu  1.27 | fark  2.09 sn
+  varsayılan   duvar  3.27 | sunucu  1.22 | fark  2.05 sn
+  varsayılan   duvar  3.28 | sunucu  1.23 | fark  2.05 sn
+  varsayılan   duvar  3.21 | sunucu  1.19 | fark  2.02 sn
+  proxy yok    duvar  3.22 | sunucu  1.16 | fark  2.06 sn
+  proxy yok    duvar  3.29 | sunucu  1.21 | fark  2.08 sn
+  proxy yok    duvar  3.30 | sunucu  1.23 | fark  2.08 sn
+  proxy yok    duvar  3.33 | sunucu  1.25 | fark  2.08 sn
+  varsayılan: fark medyan 2.05 sn (4 deneme)
+  proxy yok: fark medyan 2.08 sn (4 deneme)
+
+==============================================================================
+E8b — EMBEDDING'İN SUNUCU TARAFI (istemci gideri çıkarılmış)
+==============================================================================
+  E8 duvar süresi ölçmüştü; /api/embed de kendi süre alanlarını döndürür.
+  İki faz: sohbet modeli bellekteyken ve boşaltıldıktan sonra.
+
+  --- faz A: sohbet modeli bellekte ---
+  ps: qwen2.5:3b-instruct-q4_K_M 357c53fb659c 2.2 GB 100% CPU 4096 llamacpp 4 minutes from now
+  sorgu 1                    duvar  14.02 | sunucu  12.01 | yük 11.92 | ön-yük    11 tok /  0.00 sn [    0.0 tok/sn] | 0 vektör
+  sorgu 2                    duvar   2.13 | sunucu   0.10 | yük  0.01 | ön-yük    11 tok /  0.00 sn [    0.0 tok/sn] | 0 vektör
+  sorgu 3                    duvar   2.13 | sunucu   0.10 | yük  0.01 | ön-yük    11 tok /  0.00 sn [    0.0 tok/sn] | 0 vektör
+  sorgu 4                    duvar   2.15 | sunucu   0.10 | yük  0.01 | ön-yük    11 tok /  0.00 sn [    0.0 tok/sn] | 0 vektör
+  1.904 karakterlik parça    duvar   5.22 | sunucu   3.17 | yük  0.01 | ön-yük   450 tok /  0.00 sn [    0.0 tok/sn] | 0 vektör
+  sorgu gömme medyanı: sunucu 0.10 sn / duvar 2.14 sn
+
+  --- faz B: sohbet boşaltıldı ---
+  ps: (sohbet modeli bellekte degil)
+  sorgu 1                    duvar   2.13 | sunucu   0.10 | yük  0.01 | ön-yük    11 tok /  0.00 sn [    0.0 tok/sn] | 0 vektör
+  sorgu 2                    duvar   2.14 | sunucu   0.11 | yük  0.01 | ön-yük    11 tok /  0.00 sn [    0.0 tok/sn] | 0 vektör
+  sorgu 3                    duvar   2.16 | sunucu   0.12 | yük  0.01 | ön-yük    11 tok /  0.00 sn [    0.0 tok/sn] | 0 vektör
+  sorgu 4                    duvar   2.20 | sunucu   0.16 | yük  0.01 | ön-yük    11 tok /  0.00 sn [    0.0 tok/sn] | 0 vektör
+  1.904 karakterlik parça    duvar   5.24 | sunucu   3.22 | yük  0.01 | ön-yük   450 tok /  0.00 sn [    0.0 tok/sn] | 0 vektör
+  sorgu gömme medyanı: sunucu 0.11 sn / duvar 2.15 sn
+
+bitti.
+B3 0

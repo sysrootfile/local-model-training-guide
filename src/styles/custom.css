@@ -1,0 +1,65 @@
+/* Model Eğitimi Rehberi — özel tema */
+
+/* Koyu tema (varsayılan) */
+:root {
+  --sl-color-accent-low: #1b1740;
+  --sl-color-accent: #8b7cf7;
+  --sl-color-accent-high: #d3ccff;
+  --sl-color-white: #ffffff;
+  --sl-color-gray-1: #eceef2;
+  --sl-color-gray-2: #c2c5cf;
+  --sl-color-gray-3: #8b8f9e;
+  --sl-color-gray-4: #55596a;
+  --sl-color-gray-5: #34384a;
+  --sl-color-gray-6: #232633;
+  --sl-color-black: #16171d;
+}
+
+/* Açık tema */
+:root[data-theme='light'] {
+  --sl-color-accent-low: #e0daff;
+  --sl-color-accent: #5b47d6;
+  --sl-color-accent-high: #2b1f7a;
+  --sl-color-white: #16171d;
+  --sl-color-gray-1: #232633;
+  --sl-color-gray-2: #34384a;
+  --sl-color-gray-3: #55596a;
+  --sl-color-gray-4: #8b8f9e;
+  --sl-color-gray-5: #c2c5cf;
+  --sl-color-gray-6: #eceef2;
+  --sl-color-gray-7: #f6f7f9;
+  --sl-color-black: #ffffff;
+}
+
+/* Ana sayfa hero başlığı */
+.hero h1 {
+  letter-spacing: -0.02em;
+}
+
+/* Ana sayfa etkileşimli seçici bölümü */
+.home-wizard {
+  margin-top: 2.5rem;
+}
+
+.home-wizard > p {
+  color: var(--sl-color-gray-2);
+}
+
+/* Kartlara hafif derinlik */
+.card {
+  border-radius: 0.75rem;
+}
+
+/* Tablo satırlarına hafif vurgu */
+.sl-markdown-content tbody tr:hover {
+  background-color: var(--sl-color-gray-6);
+}
+
+:root[data-theme='light'] .sl-markdown-content tbody tr:hover {
+  background-color: var(--sl-color-gray-7);
+}
+
+/* Sayfa içi bağlantı başlıklarında yumuşak geçiş */
+.sl-markdown-content :is(h1, h2, h3, h4) {
+  scroll-margin-top: 5rem;
+}

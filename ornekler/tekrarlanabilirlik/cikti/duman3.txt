@@ -1,0 +1,52 @@
+TEKRARLANABILIRLIK OLCUM KAFESI
+  baslangic: 2026-10-17 11:02:52
+  python 3.12.10 | Windows 11
+  ollama 0.40.4 | model qwen2.5:3b-instruct-q4_K_M | tekrar 2 | varsayilan num_predict 48
+  DUMAN TESTI: A1-A3 + D2-D3, iki tekrar, K0 tek istek
+
+K0 - VARSAYILAN NUM_PREDICT ARAMASI
+   gonderim: options = {temperature: 0} (num_predict YOK)
+  K0.1: duvar 81.66 sn | ctki token 1060 | bitis stop
+
+A1 | kapali | T=0.0 | seed=- | format=yok | num_predict=48 | 2 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yanitiniz tek kelime olsun, yildan bask
+   1. [7b7a53e239] duvar  0.97 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2020'
+   2. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+
+A2 | kapali | T=0.0 | seed=1234 | format=yok | num_predict=48 | 2 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yanitiniz tek kelime olsun, yildan bask
+   1. [7b7a53e239] duvar  0.34 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2020'
+   2. [7b7a53e239] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+
+A3 | kapali | T=0.8 | seed=- | format=yok | num_predict=48 | 2 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yanitiniz tek kelime olsun, yildan bask
+   1. [05a5cf0698] duvar  0.34 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2021'
+   2. [7b7a53e239] duvar  0.39 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2020'
+
+D2 | json | T=0.8 | seed=- | format=sema | num_predict=300 | 2 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yalnizca iki alanli JSON yaz: yil (sayi
+   1. [b6bc6ec28a] duvar  3.64 sn | girdi   74 | ctki  42 | bitis stop   | FARKLI | JSON ok yil=2022 alanlar=gerekce,yil | '{ "yil": 2022, "gerekce": "Marmaray, yine de 2022 yılında hizmete açıldı."'
+   2. [d73c78fe43] duvar  1.63 sn | girdi   74 | ctki  24 | bitis stop   | FARKLI | JSON ok yil=2022 alanlar=gerekce,yil | '{ "yil": 2022, "gerekce": "Ayet" }'
+
+D3 | json | T=0.8 | seed=- | format=sema | num_predict=48 | 2 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yalnizca iki alanli JSON yaz: yil (sayi
+   1. [887f4724f4] duvar  3.24 sn | girdi   74 | ctki  48 | bitis length | FARKLI | JSON BOZUK yil=None alanlar=- | '{ "yil": 2022, "gerekce": "Marmaray, Türkiye\'nin deniz yoluna geçmesi amac'
+   2. [583f5130af] duvar  3.24 sn | girdi   74 | ctki  48 | bitis length | FARKLI | JSON BOZUK yil=None alanlar=- | '{ "yil": 2017, "gerekce": "Marmaray (İngilizce: Marmaray - Çanakkale Boğaz'
+
+=========================================================
+OZET (kol A)
+=========================================================
+hucre  n  benzersiz  en-sik-oran  uz-ort  uz-min/max  ctki-ort  duvar
+A1      2          1         1.00     4.0    4/4         5.0     1.3 sn
+A2      2          1         1.00     4.0    4/4         5.0     0.7 sn
+A3      2          2         0.50     4.0    4/4         5.0     0.7 sn
+D2      2          2         0.50    55.0   34/76       33.0     5.3 sn
+D3      2          2         0.50   107.0   99/115      48.0     6.5 sn
+
+A1     bitis: {'stop': 2} | not: sicaklik 0, tohum yok
+A2     bitis: {'stop': 2} | not: sicaklik 0, tohum 1234
+A3     bitis: {'stop': 2} | not: sicaklik 0,8, tohum yok
+D2     bitis: {'stop': 2} | JSON okunan 2/2 | yil kodlari: 2022 | alan setleri: 1 cesit | not: format=sema, sicaklik 0,8, tohum yok
+D3     bitis: {'length': 2} | JSON okunan 0/2 | yil kodlari: None | alan setleri: 1 cesit | not: format=sema AMA num_predict 48
+
+bitti: 2026-10-17 11:04:29

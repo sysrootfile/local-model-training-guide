@@ -1,0 +1,6 @@
+koşum başlangıcı: 2026-10-17 15:03:25
+kol a: çıkış kodu 0, 40 sn -> kol-a.txt
+kol b: çıkış kodu 0, 1628 sn -> kol-b.txt
+kol c: çıkış kodu 0, 155 sn -> kol-c.txt
+kol d: çıkış kodu 0, 725 sn -> kol-d.txt
+koşum bitişi: 2026-10-17 15:45:53

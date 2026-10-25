@@ -1,0 +1,314 @@
+---
+---
+<div class="mw-card" id="mw-root">
+  <div class="mw-q">
+    <p class="mw-label">1 · Elindeki donanım?</p>
+    <div class="mw-chips" data-q="hw">
+      <button type="button" class="mw-chip" data-val="none">GPU'm yok</button>
+      <button type="button" class="mw-chip" data-val="small">4-8 GB ekran kartı</button>
+      <button type="button" class="mw-chip" data-val="mid">12-24 GB ekran kartı</button>
+      <button type="button" class="mw-chip" data-val="big">24 GB+ ekran kartı</button>
+    </div>
+  </div>
+  <div class="mw-q">
+    <p class="mw-label">2 · Hedefin?</p>
+    <div class="mw-chips" data-q="goal">
+      <button type="button" class="mw-chip" data-val="chat">Türkçe sohbet / asistan</button>
+      <button type="button" class="mw-chip" data-val="domain">Alan bilgisi öğretmek</button>
+      <button type="button" class="mw-chip" data-val="style">Üslup / format öğretmek</button>
+      <button type="button" class="mw-chip" data-val="image">Görsel üretim</button>
+      <button type="button" class="mw-chip" data-val="table">Tablo verisiyle tahmin</button>
+    </div>
+  </div>
+  <div class="mw-q">
+    <p class="mw-label">3 · Deneyimin?</p>
+    <div class="mw-chips" data-q="exp">
+      <button type="button" class="mw-chip" data-val="new">Yeni başlıyorum</button>
+      <button type="button" class="mw-chip" data-val="some">Biraz Python biliyorum</button>
+      <button type="button" class="mw-chip" data-val="dev">Yazılımcıyım</button>
+    </div>
+  </div>
+  <div class="mw-result" id="mw-result">
+    <p class="mw-empty">Üç soruyu da yanıtla, sana uygun yol haritasını göstereyim.</p>
+  </div>
+</div>
+
+<script>
+  const mwState = { hw: null, goal: null, exp: null };
+
+  function mwPick(goal, hw) {
+    const cloud = hw === 'none';
+    if (goal === 'table') {
+      return {
+        title: 'Klasik makine öğrenmesi yolundan git',
+        desc:
+          'Tablo/sayısal verilerle tahmin için LLM\u2019e hiç gerek yok; scikit-learn ile ' +
+          (cloud
+            ? 'CPU\u2019da bile hızlı sonuç alırsın. '
+            : 'ekran kartınla çok hızlı sonuç alırsın. '),
+        steps: [
+          ['Temelleri öğren', '/klasik-ml/temeller/'],
+          ['İlk modelini uçtan uca eğit', '/klasik-ml/ilk-model/'],
+          ['Değerlendirme metriklerini oku', '/degerlendirme/loss-ve-metrikler/'],
+          ['Gerçek veriyle uçtan uca örnek proje', '/ornekler/klasik-ml/'],
+        ],
+      };
+    }
+    if (goal === 'image') {
+      return {
+        title: cloud
+          ? 'Bulutta görsel LoRA eğitimi'
+          : 'Yerelde görsel LoRA eğitimi',
+        desc:
+          'Görsel üretimi için difüzyon modelini baştan eğitmiyoruz; LoRA ile karakter/üslup öğretiyoruz. ' +
+          (cloud
+            ? 'GPU\u2019n olmadığı için Colab veya Kaggle\u2019daki ücretsiz GPU\u2019lar en pratik başlangıç.'
+            : '6-8 GB VRAM, SD 1.5 LoRA için yeterli; daha büyük modellerde bulutu düşün.'),
+        steps: [
+          ['Önce mantığını anla', '/gorsel/diffusion-temelleri/'],
+          ['Adım adım LoRA eğitimi', '/gorsel/lora-egitimi/'],
+          cloud
+            ? ['Ücretsiz GPU seçenekleri', '/donanim/bulut-secenekleri/']
+            : ['VRAM ihtiyacını hesapla', '/donanim/vram-hesabi/'],
+          ['Kendi stilinle LoRA eğit: örnek proje', '/ornekler/gorsel-lora/'],
+        ],
+      };
+    }
+
+    let model, method, place;
+    if (hw === 'none') {
+      model = '0,6B-4B arası küçük bir model';
+      method = 'QLoRA';
+      place = 'Kaggle veya Colab\u2019daki ücretsiz GPU ile';
+    } else if (hw === 'small') {
+      model = '0,6B-4B arası küçük bir model';
+      method = 'QLoRA';
+      place = 'kendi ekran kartınla yerelde';
+    } else if (hw === 'mid') {
+      model = '4B-8B bir model';
+      method = 'QLoRA (veya rahat duruma göre LoRA)';
+      place = 'kendi ekran kartınla yerelde';
+    } else {
+      model = '8B-14B bir model';
+      method = 'LoRA (veya küçük modellerde full fine-tuning)';
+      place = 'kendi ekran kartınla yerelde';
+    }
+
+    if (goal === 'domain') {
+      return {
+        title: 'Alan bilgisi: önce RAG, davranış da değişecekse ince ayar',
+        desc:
+          'Hukuk, tıp, teknik doküman gibi alan bilgisini modelin ağırlıklarına öğretmek yerine RAG ile ' +
+          'soru anında getirmek genelde daha ucuz ve daha günceldir; üstelik bu yol GPU gerektirmez — ' +
+          'Ollama üzerinde küçük modeller CPU\u2019da bile çalışır. Cevap üslubu da değişecekse SFT devreye girer.',
+        steps: [
+          ['Karar haritası: RAG mi, ince ayar mı?', '/rag/rag-mi-ince-ayar-mi/'],
+          ['Uçtan uca yerel RAG örneği', '/ornekler/yerel-rag/'],
+          ['Canlı veriyle RAG ve parçalama', '/ornekler/viki-rag/'],
+          ['Sistemi ölç: getirim metrikleri', '/rag/rag-degerlendirme/'],
+          ['Getirim hâlâ yetmiyorsa: hibrit arama', '/rag/parcalama-ve-hibrit-arama/'],
+          ['Üslup da değişecekse: SFT', '/llm/sft/'],
+        ],
+      };
+    }
+
+    if (goal === 'style') {
+      return {
+        title: 'Küçük ama özenli bir SFT işi',
+        desc:
+          'Üslup/format öğretmek için binlerce örnek gerekmez: 500-2.000 tutarlı, temiz örnek çoğu zaman yeter. ' +
+          place +
+          ' ' +
+          model +
+          '\u2019i ' +
+          method +
+          ' ile eğitirsin.',
+        steps: [
+          ['Format seçimi (Alpaca / ShareGPT)', '/veri/veri-formatlari/'],
+          ['Talimat ayarı (SFT) nedir', '/llm/sft/'],
+          ['Hiperparametre başlangıç ayarları', '/llm/hiperparametreler/'],
+          ['Adım adım eğitim rehberi', '/llm/adim-adim-egitim/'],
+          ['Veriyi gerçek veriyle temizle: örnek proje', '/ornekler/veri-temizleme/'],
+        ],
+      };
+    }
+
+    return {
+      title: 'Türkçe sohbet asistanı yolu',
+      desc:
+        place +
+        ' ' +
+        model +
+        '\u2019i ' +
+        method +
+        ' ile eğiterek kendi Türkçe asistanını yapabilirsin. İlk eğitimde 1.000-5.000 kaliteli örnekle başla.',
+      steps: [
+        ['QLoRA ile tanış', '/llm/lora-qlora/'],
+        ['Adım adım ilk eğitim', '/llm/adim-adim-egitim/'],
+        ['Türkçe veri kaynakları', '/veri/veri-nereden-bulunur/'],
+        ['Eğittikten sonra çalıştır', '/kullanim/ollama/'],
+        ['Uçtan uca örnek: Türkçe sohbet asistanı', '/ornekler/turkce-asistan/'],
+      ],
+    };
+  }
+
+  function mwRender() {
+    if (!mwState.hw || !mwState.goal || !mwState.exp) return;
+    const rec = mwPick(mwState.goal, mwState.hw);
+    const expTip =
+      mwState.exp === 'new'
+        ? '<p class="mw-tip">Yeni başlıyorsan önce <a href="/baslangic/kavramlar/">temel kavramlara</a> ve <a href="/baslangic/yol-haritasi/">yol haritasına</a> göz atmanı öneririm.</p>'
+        : '';
+    const steps = rec.steps
+      .map(
+        (s, i) =>
+          '<li><a href="' +
+          s[1] +
+          '"><span class="mw-step-no">' +
+          (i + 1) +
+          '</span>' +
+          s[0] +
+          '</a></li>',
+      )
+      .join('');
+    document.getElementById('mw-result').innerHTML =
+      '<h3 class="mw-title">' +
+      rec.title +
+      '</h3>' +
+      '<p class="mw-desc">' +
+      rec.desc +
+      '</p>' +
+      expTip +
+      '<ol class="mw-steps">' +
+      steps +
+      '</ol>';
+  }
+
+  document.querySelectorAll('#mw-root .mw-chips').forEach(function (group) {
+    group.addEventListener('click', function (event) {
+      const btn = event.target.closest('.mw-chip');
+      if (!btn) return;
+      group.querySelectorAll('.mw-chip').forEach(function (c) {
+        c.classList.remove('mw-active');
+      });
+      btn.classList.add('mw-active');
+      mwState[group.dataset.q] = btn.dataset.val;
+      mwRender();
+    });
+  });
+</script>
+
+<style is:global>
+  .mw-card {
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.75rem;
+    padding: 1.5rem 1.25rem 1.25rem;
+    background: var(--sl-color-gray-6);
+    margin: 1rem 0 2rem;
+  }
+  :root[data-theme='light'] .mw-card {
+    background: var(--sl-color-gray-7);
+  }
+  .mw-q + .mw-q {
+    margin-top: 1.25rem;
+  }
+  .mw-label {
+    font-size: var(--sl-text-sm);
+    font-weight: 700;
+    margin: 0 0 0.6rem;
+  }
+  .mw-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .mw-chip {
+    padding: 0.45rem 0.9rem;
+    border-radius: 2rem;
+    border: 1px solid var(--sl-color-gray-4);
+    background: transparent;
+    color: var(--sl-color-gray-1);
+    font-size: var(--sl-text-sm);
+    cursor: pointer;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease;
+  }
+  .mw-chip:hover {
+    border-color: var(--sl-color-accent);
+  }
+  .mw-chip.mw-active {
+    border-color: var(--sl-color-accent);
+    background: var(--sl-color-accent-low);
+    color: var(--sl-color-accent-high);
+    font-weight: 600;
+  }
+  :root[data-theme='light'] .mw-chip.mw-active {
+    color: var(--sl-color-accent);
+  }
+  .mw-result {
+    margin-top: 1.5rem;
+    border-top: 1px dashed var(--sl-color-gray-4);
+    padding-top: 1.25rem;
+  }
+  .mw-empty {
+    color: var(--sl-color-gray-3);
+    font-size: var(--sl-text-sm);
+    margin: 0;
+  }
+  .mw-title {
+    font-size: var(--sl-text-lg);
+    margin: 0 0 0.5rem;
+  }
+  .mw-desc {
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-2);
+    margin: 0 0 0.75rem;
+    max-width: 60ch;
+  }
+  .mw-tip {
+    font-size: var(--sl-text-sm);
+    background: var(--sl-color-accent-low);
+    border-radius: 0.5rem;
+    padding: 0.6rem 0.8rem;
+    margin: 0 0 0.75rem;
+  }
+  .mw-steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .mw-steps a {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: var(--sl-text-sm);
+    text-decoration: none;
+    color: var(--sl-color-white);
+  }
+  :root[data-theme='light'] .mw-steps a {
+    color: var(--sl-color-white);
+  }
+  .mw-steps a:hover {
+    color: var(--sl-color-accent-high);
+  }
+  :root[data-theme='light'] .mw-steps a:hover {
+    color: var(--sl-color-accent);
+  }
+  .mw-step-no {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+    background: var(--sl-color-accent-low);
+    color: var(--sl-color-accent-high);
+    font-size: var(--sl-text-xs);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+</style>

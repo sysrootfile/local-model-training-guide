@@ -1,0 +1,37 @@
+[indeks] 8 belge vektörleştirildi (4.1 sn, boyut=1024)
+==============================================================
+DEMO — üç örnek soru (ikincisi kapsam dışı)
+==============================================================
+[arama] en iyi benzerlik: 0.709 -> iade, hasar
+[üretim] 12.2 sn
+[cevap] [iade] İade süreniz 14 gün olup, teslimatta 14 gün içinde iade yapmanız gerekmektedir.
+
+[arama] en iyi benzerlik: 0.663 -> hasar, iade
+[üretim] 12.4 sn
+[cevap] [hasar] Belirttiğim politika, hasarlı paket teslim aldığınızda 48 saat içinde müşteri hizmetlerimize fotoğrafıyla birlikte bildirimde bulunmanızı sağlıyor. Ayrıca, tazminat, gönderinin beyan edilen değeriyle sınırlıdır.
+
+==============================================================
+KAPSAM DIŞI TEST — belgelerde olmayan soru
+==============================================================
+[arama] en iyi benzerlik: 0.372 -> teslimat, ek-hizmet
+[üretim] 7.6 sn
+[cevap] Bu konuda belgelerde bilgi yok [iade] [ek-hizmet]
+
+==============================================================
+GETİRİM TESTİ — doğru belge ilk k'ta geldi mi?
+==============================================================
+  [OK |OK ] İade sürem var mı, ne kadar sürede iade edebilirim?
+        beklenen: iade  bulunan: ['iade', 'hasar', 'kvkk']
+  [OK |OK ] Kargom hasarlı geldi, ne yapmalıyım?
+        beklenen: hasar  bulunan: ['hasar', 'iade', 'teslimat']
+  [OK |OK ] Siparişim kaç günde teslim olur?
+        beklenen: teslimat  bulunan: ['teslimat', 'iade', 'hasar']
+  [OK |OK ] Kişisel verilerimin silinmesini isteyebilir miyim?
+        beklenen: kvkk  bulunan: ['kvkk', 'iade', 'hasar']
+  [OK |OK ] Kapıda ödeme ek ücret gerektiriyor mu?
+        beklenen: odeme  bulunan: ['odeme', 'ek-hizmet', 'kampanya']
+  [OK |OK ] Öğrencilere indirim var mı?
+        beklenen: kampanya  bulunan: ['kampanya', 'odeme', 'ek-hizmet']
+
+  hit@1: 6/6   hit@3: 6/6
+

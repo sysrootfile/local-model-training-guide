@@ -1,0 +1,41 @@
+koşum başlangıcı: 2026-10-17 15:46:48
+kol=a duman=False model=paraphrase-multilingual-MiniLM-L12-v2 tohum=1234 adım=240 batch=16 lr=2e-05
+
+==============================================================================
+KOL A: SIRI ATIŞ (eğitim görmemiş model + sabit test kümesi)
+==============================================================================
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 4018.94it/s]
+model                      : paraphrase-multilingual-MiniLM-L12-v2
+önbellekten yükleme        : 12.70 sn
+parametre 117,653,760 | çıkış boyutu 384 | varsayılan max_seq_length 128
+süreç RSS                  : 179 MB -> 1170 MB (+991 MB)
+torch 2.6.0+cpu | kullanan is parçacığı 6
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 2515.81it/s]
+tekrar yükleme (2.)        : 4.51 sn
+indirilen ağırlık klasörü   : 457.5 MB (models--sentence-transformers--paraphrase-multilingual-MiniLM-L12-v2)
+gövde parça token sayıları  : min 18, ort 22.3, maks 30
+encode                     : 24 parça 0.25 sn (97.4 parça/sn), 8 sorgu 0.07 sn (117.26 sorgu/sn)
+
+MiniLM — dört puanlama biçimi, aynı test kümesi:
+  normalize + kosinus              hit@1 7/8  hit@3 8/8  MRR 0.938 | doğru bandı 0.305-0.718 (ort 0.609), en iyi yanlış 0.541, ayırma -0.236 | [1, 1, 1, 1, 1, 1, 2, 1]
+  normalize + negatif Öklid        hit@1 7/8  hit@3 8/8  MRR 0.938 | doğru bandı -1.390--0.565 (ort -0.782), en iyi yanlış -0.918, ayırma -0.472 | [1, 1, 1, 1, 1, 1, 2, 1]
+  ham + nokta çarpımı              hit@1 7/8  hit@3 8/8  MRR 0.917 | doğru bandı 4.377-12.345 (ort 9.252), en iyi yanlış 8.935, ayırma -4.558 | [1, 1, 1, 1, 1, 1, 3, 1]
+  ham + negatif Öklid              hit@1 6/8  hit@3 8/8  MRR 0.875 | doğru bandı -21.140--9.066 (ort -12.223), en iyi yanlış -12.181, ayırma -8.959 | [1, 1, 1, 1, 1, 2, 2, 1]
+
+bge-m3 (Ollama, yerel) — aynı test kümesi:
+  indeks 15.77 sn (1.5 parça/sn), 8 sorgu 1.03 sn, boyut 1024
+  bge-m3 + kosinus                 hit@1 8/8  hit@3 8/8  MRR 1.000 | doğru bandı 0.570-0.717 (ort 0.670), en iyi yanlış 0.528, ayırma +0.042 | [1, 1, 1, 1, 1, 1, 1, 1]
+  önekli sorgu encode 1.41 sn
+  bge-m3 + onekli sorgu            hit@1 8/8  hit@3 8/8  MRR 1.000 | doğru bandı 0.522-0.641 (ort 0.586), en iyi yanlış 0.480, ayırma +0.042 | [1, 1, 1, 1, 1, 1, 1, 1]
+
+BAĞLAM TAVANI — kuyrukta kalan bilgi görünür mü?
+[transformers] Token indices sequence length is longer than the specified maximum sequence length for this model (180 > 128). Running this sequence through the model will result in indexing errors
+  birleşik parça 180 token; kuyruk cümlesi = [Kreş kayıtları kontenjan doluysa yedek listeden ...] (gövde 160 token)
+  tavan 128 (~126 token görünüyor): kres sorusuyla kosinüs 0.280, uzun parçanın aday sırası 3 / 25
+  tavan 512 (~180 token görünüyor): kres sorusuyla kosinüs 0.234, uzun parçanın aday sırası 9 / 25
+  aynı parçanın 128 ve 512 tavanıyla üretilen vektörlerinin kosinüsü 0.882
+
+NOT: 8 soru / 24 parça. Bu tablo modellerin genel kapasitesini değil, bu korpustaki davranışını ölçer; güven aralığı hesaplanmadı.
+koşum süresi: 40.47 sn
+koşum bitişi: 2026-10-17 15:47:28

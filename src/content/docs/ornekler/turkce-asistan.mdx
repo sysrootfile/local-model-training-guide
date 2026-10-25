@@ -1,0 +1,216 @@
+---
+title: "Örnek 3: Türkçe Sohbet Asistanı"
+description: Qwen3-4B modelini QLoRA ile Türkçe sohbet verisiyle fine-tune edip GGUF'a dönüştüren ve Ollama'da çalıştıran üç betiklik uçtan uca proje. Veri hazırlama aşaması gerçek çalıştırma çıktılarıyla.
+dogrulama: 2026-10-15
+---
+
+import hazirla from '../../../../ornekler/turkce-asistan/hazirla.py?raw';
+import egitim from '../../../../ornekler/turkce-asistan/egitim.py?raw';
+import sor from '../../../../ornekler/turkce-asistan/sor.py?raw';
+import { Code } from 'astro-expressive-code/components';
+
+Bu, üçüncü **çalıştırılabilir örnek projemiz**: Qwen3-4B modeline Türkçe bir sohbet verisiyle **QLoRA ince ayarı** yapıyor, adaptörü **GGUF**'a dönüştürüyor ve **Ollama**'da yerel bir Türkçe asistan olarak çalıştırıyoruz. [LoRA ve QLoRA](/llm/lora-qlora/) ile [SFT](/llm/sft/) sayfalarındaki kavramların tek bir boru hattında birleştiği, uçtan uca gerçek bir projedir.
+
+:::note[Bu makinede hangi betik çalıştırıldı?]
+`hazirla.py` (veri hazırlama) bu makinede **gerçekten çalıştırıldı**: veri seti Hugging Face'ten canlı indirildi ve hattan geçirildi (Python 3.12, `datasets` 5.1.0, CPU). Aşağıdaki tüm veri sayıları bu çalıştırmadan alındı. `egitim.py` ve `sor.py` **GPU gerektirdiğinden bu makinede çalıştırılmadı**; betikler 2026 itibarıyla güncel Unsloth / TRL sürümlerinin resmî API'lerine göre yazıldı, ancak kendi GPU'nuzda ilk çalıştırmada küçük sürüm farklarına bağlı düzeltmeler gerekebilir. Eğitime dair hiçbir loss değeri bu sayfada "gerçek çalıştırma" olarak sunulmaz; yalnızca çıktı biçimi gösterilir.
+:::
+
+## 1) Ne yapıyoruz?
+
+**Hedef:** Genel amaçlı bir Qwen3-4B modelini, Türkçe talimat-cevap çiftleriyle eğitip "belirli bir üslupta Türkçe konuşan" bir asistana dönüştürmek; sonra bu modeli GPU'suz bir makinede bile çalışabilecek tek dosyalık (GGUF) hâle getirmek.
+
+Boru hattı dört aşamalı — her aşamanın çıktısı bir sonrakinin girdisidir:
+
+```text
+Hugging Face: AlicanKiraz0/Turkish-SFT-Dataset-v1.0    (~5.579 satır, MIT lisans)
+        │
+        │  hazirla.py ── alan eşleme + kalite filtresi + %95/%5 ayrım
+        ▼
+cikti/egitim.jsonl + cikti/test.jsonl        (chat formatı: {"messages": [...]})
+        │
+        │  egitim.py ── 4-bit Qwen3-4B üzerine LoRA (r=16), assistant_only_loss
+        ▼
+cikti/lora-model                             (adaptör: taban modelin yanında birkaç on MB)
+        │
+        │  egitim.py --gguf ── adaptörü birleştir + Q4_K_M seviyesine nicemle
+        ▼
+cikti/gguf/*.gguf (Q4_K_M)                    (birleştirilmiş + nicemlenmiş model)
+        │
+        │  Modelfile + ollama create turkce-asistan -f Modelfile
+        ▼
+Ollama: turkce-asistan                       (yerel, Türkçe sohbet)
+```
+
+Projenin kanıtı `sor.py`'dir: **aynı soruyu** temel modele ve LoRA'lı modele sorar, cevapları yan yana yazdırır. "Eğitim bir şey değiştirdi mi?" sorusunun cevabı bu yan yana çıktıdır.
+
+## 2) Kurulum
+
+Veri hazırlama CPU'da çalışır; eğitim GPU ister. Proje kökündeki sanal ortamınızda ([Yerel Kurulum](/donanim/yerel-kurulum/) sayfasındaki gibi oluşturabilirsiniz):
+
+```bash
+# 1) Veri hazırlama (CPU yeterli):
+pip install datasets
+
+# 2) Eğitim ve GGUF (GPU gerekir):
+pip install unsloth trl peft accelerate bitsandbytes datasets matplotlib
+```
+
+:::caution[Windows'ta WSL2 önerilir]
+Unsloth + bitsandbytes kurulumu ve GGUF üretiminin arka planındaki llama.cpp derlemesi Windows'ta düzenli olarak tıkanır. Bu projeyi **WSL2, Linux ya da bulut GPU**'da çalıştırmanız çok daha sorunsuz olur. Kurulum komutları hâlâ hızlı değişiyor; en güncel sürümü Unsloth'un kendi dokümantasyonundan doğrulayın.
+:::
+
+Donanım eşleştirmesi ([VRAM Hesaplama](/donanim/vram-hesabi/) sayfasındaki yöntemle tutarlı):
+
+| VRAM | Ne yapabilirsiniz | Bu projede karşılığı |
+| --- | --- | --- |
+| 8 GB | 1.7B model QLoRA rahat; 4B ancak batch 1 + kısa `--max-uzunluk` ile sınırda | `--model unsloth/Qwen3-1.7B-unsloth-bnb-4bit` |
+| 12 GB | 4B QLoRA rahat (bu projenin varsayılanı); `sor.py` iki modeli birlikte yükleyebilir | Varsayılan akış olduğu gibi çalışır |
+| 16 GB+ | 8B model QLoRA veya 4B'de daha büyük batch/uzunluk | `--model unsloth/Qwen3-8B-unsloth-bnb-4bit` |
+
+Elinizde GPU yoksa bulut seçeneği var (2026 itibarıyla yaklaşık fiyatlar): **RunPod** RTX 4090 ~0,34–0,74 $/saat, **Vast.ai** RTX 4090 ~0,13–0,47 $/saat. Kiralık bir 4090'da 4B QLoRA eğitimi tipik olarak 1–2 saat sürer; yani tek seferlik bir eğitim birkaç doların altında biter. Karşılaştırma ve adım adım rehber: [Bulut GPU Seçenekleri](/donanim/bulut-secenekleri/).
+
+## 3) Betiklerin tamamı
+
+Üç betik sırayla çalıştırılır; her biri `cikti/` klasörüne bir sonrakinin okuduğu dosyayı yazar. Yorum satırları her kararın **neden**'ini açıklıyor.
+
+### a) hazirla.py — veri indirme ve hazırlama
+
+<Code code={hazirla} lang="python" title="ornekler/turkce-asistan/hazirla.py" />
+
+### b) egitim.py — QLoRA eğitimi (ve isteğe bağlı GGUF)
+
+<Code code={egitim} lang="python" title="ornekler/turkce-asistan/egitim.py" />
+
+### c) sor.py — öncesi/sonrası karşılaştırma
+
+<Code code={sor} lang="python" title="ornekler/turkce-asistan/sor.py" />
+
+### Gerçek çalıştırma: veri hazırlama (bu makinede)
+
+Aşağıdaki çıktı, tam veri setiyle bu makinede yapılan gerçek çalıştırmadan alındı (ilerleme çubukları ve makineye özel dosya yolları çıkarıldı; sayılar olduğu gibi):
+
+```text title="python hazirla.py (gerçek çalıştırma)"
+1) Veri seti: AlicanKiraz0/Turkish-SFT-Dataset-v1.0 (train bölümü)
+Ham kayıt sayısı: 5579
+Sütunlar: ['system', 'user', 'assistant']
+
+2) Alan eşleme (sütun adları -> messages şeması)
+  'user' sütunu -> kullanici rolü
+  'assistant' sütunu -> asistan rolü
+  'system' sütunu -> sistem rolü
+Eşlenen: 5579 | eşlenemeyip atılan: 0
+
+3) Kalite filtresi (boş / çok kısa / soru=cevap)
+  elenen -> cevap çok kısa: 4
+Kalan kayıt: 5575
+
+4) Train/test ayrımı (%95 / %5, seed=42)
+Eğitim: 5297 | Test: 278
+
+5) Kaydetme (chat formatı: messages)
+Yazıldı: cikti/egitim.jsonl (5297 kayıt)
+Yazıldı: cikti/test.jsonl (278 kayıt)
+Yazıldı: cikti/rapor.json
+```
+
+Çıktı dosyalarındaki kayıtlar tam olarak şu biçimde — `egitim.jsonl`'den gerçek bir örnek:
+
+```json title="cikti/egitim.jsonl — gerçek kayıt (147. satır, uzun alanlar kısaltıldı)"
+{"messages": [
+  {"role": "system",    "content": "Sen, Türkçe'nin tüm inceliklerini kavramış ..."},
+  {"role": "user",      "content": "Başarı kriterlerini ölçüm planına bağlayan iki cümle yaz."},
+  {"role": "assistant", "content": "Başarı kriterleri, ölçüm planında tanımlanan performans göstergeleriyle doğrudan eşleştirilerek, hedeflenen sonuçların ne kadar gerçekleştiği izlenir. Ölçüm planı ise ..."}
+]}
+```
+
+Sayıların dürüst yorumu: veri seti bakımlı olduğu için kalite filtresi yalnızca **4 kaydı** eledi ("cevap çok kısa"); alan eşleme 5.579 kaydın tamamında başarılı oldu. Bu beklenen bir sonuçtur — asıl sürpriz şurada: bu setin cevapları **çok uzun** (asistan cevaplarının medyanı ~7.000 karakter, en uzunu ~15.700). Yani eğitimde `--max-uzunluk` değerini bilinçli seçmek gerekir (bkz. bölüm 6).
+
+:::tip[Boru hattını önce küçük veriyle deneyin]
+İlk kez çalıştırıyorsanız doğrudan tam eğitime gitmeyin: `python hazirla.py --limit 200` ile küçük bir set üretip `python egitim.py --epoch 1` çalıştırın. Boru hattının baştan sona (kaydetme ve grafik dahil) çalıştığını görürsünüz; sonra tam veriyle asıl eğitime geçin.
+:::
+
+## 4) Akışın adım adım açıklaması
+
+Betikleri yukarıda gördünüz; burada satır aralarındaki dört kritik kararı açıyoruz.
+
+### a) Neden 4-bit yükleme? (QLoRA'nın "Q"su)
+
+4B parametreli bir model fp16'da yaklaşık 8 GB VRAM ister — yalnızca ağırlıklar için. 4-bit'e nicemlenmiş sürüm (`unsloth/Qwen3-4B-unsloth-bnb-4bit`) ~2,5 GB'a iner; üstüne eğitilen LoRA adaptörü de yalnızca birkaç on MB ekler. QLoRA makalesi (arXiv:2305.14314), iyi ayarlanmış bir 4-bit + LoRA eğitiminin fp16 LoRA'ya çok yakın sonuç verdiğini gösterdi. Detaylar: [LoRA ve QLoRA](/llm/lora-qlora/).
+
+### b) Neden r=16, alpha=16 ve neden yedi projeksiyonun tamamı?
+
+`r` adaptörün kapasitesini, `lora_alpha` güncellemenin ölçeğini belirler; 16/16, Unsloth'un Qwen ailesi için önerdiği dengeli başlangıçtır. `target_modules` listesindeki yedi modül, modelin **tüm dikkat** (`q/k/v/o`) ve **MLP** (`gate/up/down`) projeksiyonlarıdır: yalnızca `q_proj`/`v_proj` hedeflemek daha az VRAM kullanır ama öğrenme kapasitesini ciddi biçimde kısıtlar — "model değişmiyor" şikâyetinin en sık kaynağı budur.
+
+### c) Neden `assistant_only_loss=True`?
+
+Kayıp maskesi olmadan model, **kullanıcı sorusunu ve sistem metnini de** tahmin etmeyi öğrenir; bu hem zaman kaybıdır hem de modeli istemediğimiz yönde eğitir. `assistant_only_loss=True` ile kayıp yalnızca asistanın cevap jetonlarından hesaplanır. Koşulu: verinin sohbet formatında (`messages`) olması — `hazirla.py` tam bu yüzden çıktıyı `messages` biçiminde yazar. Kavramın kendisi: [SFT](/llm/sft/).
+
+:::caution[Sessiz yok sayma tuzağı]
+TRL'de `assistant_only_loss=True`, `use_liger_kernel=True` ile birlikte kullanıldığında maskeler bir dönem **sessizce** düşürülüyordu (TRL issue #3781). Bu projedeki betik liger çekirdeğini kullanmaz; kullanırsanız kayıp maskesinin gerçekten uygulandığını doğrulayın.
+:::
+
+### d) Chat template neden elle yazılmaz?
+
+Qwen3'ün sohbet kalıbı (`<|im_start|>role ... <|im_end|>`) modele ön eğitimde öğretilmiştir ve tokenizer ile birlikte gelir. Bu kalıbı elle kurmak ya da şablonda olmayan özel token eklemek iki şekilde bozar: (1) modelin tanıdığı özel token'lar kaçırılır, (2) eğitimde kullanılan kalıp çıkarımdakiyle eşleşmez ve model "bozulur". Bu yüzden betikte şablon **yalnızca** `tokenizer.apply_chat_template(...)` ile uygulanır — hiçbir yerde `add_special_tokens` ya da elle ChatML metni yoktur. Benzer gerekçeyle eos token'ı (Qwen3'te `<|im_end|>`) tokenizer'dan olduğu gibi alınır; betik bunu ekrana yazıp doğrular. Genel kural: [Tokenizasyon](/temeller/tokenizasyon/), veri formatı tarafı: [Veri Formatları](/veri/veri-formatlari/).
+
+## 5) Eğitim sonrası: GGUF, Ollama ve karşılaştırma
+
+### GGUF üret ve Ollama'ya ekle
+
+`python egitim.py --gguf` ile adaptör birleştirilip `cikti/gguf/` altına Q4_K_M seviyesinde nicemlenmiş GGUF yazılır. Neden Q4_K_M ve neden GGUF: [Nicemleme](/kullanim/quantization/) ile [Ollama](/kullanim/ollama/) sayfalarında anlattık. GGUF'un yanına şu `Modelfile`'ı koyup tek komutla modele dönüştürün:
+
+```dockerfile title="cikti/gguf/Modelfile"
+# Aynı klasördeki GGUF dosyası
+FROM ./model.gguf
+
+PARAMETER temperature 0.7
+PARAMETER top_p 0.9
+PARAMETER stop "<|im_end|>"
+
+# Türkçe sistem istemi: eğitimdekiyle aynı ruhu taşımalı
+SYSTEM """Sen Türkçe konuşan yardımcı bir asistansın. Sorulara kısa, net ve doğru cevaplar verirsin. Bilmediğin bir konuda emin olmadığını açıkça söylersin."""
+```
+
+```bash
+ollama create turkce-asistan -f Modelfile
+ollama run turkce-asistan
+```
+
+### Öncesi/sonrası: `sor.py`
+
+`python sor.py`, aynı Türkçe soruyu önce temel modele sonra LoRA'lı modele sorar ve iki cevabı yan yana yazdırır. Çıktının biçimi şöyledir (aşağıdaki metinler **temsilîdir**; bu makinede GPU olmadığı için gerçek bir çalıştırmadan alınmadı):
+
+```text title="sor.py çıktı biçimi (temsilî)"
+Soru: Kendini kısaca tanıtır mısın? Ne konularda yardımcı olabilirsin?
+
+TEMEL MODEL (öncesi)                        | LORA'LI MODEL (sonrası)
+--------------------------------------------+--------------------------------------------
+<temel model genel, uzun bir cevap verir>   | <LoRA'lı model, eğitim verisinin üslubuna
+                                            |  yakın, hedeflediğiniz tonda cevap verir>
+```
+
+Not: Qwen3 hibrit bir "düşünen" modeldir; şablon varsayılan olarak düşünme bloğu açar. `sor.py` sohbet karşılaştırması için `apply_chat_template(..., enable_thinking=False)` ile bunu kapatır — aksi hâlde cevaplar uzun bir iç muhakeme metniyle başlar.
+
+## 6) Sık tuzaklar
+
+| Tuzak | Belirti | Çözüm |
+| --- | --- | --- |
+| T4 gibi bf16'sız GPU'da `bf16` açmak | NaN loss ya da çökme | `--fp16`; betik zaten donanımı algılar ve gerekirse fp16'ya düşer |
+| ChatML kalıbını elle yazmak / özel token eklemek | Model bozulur, loss düşmez | Şablonu her zaman `tokenizer.apply_chat_template` uygulasın |
+| `assistant_only_loss` + düz `text` verisi | Hata ya da loss = 0 (tüm etiketler maskeli) | Veri `messages` biçiminde olmalı; `hazirla.py` bunu üretir |
+| `--max-uzunluk` varsayılanda kalmak | Uzun cevapların sonu kesilir, model yarım cümle öğrenir | Bu sette cevaplar uzun (medyan ~7.000 karakter): `--max-uzunluk 4096` deneyin, VRAM'e dikkat |
+| Windows'ta bitsandbytes / llama.cpp | Kurulum ya da GGUF adımında derleme hatası | WSL2, Linux veya bulut GPU kullanın |
+| `sor.py`'yi 8 GB kartta 4B ile çalıştırmak | CUDA out of memory (iki model birlikte yüklenir) | `--temel unsloth/Qwen3-1.7B-unsloth-bnb-4bit` ile deneyin |
+| Ollama'da cevap bir türlü bitmiyor | `stop` token'ı eksik | Modelfile'a `PARAMETER stop "<\|im_end\|>"` ekleyin |
+
+:::danger[Kendi verinizle çalışırken]
+İki hata modeli sessizce çöpe atar: (1) eğitim ve test örneklerinin karışması — aynı soruyu hem eğitip hem "testte bildi" demek; `hazirla.py` ayrımı sabit seed ile tek yerde yapar. (2) Aynı sorudan birden çok kopya — model cevabı öğrenmek yerine soruyu ezberler. Farklı kaynaklardan veri birleştiriyorsanız tekrar temizliği için [Örnek 2: Veri Temizleme Atölyesi](/ornekler/veri-temizleme/)'ndeki hattı uygulayın.
+:::
+
+## 7) Sonraki adımlar
+
+- **Adaptörü elle birleştirmek** isterseniz (ör. farklı bir nicemleme aracıyla çalışacaksanız): [LoRA Birleştirme](/kullanim/lora-birlestirme/).
+- **Modeli paylaşmak:** Hugging Face'te adaptörü ya da GGUF sürümünü yayınlamak için [Hugging Face'te Paylaşım](/kullanim/huggingface-paylasim/).
+- **Eğitim tıkanırsa** (loss düşmüyor, taşma, yavaşlık): [Sorun Giderme](/llm/sorun-giderme/) ve [Hiperparametreler](/llm/hiperparametreler/).
+- **Kendi verinizle denemek:** Bu projede hazır bir veri seti kullandık; kendi talimat çiftlerinizi üretmek için [Kendi Verini Oluştur](/veri/kendi-verini-olustur/), hazır veriyi törpülemek için [Veri Temizleme](/veri/veri-temizleme/) sayfalarına bakın — `hazirla.py --veri-seti` parametresi herhangi bir HF veri setini kabul eder.
+- **VRAM planı:** Bir üst boyuta (8B) geçmeden önce [VRAM Hesaplama](/donanim/vram-hesabi/) ile bütçenizi çıkarın; [Bulut GPU Seçenekleri](/donanim/bulut-secenekleri/) fiyat karşılaştırmasıyla devam edin.

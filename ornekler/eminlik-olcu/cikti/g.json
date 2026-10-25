@@ -1,0 +1,92 @@
+[
+ {
+  "no": 1,
+  "duvar": 4.4918670654296875,
+  "icerik": "Birinci Satır: Llama 3'un kelime dagarcigi (tokenizer sozlugui) kaçtır?\nİkinci Satır: GUVEN: 26",
+  "guven": 26,
+  "dogru_mu": false,
+  "guven_etiketi": 1,
+  "dogru_metin": "128.256"
+ },
+ {
+  "no": 2,
+  "duvar": 4.045921802520752,
+  "icerik": "Birinci Satır: Qwen3'un kelime dagacığı hangi değerdir?\n\nİkinci Satır: GUVEN: 85",
+  "guven": 85,
+  "dogru_mu": false,
+  "guven_etiketi": 1,
+  "dogru_metin": "151.936"
+ },
+ {
+  "no": 3,
+  "duvar": 6.567483186721802,
+  "icerik": "Gemma 3'un kelime dagarcigi hangi değerdir? Bu soruyu cevaplayan doğru secenek A) 128.256'dır.\n\nBirinci satır:\nGemma 3'un kelime dagarcigi kactir?\n\nBirinci sat",
+  "guven": null,
+  "dogru_mu": false,
+  "guven_etiketi": 0,
+  "dogru_metin": "262.208"
+ },
+ {
+  "no": 4,
+  "duvar": 3.6460249423980713,
+  "icerik": "BAAI/bge-m3 embedding modeli 768 boyutlu vektor üretir. Güven: 85",
+  "guven": 85,
+  "dogru_mu": false,
+  "guven_etiketi": 1,
+  "dogru_metin": "1024"
+ },
+ {
+  "no": 5,
+  "duvar": 6.289438962936401,
+  "icerik": "Birinci satır: MiniLM-L12 modelinin çıktı verimizi kaç boyutlu olduğuna dair soruyu soruyoruz.\n\nİkinci satır: SORU: MiniLM-L12 modelinin çıktı verimizi kaç boyutlu olduğuna dair soruy",
+  "guven": null,
+  "dogru_mu": false,
+  "guven_etiketi": 0,
+  "dogru_metin": "384"
+ },
+ {
+  "no": 6,
+  "duvar": 5.039576768875122,
+  "icerik": "Birinci satırın metni:\n\nTRL'de DPO egitiminin varsayilan beta degeri nedir?\n\nİkinci satırın tamamlanması:\n\nGUVEN: 0.5",
+  "guven": 0,
+  "dogru_mu": false,
+  "guven_etiketi": 1,
+  "dogru_metin": "0,1"
+ },
+ {
+  "no": 7,
+  "duvar": 4.245496511459351,
+  "icerik": "Birinci satır: \"TRL kütüphanesinde SimPO karsiligi olan kayip turu hangisidir?\"\n\nİkinci satır: 5",
+  "guven": null,
+  "dogru_mu": false,
+  "guven_etiketi": 0,
+  "dogru_metin": "sigmoid_norm"
+ },
+ {
+  "no": 8,
+  "duvar": 5.533226251602173,
+  "icerik": "Birinci satırın metni:\n\nFineWeb-2 derlemesinin tur_Latn bolümü, toplam 95.129.129 belge içerir. \n\nGUVEN: 85",
+  "guven": 85,
+  "dogru_mu": true,
+  "guven_etiketi": 1,
+  "dogru_metin": "95.129.129"
+ },
+ {
+  "no": 9,
+  "duvar": 4.882537603378296,
+  "icerik": "Birinci satır:\nOpenAssistant oasst1 derlemesinin Türkçe kısım kaç mesajdir?\n\nİkinci satır:\nGUVEN: 88.838",
+  "guven": 88,
+  "dogru_mu": false,
+  "guven_etiketi": 1,
+  "dogru_metin": "37"
+ },
+ {
+  "no": 10,
+  "duvar": 4.5866539478302,
+  "icerik": "Birinci satır:\nRunPod'da ag volume'unun fiyati (1 TB altinda) nedir?\n\nİkinci satır:\nGUVEN: 7",
+  "guven": 7,
+  "dogru_mu": false,
+  "guven_etiketi": 1,
+  "dogru_metin": "$0,07/GB-ay"
+ }
+]

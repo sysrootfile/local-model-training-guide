@@ -1,0 +1,218 @@
+EMINLIK OLCUM KAFESI
+  baslangic: 2026-10-17 23:05:00
+  python 3.12.10 | Windows 11
+  ollama 0.40.5 | sohbet qwen2.5:3b-instruct-q4_K_M | gomme bge-m3
+  mod: TAM | kol: olcum
+  sozlesme notu: eval_count logprob kayindan 1 fazladir (probda olculen off-by-one); ortalamalar KAYIT sayisina alinir
+
+=========================================================
+KOL B - CEVAP-HARF OLASILIGI (P(True) kalibi, T=0, num_predict=1)
+=========================================================
+  istem kalibi (bir kerelik):
+  'cigi (tokenizer sozlugui) kactir?\nSIKKLAR:\nA) 128.256\nB) 151.936\nC) 262.208\nD) 50.257\n\nYalnizca dogru sikkin harfini yaz. Baska hicbir karakter yazma.'
+B1  |  0.13 sn | bilgi     | altin A secim C    | P(altin) 0.0001   | en yuksek C
+     P vektoru  A=0.0001 B=0.0385 C=0.9613 D=0.0001
+B2  |  0.15 sn | bilgi     | altin B secim C    | P(altin) 0.0000   | en yuksek C
+     P vektoru  A=0.0000 B=0.0000 C=1.0000 D=0.0000
+B3  |  0.10 sn | bilgi     | altin C secim C    | P(altin) 1.0000   | en yuksek C
+     P vektoru  A=0.0000 B=0.0000 C=1.0000 D=0.0000
+B4  |  0.10 sn | bilgi     | altin D secim B    | P(altin) 0.0000   | en yuksek B
+     P vektoru  A=0.0004 B=0.9996 C=0.0000 D=0.0000
+B5  |  0.10 sn | bilgi     | altin A secim C    | P(altin) 0.0000   | en yuksek C
+     P vektoru  A=0.0000 B=0.0000 C=1.0000 D=0.0000
+B6  |  0.10 sn | bilgi     | altin B secim C    | P(altin) 0.0112   | en yuksek C
+     P vektoru  A=0.0001 B=0.0112 C=0.9888 D=0.0000
+B7  |  2.19 sn | bilgi     | altin C secim C    | P(altin) 0.9993   | en yuksek C
+     P vektoru  A=0.0004 B=0.0002 C=0.9993 D=0.0000
+B8  |  2.80 sn | bilgi     | altin D secim C    | P(altin) 0.0000   | en yuksek C
+     P vektoru  A=0.0002 B=0.0000 C=0.9998 D=0.0000
+B9  |  2.30 sn | bilgi     | altin A secim C    | P(altin) 0.0000   | en yuksek C
+     P vektoru  A=0.0000 B=0.0000 C=1.0000 D=0.0000
+B10 |  2.71 sn | bilgi     | altin B secim B    | P(altin) 1.0000   | en yuksek B
+     P vektoru  A=0.0000 B=1.0000 C=0.0000 D=0.0000
+B11 |  2.97 sn | bilgi     | altin C secim C    | P(altin) 0.6043   | en yuksek C
+     P vektoru  A=0.0013 B=0.3032 C=0.6043 D=0.0912
+B12 |  2.74 sn | bilgi     | altin D secim C    | P(altin) 0.0003   | en yuksek C
+     P vektoru  A=0.0212 B=0.0410 C=0.9375 D=0.0003
+B13 |  2.09 sn | bilgi     | altin A secim C    | P(altin) 0.0111   | en yuksek C
+     P vektoru  A=0.0111 B=0.0166 C=0.9720 D=0.0003
+B14 |  2.14 sn | bilgi     | altin B secim C    | P(altin) 0.0122   | en yuksek C
+     P vektoru  A=0.0062 B=0.0122 C=0.9748 D=0.0069
+B15 |  2.22 sn | bilgi     | altin C secim C    | P(altin) 1.0000   | en yuksek C
+     P vektoru  A=0.0000 B=0.0000 C=1.0000 D=0.0000
+B16 |  2.13 sn | bilgi     | altin D secim C    | P(altin) 0.0002   | en yuksek C
+     P vektoru  A=0.0001 B=0.0682 C=0.9316 D=0.0002
+B17 |  2.40 sn | bilgi     | altin A secim C    | P(altin) 0.0017   | en yuksek C
+     P vektoru  A=0.0017 B=0.0417 C=0.9053 D=0.0513
+B18 |  2.21 sn | bilgi     | altin B secim D    | P(altin) 0.0143   | en yuksek D
+     P vektoru  A=0.0001 B=0.0143 C=0.3419 D=0.6436
+B19 |  2.34 sn | bilgi     | altin C secim C    | P(altin) 0.7272   | en yuksek C
+     P vektoru  A=0.0077 B=0.0272 C=0.7272 D=0.2379
+B20 |  2.83 sn | bilgi     | altin D secim B    | P(altin) 0.0104   | en yuksek B
+     P vektoru  A=0.1013 B=0.6399 C=0.2484 D=0.0104
+B21 |  2.91 sn | bilinemez | altin A secim B    | P(altin) 0.4581   | en yuksek B
+     P vektoru  A=0.4581 B=0.5367 C=0.0024 D=0.0028
+B22 |  2.34 sn | bilinemez | altin B secim C    | P(altin) 0.1383   | en yuksek C
+     P vektoru  A=0.0000 B=0.1383 C=0.8617 D=0.0000
+B23 |  2.31 sn | bilinemez | altin C secim C    | P(altin) 0.9998   | en yuksek C
+     P vektoru  A=0.0000 B=0.0002 C=0.9998 D=0.0000
+B24 |  2.45 sn | bilinemez | altin D secim B    | P(altin) 0.0198   | en yuksek B
+     P vektoru  A=0.0003 B=0.9707 C=0.0092 D=0.0198
+B25 |  2.47 sn | bilinemez | altin A secim D    | P(altin) 0.0008   | en yuksek D
+     P vektoru  A=0.0008 B=0.0009 C=0.1895 D=0.8087
+B26 |  2.28 sn | bilinemez | altin B secim B    | P(altin) 1.0000   | en yuksek B
+     P vektoru  A=0.0000 B=1.0000 C=0.0000 D=0.0000
+
+---------------------------------------------------------
+KOL B OZETI
+  onemli: esik, SECILEN harfin olasiligi uzerinden taranir (uretimde altin
+  etiket bilinmez). P(altin) satirlari YALNIZ analiz degeridir, esik kurmaz.
+  bilgi sorulari: toplam 20 | olculen 20 | aday-eksik (metrik disi) 0 | harf disi secim (bicim kirilmasi) 0
+  dogru secim 6/20 (0.30)
+  secim harfi dagilimi: A:0 B:3 C:16 D:1 | en sik 0.80
+  [GECERSIZLIK KAPISI] tek bir harf secimlerin yarisindan cogunu aldi: bu kolda P(secilen) konum yanliliginin olcusudur, bilginin degil. Esik/risk tablolaru bu durumda ayirici sayilmaz; serbest metin kolu (D/G) ayni sorularin icerik kontroludur.
+  dogru secimlerin P(secilen): min 0.6043 | ort 0.8885 | max 1.0000
+  yanlis secimlerin P(secilen): min 0.6399 | ort 0.9253 | max 1.0000
+  ayrisma payi (en kotu dogru - en iyi yanlis): -0.3957
+  [analiz] P(altin) dogrularda: ort 0.8885 (min 0.6043 max 1.0000)
+  [analiz] P(altin) yanlislarda: ort 0.0044 (min 0.0000 max 0.0143)
+  esik tarasi (P(secilen) >= tau -> cevap ver; yoksa cekil):
+    tau 0.30  | kapsama 1.00 (20/20) | risk 0.700
+    tau 0.40  | kapsama 1.00 (20/20) | risk 0.700
+    tau 0.50  | kapsama 1.00 (20/20) | risk 0.700
+    tau 0.60  | kapsama 1.00 (20/20) | risk 0.700
+    tau 0.70  | kapsama 0.85 (17/20) | risk 0.706
+    tau 0.80  | kapsama 0.80 (16/20) | risk 0.750
+    tau 0.90  | kapsama 0.80 (16/20) | risk 0.750
+    tau 0.95  | kapsama 0.65 (13/20) | risk 0.692
+    tau 0.99  | kapsama 0.45 ( 9/20) | risk 0.556
+  bilinemez sorular: olculen 6/6 | 'bilmiyorum' secimi 2
+     -> B21 bilinen bir secer gibi cevap verdi: secim B, P(secilen) 0.5367
+     -> B22 bilinen bir secer gibi cevap verdi: secim C, P(secilen) 0.8617
+     -> B24 bilinen bir secer gibi cevap verdi: secim B, P(secilen) 0.9707
+     -> B25 bilinen bir secer gibi cevap verdi: secim D, P(secilen) 0.8087
+
+=========================================================
+KOL C - SICAKLIK DONEN LOGPROB'U DEGISTIRIYOR MU (seed=1234)
+=========================================================
+C1  | T=0.0 P=0.0001 sec=C | T=0.7 P=0.0001 sec=C | T=1.0 P=0.0001 sec=C
+      P araligi 0.00000  -> sicaklik logprob'u DEGISTIRMIYOR
+C2  | T=0.0 P=0.0000 sec=C | T=0.7 P=0.0000 sec=C | T=1.0 P=0.0000 sec=C
+      P araligi 0.00001  -> sicaklik logprob'u DEGISTIRIYOR
+C3  | T=0.0 P=1.0000 sec=C | T=0.7 P=1.0000 sec=C | T=1.0 P=1.0000 sec=C
+      P araligi 0.00000  -> sicaklik logprob'u DEGISTIRMIYOR
+C4  | T=0.0 P=0.0000 sec=B | T=0.7 P=0.0000 sec=B | T=1.0 P=0.0000 sec=B
+      P araligi 0.00000  -> sicaklik logprob'u DEGISTIRMIYOR
+C5  | T=0.0 P=0.0000 sec=C | T=0.7 P=0.0000 sec=C | T=1.0 P=0.0000 sec=C
+      P araligi 0.00000  -> sicaklik logprob'u DEGISTIRMIYOR
+C6  | T=0.0 P=0.0112 sec=C | T=0.7 P=0.0112 sec=C | T=1.0 P=0.0112 sec=C
+      P araligi 0.00000  -> sicaklik logprob'u DEGISTIRMIYOR
+C7  | T=0.0 P=0.9995 sec=C | T=0.7 P=0.9995 sec=C | T=1.0 P=0.9995 sec=C
+      P araligi 0.00000  -> sicaklik logprob'u DEGISTIRMIYOR
+C8  | T=0.0 P=0.0000 sec=C | T=0.7 P=0.0000 sec=C | T=1.0 P=0.0000 sec=C
+      P araligi 0.00000  -> sicaklik logprob'u DEGISTIRMIYOR
+C9  | T=0.0 P=0.0000 sec=C | T=0.7 P=0.0000 sec=C | T=1.0 P=0.0000 sec=C
+      P araligi 0.00000  -> sicaklik logprob'u DEGISTIRMIYOR
+C10 | T=0.0 P=1.0000 sec=B | T=0.7 P=1.0000 sec=B | T=1.0 P=1.0000 sec=B
+      P araligi 0.00000  -> sicaklik logprob'u DEGISTIRMIYOR
+
+=========================================================
+KOL D - SERBEST CEVAP: ORTALAMA LOGPROB + KIRPIK ENTROPI (ALT SINIR)
+=========================================================
+D1  |  5.62 sn | ctki  64 | kayit  64 (0 yok) | ort lp  -0.4620 | kirpik ent ort 0.8223 max 2.6291
+      cevap "D) 50.257\n\nLlama 3'un kelime dairagiği (tokenizer sozcuk say" | dogru '128.256'
+D2  |  1.71 sn | ctki  11 | kayit  10 (1 yok) | ort lp  -0.1389 | kirpik ent ort 0.3050 max 1.7166
+      cevap 'B) 151.936' | dogru '151.936'
+D3  |  3.74 sn | ctki  42 | kayit  41 (1 yok) | ort lp  -0.4680 | kirpik ent ort 0.8391 max 2.7541
+      cevap "Gemma 3'un kelime dagarcigi 262.208'dır. Bu değer, belirli b" | dogru '262.208'
+D4  |  2.43 sn | ctki  24 | kayit  23 (1 yok) | ort lp  -0.0706 | kirpik ent ort 0.1797 max 0.9418
+      cevap 'BAAI/bge-m3 embedding modeli 768 boyutlu vektör üretir.' | dogru '1024'
+D5  |  1.65 sn | ctki  14 | kayit  13 (1 yok) | ort lp  -0.0496 | kirpik ent ort 0.1566 max 0.7472
+      cevap 'C) 768 boyutlu çıkış verir.' | dogru '384'
+D6  |  3.73 sn | ctki  40 | kayit  39 (1 yok) | ort lp  -0.3654 | kirpik ent ort 0.7148 max 2.0668
+      cevap 'Bulunduğu metinde bulunulamadı, ancak DPO eğitiminin varsayı' | dogru '0,1'
+D7  |  1.05 sn | ctki   5 | kayit   4 (1 yok) | ort lp  -0.1298 | kirpik ent ort 0.3890 max 0.8079
+      cevap 'A) simpo' | dogru 'sigmoid_norm'
+D8  |  1.42 sn | ctki  10 | kayit   9 (1 yok) | ort lp  -0.0807 | kirpik ent ort 0.1336 max 1.1969
+      cevap 'C) 41.933' | dogru '95.129.129'
+D9  |  1.33 sn | ctki  10 | kayit   9 (1 yok) | ort lp  -0.0028 | kirpik ent ort 0.0173 max 0.0792
+      cevap 'C) 88.838' | dogru '37'
+D10 |  1.59 sn | ctki  12 | kayit  11 (1 yok) | ort lp  -0.0018 | kirpik ent ort 0.0120 max 0.1006
+      cevap 'B) $0,07/GB-ay' | dogru '$0,07/GB-ay'
+
+=========================================================
+KOL E - OZ-TUTARLILIK (10 ornek/soru, T=0,8, seed yok)
+=========================================================
+E1  | anlasma 1.00 (C:10) | cogunluk C | altin A | cogunluk YANLIS
+E2  | anlasma 1.00 (C:10) | cogunluk C | altin B | cogunluk YANLIS
+E3  | anlasma 1.00 (C:10) | cogunluk C | altin C | cogunluk DOGRU
+E4  | anlasma 1.00 (B:10) | cogunluk B | altin D | cogunluk YANLIS
+E5  | anlasma 1.00 (C:10) | cogunluk C | altin A | cogunluk YANLIS
+E6  | anlasma 1.00 (C:10) | cogunluk C | altin B | cogunluk YANLIS
+E7  | anlasma 1.00 (C:10) | cogunluk C | altin C | cogunluk DOGRU
+E8  | anlasma 1.00 (C:10) | cogunluk C | altin D | cogunluk YANLIS
+E9  | anlasma 1.00 (C:10) | cogunluk C | altin A | cogunluk YANLIS
+E10 | anlasma 1.00 (B:10) | cogunluk B | altin B | cogunluk DOGRU
+
+  E toplami: 100 secim | harf dagilimi A:0 B:20 C:80 D:0 | en sik 0.80 | anlasma ort 1.00
+  not: anlasma 1,00'e yakinse oz-tutarlilik ornekleminde cesitlilik yoktur; semantik entropi ~0 cikar ve bu bir bulgudur, olcum hatasi degil
+
+=========================================================
+KOL F - SEMANTIK KUMELEME (bge-m3 kosinus; yontem sapmasi belgeli)
+=========================================================
+
+  kosinus esigi 0.70
+    F1  | ornek 10 | talimat yankisi 0 | kume 2 | cogunluk 0.90 | sem-ent 0.3251
+    F2  | ornek 10 | talimat yankisi 2 | kume 5 | cogunluk 0.60 | sem-ent 1.2275
+    F3  | ornek 10 | talimat yankisi 0 | kume 1 | cogunluk 1.00 | sem-ent -0.0000
+    F4  | ornek 10 | talimat yankisi 0 | kume 1 | cogunluk 1.00 | sem-ent -0.0000
+    F5  | ornek 10 | talimat yankisi 0 | kume 1 | cogunluk 1.00 | sem-ent -0.0000
+    F6  | ornek 10 | talimat yankisi 0 | kume 2 | cogunluk 0.70 | sem-ent 0.6109
+    F7  | ornek 10 | talimat yankisi 0 | kume 2 | cogunluk 0.90 | sem-ent 0.3251
+    F8  | ornek 10 | talimat yankisi 0 | kume 3 | cogunluk 0.70 | sem-ent 0.8018
+    F9  | ornek 10 | talimat yankisi 0 | kume 1 | cogunluk 1.00 | sem-ent -0.0000
+    F10 | ornek 10 | talimat yankisi 0 | kume 1 | cogunluk 1.00 | sem-ent -0.0000
+    ozet: kume sayisi ort 1.90 (min 1 max 5) | semantik entropi ort 0.3290
+
+  kosinus esigi 0.80
+    F1  | ornek 10 | talimat yankisi 0 | kume 3 | cogunluk 0.70 | sem-ent 0.8018
+    F2  | ornek 10 | talimat yankisi 2 | kume 7 | cogunluk 0.20 | sem-ent 1.8867
+    F3  | ornek 10 | talimat yankisi 0 | kume 1 | cogunluk 1.00 | sem-ent -0.0000
+    F4  | ornek 10 | talimat yankisi 0 | kume 1 | cogunluk 1.00 | sem-ent -0.0000
+    F5  | ornek 10 | talimat yankisi 0 | kume 1 | cogunluk 1.00 | sem-ent -0.0000
+    F6  | ornek 10 | talimat yankisi 0 | kume 2 | cogunluk 0.70 | sem-ent 0.6109
+    F7  | ornek 10 | talimat yankisi 0 | kume 2 | cogunluk 0.90 | sem-ent 0.3251
+    F8  | ornek 10 | talimat yankisi 0 | kume 3 | cogunluk 0.70 | sem-ent 0.8018
+    F9  | ornek 10 | talimat yankisi 0 | kume 1 | cogunluk 1.00 | sem-ent -0.0000
+    F10 | ornek 10 | talimat yankisi 0 | kume 1 | cogunluk 1.00 | sem-ent -0.0000
+    ozet: kume sayisi ort 2.20 (min 1 max 7) | semantik entropi ort 0.4426
+
+=========================================================
+KOL G - SOZLU GUVEN (0-100) | ornek DEGER yok, yalnizca olcek
+=========================================================
+  istem kalibi (bir kerelik):
+  'i) kactir?\nSIKKLAR:\nA) 128.256\nB) 151.936\nC) 262.208\nD) 50.257\n\nYanit iki satirdan olussun: birinci satirda secigin metni, ikinci satirda 0 ile 100 arasinda tek bir tam sayi (bu cevabin dogru olmasina guvenin).'
+G1  |  5.47 sn | guven 2    | cevap dogru mu HAYIR | 'A) 151.936 /  / 1 satır: "Llama 3\'un kelime dagarcigi (tokenizer sozlu'
+G2  |  3.97 sn | guven 1    | cevap dogru mu HAYIR | 'A) 128.256 /  / 1 ile 100 arasinda tek bir tam sayi: 50'
+G3  |  3.20 sn | guven 2    | cevap dogru mu HAYIR | 'A) 128.256 /  / 2) 151.936'
+G4  |  2.06 sn | guven AYRISTIRILAMADI | cevap dogru mu HAYIR | 'B) 768'
+G5  |  6.48 sn | guven 0    | cevap dogru mu HAYIR | 'C) 768 /  / 0 ile 100 arasinda bir tam sayı (0-100) seçememekle biraz '
+G6  |  3.49 sn | guven 1    | cevap dogru mu EVET | 'B) 0,1 /  / 1 ile 100 arasinda tek bir tam sayi: 10'
+G7  |  2.10 sn | guven 30   | cevap dogru mu HAYIR | 'A) simpo / 30'
+G8  |  4.80 sn | guven 2    | cevap dogru mu HAYIR | 'A) 88.838 /  / Bu metin, FineWeb-2 derlemesinin tur_Latn bolümü kac be'
+G9  |  4.25 sn | guven 88   | cevap dogru mu HAYIR | 'C) 88.838 /  / Bu derlemenin Türkçeki kısım 88.838 mesajlık bir Türkçe'
+G10 |  2.77 sn | guven 20   | cevap dogru mu EVET | 'B) $0,07/GB-ay / 20'
+
+  G ozet: ayristirilabilen 9/10
+  genel guven ortalamasi 16.2 | min 0 | max 88
+  dogru cevaplarin guveni: n=2 ort 10.5 (min 1 max 20)
+  yanlis cevaplarin guveni: n=7 ort 17.9 (min 0 max 88)
+  [UYARI] 1 soruda sayi ayristirilamadi -> bu sorular yukaridaki ortalamalara GIRMEZ, ayri sayilir
+  -> b.json yazildi (26 kayit)
+  -> c.json yazildi (30 kayit)
+  -> d.json yazildi (10 kayit)
+  -> e.json yazildi (100 kayit)
+  -> serbest.json yazildi (10 kayit)
+  -> g.json yazildi (10 kayit)
+
+bitti: 2026-10-17 23:10:02

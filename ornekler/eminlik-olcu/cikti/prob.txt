@@ -1,0 +1,156 @@
+EMINLIK OLCUM KAFESI - LOGPROB SOZLESME PROBU
+  baslangic: 2026-10-17 22:09:25
+  python 3.12.10 | Windows 11
+  ollama 0.40.5 | model qwen2.5:3b-instruct-q4_K_M
+  mod: TAM PROB
+
+A1 | /api/chat | logprobs=true, top_logprobs GONDERILMEDI
+  duvar  1.32 sn | ctki 18 | logprob kaydi 17 | alanlar: token,logprob,bytes
+  top_logprobs aday sayisi: min 0 / max 0 | bayt-uzanti uyumu 17/17
+  cevap 'Marmaray hizmeti 2013 yılında açıldı.'
+  tokenlari: 'M' 'arm' 'ar' 'ay' ' h' 'iz' 'met' 'i' ' ' '2' '0' '1' '3' ' yılında'
+  son tokenlar: '1' '3' ' yılında' ' aç' 'ıldı' '.'
+  sozlesme: eval_count 18 - logprob kaydi 17 = 1 kayit YOK
+  yanit anahtarlari: created_at,done,done_reason,eval_count,eval_duration,load_duration,logprobs,message,model,prompt_eval_cached_count,prompt_eval_count,prompt_eval_duration,total_duration
+
+A2 | /api/chat | top_logprobs=5
+  duvar  1.36 sn | ctki 18 | logprob kaydi 17 | alanlar: token,logprob,bytes,top_logprobs
+  top_logprobs aday sayisi: min 5 / max 5 | bayt-uzanti uyumu 17/17
+  cevap 'Marmaray hizmeti 2013 yılında açıldı.'
+  tokenlari: 'M' 'arm' 'ar' 'ay' ' h' 'iz' 'met' 'i' ' ' '2' '0' '1' '3' ' yılında'
+  son tokenlar: '1' '3' ' yılında' ' aç' 'ıldı' '.'
+  sozlesme: eval_count 18 - logprob kaydi 17 = 1 kayit YOK
+  kirpik entropi (nat): ilk 0.1593 | ort 0.3542 | son 0.0051  [ALT SINIR]
+  ilk konum adaylari: 'M'=0.9668, '1'=0.0113, 'İ'=0.0075, 'I'=0.0044, '2'=0.0037
+  yanit anahtarlari: created_at,done,done_reason,eval_count,eval_duration,load_duration,logprobs,message,model,prompt_eval_cached_count,prompt_eval_count,prompt_eval_duration,total_duration
+
+A3 | /api/chat | num_predict=1, top_logprobs=10
+  duvar  0.10 sn | ctki 1 | logprob kaydi 1 | alanlar: token,logprob,bytes,top_logprobs
+  top_logprobs aday sayisi: min 10 / max 10 | bayt-uzanti uyumu 1/1
+  cevap 'M'
+  tokenlari: 'M'
+  sozlesme: eval_count 1 - logprob kaydi 1 = 0 kayit YOK
+  kirpik entropi (nat): ilk 0.1922 | ort 0.1922 | son 0.1922  [ALT SINIR]
+  ilk konum adaylari: 'M'=0.9668, '1'=0.0113, 'İ'=0.0075, 'I'=0.0044, '2'=0.0037, 'Al'=0.0032
+  yanit anahtarlari: created_at,done,done_reason,eval_count,eval_duration,load_duration,logprobs,message,model,prompt_eval_cached_count,prompt_eval_count,prompt_eval_duration,total_duration
+
+A4.1 | /api/chat | top_logprobs=1 sinir aramasi
+  duvar  0.10 sn | ctki 1 | logprob kaydi 1 | alanlar: token,logprob,bytes,top_logprobs
+  top_logprobs aday sayisi: min 1 / max 1 | bayt-uzanti uyumu 1/1
+  cevap 'M'
+  tokenlari: 'M'
+  sozlesme: eval_count 1 - logprob kaydi 1 = 0 kayit YOK
+  kirpik entropi (nat): ilk -0.0000 | ort 0.0000 | son -0.0000  [ALT SINIR]
+  ilk konum adaylari: 'M'=0.9668
+  yanit anahtarlari: created_at,done,done_reason,eval_count,eval_duration,load_duration,logprobs,message,model,prompt_eval_cached_count,prompt_eval_count,prompt_eval_duration,total_duration
+
+A4.20 | /api/chat | top_logprobs=20 sinir aramasi
+  duvar  0.10 sn | ctki 1 | logprob kaydi 1 | alanlar: token,logprob,bytes,top_logprobs
+  top_logprobs aday sayisi: min 20 / max 20 | bayt-uzanti uyumu 1/1
+  cevap 'M'
+  tokenlari: 'M'
+  sozlesme: eval_count 1 - logprob kaydi 1 = 0 kayit YOK
+  kirpik entropi (nat): ilk 0.2005 | ort 0.2005 | son 0.2005  [ALT SINIR]
+  ilk konum adaylari: 'M'=0.9668, '1'=0.0113, 'İ'=0.0075, 'I'=0.0044, '2'=0.0037, 'Al'=0.0032
+  yanit anahtarlari: created_at,done,done_reason,eval_count,eval_duration,load_duration,logprobs,message,model,prompt_eval_cached_count,prompt_eval_count,prompt_eval_duration,total_duration
+
+A4.100 | /api/chat | top_logprobs=100 sinir aramasi
+  HTTP 400 | govde: {"error":"top_logprobs must be between 0 and 20"}
+
+A4.0 | /api/chat | top_logprobs=0 sinir aramasi
+  duvar  0.10 sn | ctki 1 | logprob kaydi 1 | alanlar: token,logprob,bytes
+  top_logprobs aday sayisi: min 0 / max 0 | bayt-uzanti uyumu 1/1
+  cevap 'M'
+  tokenlari: 'M'
+  sozlesme: eval_count 1 - logprob kaydi 1 = 0 kayit YOK
+  yanit anahtarlari: created_at,done,done_reason,eval_count,eval_duration,load_duration,logprobs,message,model,prompt_eval_cached_count,prompt_eval_count,prompt_eval_duration,total_duration
+
+A5 | /api/generate | native generate ucu (prompt/response govdesi)
+  duvar  1.49 sn | ctki 18 | logprob kaydi 17 | alanlar: token,logprob,bytes,top_logprobs
+  top_logprobs aday sayisi: min 5 / max 5 | bayt-uzanti uyumu 17/17
+  cevap 'Marmaray hizmeti 2013 yılında açıldı.'
+  tokenlari: 'M' 'arm' 'ar' 'ay' ' h' 'iz' 'met' 'i' ' ' '2' '0' '1' '3' ' yılında'
+  son tokenlar: '1' '3' ' yılında' ' aç' 'ıldı' '.'
+  sozlesme: eval_count 18 - logprob kaydi 17 = 1 kayit YOK
+  kirpik entropi (nat): ilk 0.1593 | ort 0.3542 | son 0.0051  [ALT SINIR]
+  ilk konum adaylari: 'M'=0.9668, '1'=0.0113, 'İ'=0.0075, 'I'=0.0044, '2'=0.0037
+  yanit anahtarlari: context,created_at,done,done_reason,eval_count,eval_duration,load_duration,logprobs,model,prompt_eval_cached_count,prompt_eval_count,prompt_eval_duration,response,total_duration
+
+A6 | /v1/chat/completions | OpenAI uyumlu chat completions
+  duvar  1.41 sn | ctki 18 | logprob kaydi 17 | alanlar: token,logprob,bytes,top_logprobs
+  top_logprobs aday sayisi: min 3 / max 3 | bayt-uzanti uyumu 17/17
+  cevap 'Marmaray hizmeti 2013 yılında açıldı.'
+  tokenlari: 'M' 'arm' 'ar' 'ay' ' h' 'iz' 'met' 'i' ' ' '2' '0' '1' '3' ' yılında'
+  son tokenlar: '1' '3' ' yılında' ' aç' 'ıldı' '.'
+  sozlesme: eval_count 18 - logprob kaydi 17 = 1 kayit YOK
+  kirpik entropi (nat): ilk 0.1073 | ort 0.2876 | son 0.0034  [ALT SINIR]
+  ilk konum adaylari: 'M'=0.9668, '1'=0.0113, 'İ'=0.0075
+  yanit anahtarlari: choices,created,id,model,object,system_fingerprint,usage
+
+A7 | /api/chat | format=json + logprobs
+  duvar  3.88 sn | ctki 36 | logprob kaydi 35 | alanlar: token,logprob,bytes,top_logprobs
+  top_logprobs aday sayisi: min 5 / max 5 | bayt-uzanti uyumu 35/35
+  cevap '{\n  "yil": 2022,\n  "gerceklesen": "Hızmet Acılış Tarihi 2022"\n}'
+  tokenlari: '{\n' ' ' ' "' 'y' 'il' '":' ' ' '2' '0' '2' '2' ',\n' ' ' ' "'
+  son tokenlar: '2' '0' '2' '2' '"\n' '}'
+  sozlesme: eval_count 36 - logprob kaydi 35 = 1 kayit YOK
+  kirpik entropi (nat): ilk 0.0217 | ort 0.3382 | son 0.0000  [ALT SINIR]
+  ilk konum adaylari: '{\n'=0.9969, '```'=0.0028, '``'=0.0002, '{\r\n'=0.0000, '{"'=0.0000
+  yanit anahtarlari: created_at,done,done_reason,eval_count,eval_duration,load_duration,logprobs,message,model,prompt_eval_cached_count,prompt_eval_count,prompt_eval_duration,total_duration
+
+A8 | /api/chat | format=sema + logprobs
+  duvar  1.81 sn | ctki 24 | logprob kaydi 23 | alanlar: token,logprob,bytes,top_logprobs
+  top_logprobs aday sayisi: min 5 / max 5 | bayt-uzanti uyumu 23/23
+  cevap '{\n  "yil": 2022,\n  "gerekce": "Ayet"\n}'
+  tokenlari: '{\n' ' ' ' "' 'y' 'il' '":' ' ' '2' '0' '2' '2' ',\n' ' ' ' "'
+  son tokenlar: '":' ' "' 'A' 'yet' '"\n' '}'
+  sozlesme: eval_count 24 - logprob kaydi 23 = 1 kayit YOK
+  kirpik entropi (nat): ilk 0.0181 | ort 0.2862 | son 0.0000  [ALT SINIR]
+  ilk konum adaylari: '{\n'=0.9975, '```'=0.0023, '``'=0.0002, '{\r\n'=0.0000, '{"'=0.0000
+  yanit anahtarlari: created_at,done,done_reason,eval_count,eval_duration,load_duration,logprobs,message,model,prompt_eval_cached_count,prompt_eval_count,prompt_eval_duration,total_duration
+
+A9 | /api/chat | Turkce karakter bayt eslesmesi
+  duvar  2.73 sn | ctki 19 | logprob kaydi 18 | alanlar: token,logprob,bytes,top_logprobs
+  top_logprobs aday sayisi: min 3 / max 3 | bayt-uzanti uyumu 18/18
+  cevap 'Istanbul\'da bir vapur iskelesi "Şehir" adında.'
+  tokenlari: 'I' 'stanbul' "'d" 'a' ' bir' ' vap' 'ur' ' is' 'ke' 'lesi' ' "' 'Ş' 'eh' 'ir'
+  son tokenlar: 'eh' 'ir' '"' ' ad' 'ında' '.'
+  sozlesme: eval_count 19 - logprob kaydi 18 = 1 kayit YOK
+  kirpik entropi (nat): ilk 0.7552 | ort 0.3382 | son 0.5733  [ALT SINIR]
+  ilk konum adaylari: 'I'=0.5014, 'İ'=0.1418, 'H'=0.0525
+  yanit anahtarlari: created_at,done,done_reason,eval_count,eval_duration,load_duration,logprobs,message,model,prompt_eval_cached_count,prompt_eval_count,prompt_eval_duration,total_duration
+
+A10 | /api/chat | top_logprobs=5 AMA logprobs gonderilmedi
+  logprobs ALANININ KENDISI YOK/GOK | duvar  0.59 sn | ctki 8 | cevap 'Marmaray hizmeti'
+
+A11 | /api/chat | logprobs GONDERILMEDI (karsit kanit)
+  logprobs ALANININ KENDISI YOK/GOK | duvar  0.60 sn | ctki 8 | cevap 'Marmaray hizmeti'
+
+=========================================================
+KOL H - LOGPROB TEKRARI (sicaklik 0, ayni istem)
+=========================================================
+H1.1 |  1.36 sn | kayit 17 | 'Marmaray hizmeti 2013 yılında açıldı.'
+H1.2 |  1.36 sn | kayit 17 | 'Marmaray hizmeti 2013 yılında açıldı.'
+H1.3 |  1.33 sn | kayit 17 | 'Marmaray hizmeti 2013 yılında açıldı.'
+  H1 | 3 tekrar -> EVET (token + logprob bit bit ayni)
+  not: T=0, seed=1234, num_predict=32
+H2.1 |  1.36 sn | kayit 17 | 'Marmaray hizmeti 2013 yılında açıldı.'
+H2.2 |  1.38 sn | kayit 17 | 'Marmaray hizmeti 2013 yılında açıldı.'
+H2.3 |  1.47 sn | kayit 17 | 'Marmaray hizmeti 2013 yılında açıldı.'
+  H2 | 3 tekrar -> EVET (token + logprob bit bit ayni)
+  not: T=0, seed YOK, num_predict=32
+H3.1 |  0.10 sn | kayit  1 | 'M'
+H3.2 |  0.10 sn | kayit  1 | 'M'
+H3.3 |  0.10 sn | kayit  1 | 'M'
+  H3 | 3 tekrar -> EVET (token + logprob bit bit ayni)
+  not: T=0, seed=1234, num_predict=1
+
+H4 | keep_alive=0 ile model dusurulur, sonra ayni istem
+  dusurma istegi gonderildi (keep_alive=0)
+  H4.1 |  6.68 sn | kayit 17 | soguk (model yeni yuklendi) | 'Marmaray hizmeti 2013 yılında açıldı.'
+  H4.2 |  1.38 sn | kayit 17 | sicak | 'Marmaray hizmeti 2013 yılında açıldı.'
+  H4.3 |  1.37 sn | kayit 17 | sicak | 'Marmaray hizmeti 2013 yılında açıldı.'
+  H4 | soguk vs sicak -> HAYIR (ayni tokenlar, max |delta logprob| 2.286e-01, ilk: 'i')
+  not: H1 ile ayni ayar; fark yalnizca yukleme durumundan gelmelidir
+
+bitti: 2026-10-17 22:09:59

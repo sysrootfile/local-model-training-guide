@@ -1,0 +1,76 @@
+{
+  "klasor": "cikti\\test-gorseller",
+  "tetikleyici": "stilim",
+  "ozet": {
+    "toplam_gorsel": 6,
+    "okunamayan": 0,
+    "kucuk_gorsel": 1,
+    "tam_tekrar_grup": 1,
+    "yakin_tekrar_cift": 2,
+    "caption_eksik": 1,
+    "caption_fazla": 1,
+    "bos_caption": 0,
+    "tetikleyici_iceren_caption": 4,
+    "tetikleyici_toplam_gecis": 4
+  },
+  "format_dagilimi": {
+    "PNG": 5,
+    "JPEG": 1
+  },
+  "boyut_dagilimi": [
+    {
+      "boyut": "1024x1024",
+      "adet": 4
+    },
+    {
+      "boyut": "512x512",
+      "adet": 1
+    },
+    {
+      "boyut": "1536x1024",
+      "adet": 1
+    }
+  ],
+  "kucuk_gorseller": [
+    {
+      "dosya": "sahne_02.jpg",
+      "boyut": "512x512"
+    }
+  ],
+  "tam_tekrarlar": [
+    [
+      "sahne_01.png",
+      "sahne_03.png"
+    ]
+  ],
+  "yakin_tekrarlar": [
+    {
+      "a": "sahne_01.png",
+      "b": "sahne_04.png",
+      "hamming": 0
+    },
+    {
+      "a": "sahne_03.png",
+      "b": "sahne_04.png",
+      "hamming": 0
+    }
+  ],
+  "caption_eksik": [
+    "sahne_05.png"
+  ],
+  "caption_fazla": [
+    "notlar.txt"
+  ],
+  "bos_captionlar": [],
+  "tetikleyici_icermeyen_captionlar": [
+    "sahne_06.txt"
+  ],
+  "uyarilar": [
+    "1 görselin kısa kenarı 1024px altında (SDXL için bulanıklık riski)",
+    "1 birebir tekrar grubu (sha1) var",
+    "2 çift neredeyse aynı görsel (dHash <= 6)",
+    "1 görselin caption'ı eksik",
+    "1 fazladan caption dosyası (görselsiz)",
+    "1 caption tetikleyici kelimeyi içermiyor"
+  ]
+}

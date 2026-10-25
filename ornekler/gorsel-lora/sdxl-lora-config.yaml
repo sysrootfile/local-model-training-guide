@@ -1,0 +1,150 @@
+# ---------------------------------------------------------------------------
+# Örnek Proje 4: Görsel Stil LoRA — ai-toolkit eğitim config'i (SDXL)
+#
+# Anahtar adları ai-toolkit'in resmî deposundan doğrulanmıştır
+# (github.com/ostris/ai-toolkit; config/examples/train_lora_flux_24gb.yaml ve
+# jobs/process/BaseSDTrainProcess.py, toolkit/config_modules.py — 2026 sürümü).
+# Buradaki her kritik değerin "neden"i üstündeki yorumda açıklanmıştır.
+#
+# Kullanım: Bu dosyayı ai-toolkit deposundaki config/ klasörüne kopyalayın ve
+# işaretli iki yeri kendiniz doldurun:
+#   1) datasets[0].folder_path  -> görsellerinizin klasörü
+#   2) sample.prompts           -> kendi test sahneleriniz (İngilizce önerilir)
+# Çalıştır (ai-toolkit deposunun kökünden):
+#   python run.py config/stilim-sdxl-lora.yaml
+# ---------------------------------------------------------------------------
+
+job: extension
+config:
+  # Oturum adı: klasör VE dosya adı bunu kullanır.
+  # Çıktılar output/stilim-sdxl-lora-v1/ altına düşer.
+  name: "stilim-sdxl-lora-v1"
+
+  process:
+    - type: 'sd_trainer'
+      # Tüm oturum çıktılarının kökü. ai-toolkit deposu içinde "output"
+      # kullanmak, eğitim çıktısını depo dosyalarından ayrı tutar.
+      training_folder: "output"
+      # Tek GPU: 0. kart. Birden çok GPU varsa eğitim otomatik yayılır.
+      device: cuda:0
+
+      # Tetikleyici kelime: caption'da yoksa ai-toolkit otomatik ekler.
+      # Nadir, anlamsız bir dize seçin. "stilim" yalnızca örnektir; "sanat"
+      # gibi taban modelin zaten bildiği kelimeler karışıklık yaratır.
+      trigger_word: "stilim"
+
+      network:
+        type: "lora"
+        # rank (ai-toolkit'te "linear"): LoRA'nın kapasitesi.
+        # SDXL üslup işi için 32 iyi başlangıç; detay yetmiyorsa 64'e çıkın,
+        # önce 32 ile bir tur atın (64, dosyayı ve aşırı öğrenme riskini büyütür).
+        linear: 32
+        # alpha: eğitimin ölçeği. ai-toolkit'in resmî örnekleri alpha=rank
+        # kullanır; kohya tarafında rank/2 da yaygındır. İkisi de geçerli.
+        linear_alpha: 32
+
+      save:
+        # Diske kayıt hassasiyeti; eğitim bf16 olsa da LoRA için fp16 yeter.
+        dtype: float16
+        # Her 250 adımda ara kayıt: aşırı öğrenmeyi (overfit) erken yakalamanın
+        # yolu. Ara dosyaları ComfyUI'da aynı prompt ve seed ile karşılaştırın.
+        save_every: 250
+        # Son 4 ara kaydı sakla; hepsini tutmak diski şişirir.
+        max_step_saves_to_keep: 4
+        # Hugging Face'e otomatik yükleme kapalı; paylaşımı elle yapacağız.
+        push_to_hub: false
+
+      datasets:
+        # DOLDURUN: görseller + her görselle AYNI ADLI .txt caption dosyaları.
+        # Windows'ta ters bölü çizgileri çift yazın: "C:\\veri\\stilim"
+        - folder_path: "veri/stilim"
+          # Caption uzantısı: .txt. veri_kontrol.py de tam bu eşleşmeyi denetler.
+          caption_ext: "txt"
+          # Caption'ların %5'i eğitimde kazara boş görülür; bu, modelin
+          # tetikleyici olmadan da esneklik kazanmasına yardım eder.
+          caption_dropout_rate: 0.05
+          # Etiket sırası karıştırılmıyor: üslup caption'ları elle yazıldı,
+          # kelime sırası anlam taşımıyor; karıştırma fayda getirmez.
+          shuffle_tokens: false
+          # VAE latent'leri bir kez hesaplanıp diske yazılır; sonraki
+          # çalıştırmalar belirgin hızlanır (önerilen değer: true).
+          cache_latents_to_disk: true
+          # SDXL'in eğitim çözünürlüğü 1024. Farklı en-boy oranları
+          # otomatik bucket'lanır; görseller kırpılmaz.
+          resolution: 1024
+
+      train:
+        # 8-12 GB VRAM'de 1'de kalın; 24 GB+ kartlarda 2-4 denenebilir.
+        batch_size: 1
+        # Toplam adım: SDXL stil LoRA için tipik aralık 1000-2000.
+        # 15-30 görselle 1500 iyi bir başlangıç; ara kayıtları görüp
+        # gerekirse erken bir checkpoint kullanarak "az eğitilmiş" tarafı seçin.
+        steps: 1500
+        # Etkin yığın = batch_size x gradient_accumulation_steps.
+        # 1: gradyanlar her adımda uygulanır; tek GPU'da en basit kurulum.
+        gradient_accumulation_steps: 1
+        # U-Net'i eğit: LoRA'nın öğrendiği asıl ağırlıklar burada.
+        train_unet: true
+        # SDXL'de metin kodlayıcıyı eğitmek VRAM'i ciddi büyütür ve üslup
+        # işi için genelde gereksizdir; kapalı bırakın.
+        train_text_encoder: false
+        # Bellek-yer / hesaplama-zamanı takası; 24 GB altı kartlarda açık kalsın.
+        gradient_checkpointing: true
+        # SDXL'in gürültü programı ddpm. sample.sampler ile AYNI olmalıdır.
+        noise_scheduler: "ddpm"
+        # 8 bit AdamW: bellek tasarrufu ile kararlılık dengesi;
+        # resmî Flux örneğinde de bu optimizer kullanılıyor.
+        optimizer: "adamw8bit"
+        # Öğrenme hızı: SDXL LoRA için 1e-4 tipik başlangıç.
+        # Örnek görseller erken bozuluyorsa ilk düşürülecek değer budur.
+        lr: 1e-4
+        # EMA kayıtları yumuşatır (küçük dalgalanmaları temizler); açık kalsın.
+        ema_config:
+          use_ema: true
+          ema_decay: 0.99
+        # Eğitim hassasiyeti: 30/40 serisi kartlarda bf16 hızlı ve kararlı.
+        dtype: bf16
+
+      model:
+        # Taban model: SDXL base 1.0 — CreativeML Open RAIL++-M lisansı,
+        # ticari kullanıma açık. Hugging Face'ten otomatik indirilir;
+        # yerel bir .safetensors dosya yolu da verilebilir.
+        name_or_path: "stabilityai/stable-diffusion-xl-base-1.0"
+        # SDXL, Flux'un akış-eşleşme (flow matching) ailesinden DEĞİLDİR.
+        is_flux: false
+        # SDXL ailesi işareti; mimariyi (iki metin kodlayıcı, 1024px) bu belirler.
+        is_xl: true
+        # SDXL base 1.0 epsilon tahminiyle eğitildi (v-tahmin değil).
+        is_v_pred: false
+
+      sample:
+        # Örnek üretimin örnekleyicisi; train.noise_scheduler ile eşleşmek
+        # ZORUNDA (resmî config'lerin yorumu da bunu söylüyor).
+        sampler: "ddpm"
+        # Her 250 adımda örnek üret; ara kayıtlarla aynı ritimde olması
+        # ikisini birlikte incelemeyi kolaylaştırır.
+        sample_every: 250
+        sample_start_step: 0
+        width: 1024
+        height: 1024
+        # DOLDURUN: üslubu eğitimde GÖRÜLMEMİŞ sahnelerde test edin;
+        # ezber (overfit) ancak böyle ortaya çıkar. [trigger] etiketi
+        # tetikleyici kelimeyle otomatik değiştirilir.
+        # CLIP tabanlı SDXL İngilizce anlar; prompt'ları İngilizce yazın.
+        prompts:
+          - "[trigger], watercolor landscape, misty mountains, pastel colors"
+          - "[trigger], close-up portrait, warm light, soft brush strokes"
+          - "[trigger], still life, bowl of fruit, muted palette"
+          - "[trigger], city street at night, rain, glowing reflections"
+        neg: ""
+        # Sabit tohum: ara kayıtları adil karşılaştırmanın şartı.
+        seed: 42
+        walk_seed: false
+        # SDXL base 1.0 için standart cfg değeri.
+        guidance_scale: 7
+        sample_steps: 20
+
+# Modelin içine gömülen meta bilgi; [name] otomatik doldurulur.
+meta:
+  name: "[name]"
+  version: '1.0'

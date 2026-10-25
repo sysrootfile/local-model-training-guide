@@ -1,0 +1,3 @@
+Veri: breast_cancer | Eğitim: 455 | Test: 114
+Model: Lojistik Regresyon (StandardScaler pipeline)
+ROC-AUC: 0.9954 | Doğruluk: 0.9825 | Duyarlılık: 0.9861

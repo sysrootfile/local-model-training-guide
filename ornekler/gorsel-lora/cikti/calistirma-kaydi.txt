@@ -1,0 +1,92 @@
+
+============================================================
+1) Klasör taraması
+============================================================
+Klasör          : cikti\test-gorseller
+Görsel dosyası  : 6
+Caption (.txt)  : 6
+Tetikleyici     : 'stilim'
+
+============================================================
+2) Format ve boyut dağılımı
+============================================================
+Format dağılımı:
+  PNG   : 5 dosya
+  JPEG  : 1 dosya
+
+Boyut dağılımı (genişlik x yükseklik):
+  1024 x 1024 : 4 görsel
+   512 x  512 : 1 görsel
+  1536 x 1024 : 1 görsel
+
+En küçük kısa kenar: 512 px | Medyan: 1024 px
+
+============================================================
+3) Çok küçük görseller (kısa kenar < 1024px)
+============================================================
+  UYARI  sahne_02.jpg             512 x 512
+
+1 görsel 1024px altı. SDXL eğitiminde bu
+görseller büyütülerek kullanılır; bulanıklık ve detay kaybı üretir.
+Öneri: en az 1024 kısa kenarlı sürümlerle değiştirin.
+
+============================================================
+4) Birebir tekrarlar (sha1: bayt bayt aynı dosyalar)
+============================================================
+  Grup (sha1: sahne_01...): sahne_01.png, sahne_03.png
+
+1 tekrar grubu, toplam 1 fazladan kopya.
+Kopyalardan birini silmek yeterlidir.
+
+============================================================
+5) Yakın tekrarlar (dHash Hamming mesafesi <= 6/64)
+============================================================
+  sahne_01.png             <-> sahne_04.png             mesafe: 0/64
+  sahne_03.png             <-> sahne_04.png             mesafe: 0/64
+
+2 çift görsel olarak neredeyse aynı. Bunlar aynı
+pozu/frame'i iki kez sayar; birini eleyin. (Mesafe 0, gözle aynı
+dosyaların yeniden kaydedilmiş sürümleri anlamına gelir.)
+
+============================================================
+6) Caption (.txt) denetimi
+============================================================
+Eşleşme kuralı: her görselin yanında AYNI ADLI .txt dosyası olmalı.
+  Caption eksik : 1 görsel
+    sahne_05.png             -> beklenen: sahne_05.txt
+  Fazla caption : 1 dosya (karşılık görsel yok)
+    notlar.txt
+  Boş caption   : 0 dosya
+
+============================================================
+7) Tetikleyici kelime denetimi: 'stilim'
+============================================================
+Değerlendirilen caption     : 5 (görselsiz .txt'ler hariç)
+Tetikleyici içeren caption : 4 / 5
+Toplam geçiş sayısı        : 4
+Tetikleyici içermeyen caption'lar:
+  UYARI  sahne_06.txt
+
+Bu caption'lardaki görseller üslubu kelimeye bağlamaz; eğitimden
+önce tetikleyiciyi ekleyin (ör. caption başına: 'stilim, ...').
+
+============================================================
+ÖZET: Denetim sonucu
+============================================================
+  Toplam görsel dosyası                  6
+  Okunamayan dosya                       0
+  Kısa kenarı 1024px altı görsel         1
+  Birebir tekrar grubu (sha1)            1
+  Neredeyse aynı çift (dHash <= 6)       2
+  Caption eksik / fazla / boş            1 / 1 / 0
+  Tetikleyici içermeyen caption          1
+
+UYARILAR (eğitimden önce ele alın):
+  - 1 görselin kısa kenarı 1024px altında (SDXL için bulanıklık riski)
+  - 1 birebir tekrar grubu (sha1) var
+  - 2 çift neredeyse aynı görsel (dHash <= 6)
+  - 1 görselin caption'ı eksik
+  - 1 fazladan caption dosyası (görselsiz)
+  - 1 caption tetikleyici kelimeyi içermiyor
+
+Rapor yazıldı: D:\projects\model-egitimi-rehberi\ornekler\gorsel-lora\cikti\denetim-raporu.json

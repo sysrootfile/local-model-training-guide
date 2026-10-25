@@ -1,0 +1,52 @@
+TEKRARLANABILIRLIK OLCUM KAFESI
+  baslangic: 2026-10-17 10:58:15
+  python 3.12.10 | Windows 11
+  ollama 0.40.4 | model qwen2.5:3b-instruct-q4_K_M | tekrar 2 | num_predict 48
+  DUMAN TESTI: A1-A3 + D1-D2, iki tekrar, K0 tek istek
+
+K0 - VARSAYILAN NUM_PREDICT ARAMASI
+   gonderim: options = {temperature: 0} (num_predict YOK)
+  K0.1: duvar 120.85 sn | ctki token 1060 | bitis stop
+
+A1 | kapali | T=0.0 | seed=- | format=yok | 2 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yanitiniz tek kelime olsun, yildan bask
+   1. [7b7a53e239] duvar  1.40 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2020'
+   2. [7b7a53e239] duvar  0.41 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+
+A2 | kapali | T=0.0 | seed=1234 | format=yok | 2 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yanitiniz tek kelime olsun, yildan bask
+   1. [7b7a53e239] duvar  0.87 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2020'
+   2. [7b7a53e239] duvar  0.36 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2020'
+
+A3 | kapali | T=0.8 | seed=- | format=yok | 2 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yanitiniz tek kelime olsun, yildan bask
+   1. [05a5cf0698] duvar  0.69 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2021'
+   2. [7b7a53e239] duvar  0.36 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2020'
+
+D1 | json | T=0.8 | seed=- | format=json | 2 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yalnizca iki alanli JSON yaz: yil (sayi
+   1. [82c5defec4] duvar  3.73 sn | girdi   74 | ctki  43 | bitis stop   | FARKLI | JSON ok yil=2023 | '{ "yil": 2023, "gereken": "Ayetiyle hizmete alınan service debutu 2023 yıl'
+   2. [da1a78c2b9] duvar  2.31 sn | girdi   74 | ctki  34 | bitis stop   | FARKLI | JSON ok yil=2021 | '{ "yil": 2021, "gerceklesen": "Hizmet acilmasi bilinmeyen" }'
+
+D2 | json | T=0.8 | seed=- | format=sema | 2 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yalnizca iki alanli JSON yaz: yil (sayi
+   1. [f36a0c6db4] duvar  3.40 sn | girdi   74 | ctki  48 | bitis length | FARKLI | JSON BOZUK yil=None | '{ "yil": 2021, "gerekce": "Marmaray, İstanbul\'un eski ve yeni hat arasında'
+   2. [f47a02a01f] duvar  3.48 sn | girdi   74 | ctki  48 | bitis length | FARKLI | JSON BOZUK yil=None | '{ "yil": 2017, "gerekce": "Marmaray, İstanbul\'un Atlantik Körfezi ile Kara'
+
+=========================================================
+OZET (kol A)
+=========================================================
+hucre  n  benzersiz  en-sik-oran  uz-ort  uz-min/max  ctki-ort  duvar
+A1      2          1         1.00     4.0    4/4         5.0     1.8 sn
+A2      2          1         1.00     4.0    4/4         5.0     1.2 sn
+A3      2          2         0.50     4.0    4/4         5.0     1.0 sn
+D1      2          2         0.50    75.0   60/90       38.5     6.0 sn
+D2      2          2         0.50   118.5  117/120      48.0     6.9 sn
+
+A1     bitis: {'stop': 2} | not: sicaklik 0, tohum yok
+A2     bitis: {'stop': 2} | not: sicaklik 0, tohum 1234
+A3     bitis: {'stop': 2} | not: sicaklik 0,8, tohum yok
+D1     bitis: {'stop': 2} | JSON okunan 2/2, yil kodlari: 2021,2023 | not: format=json, sicaklik 0,8, tohum yok
+D2     bitis: {'length': 2} | JSON okunan 0/2, yil kodlari: None | not: format=sema, sicaklik 0,8, tohum yok
+
+bitti: 2026-10-17 11:00:33

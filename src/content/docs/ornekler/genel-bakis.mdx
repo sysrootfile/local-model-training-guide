@@ -1,0 +1,80 @@
+---
+title: "Örnek Projeler: Genel Bakış"
+description: Rehberdeki kavramları gerçek veri ve gerçek betiklerle birleştiren sekiz uçtan uca proje — hangisi size uygun, ne gerektirir, nasıl çalıştırılır?
+sidebar:
+  order: -1
+dogrulama: 2026-10-19
+---
+
+Bu bölüm, rehberin geri kalanındaki kavramları **çalıştırılabilir projelere** dönüştürüyor. Her proje: eksiksiz bir betik (veya betik seti) + gerçek çalıştırma çıktıları + satır satır açıklama içeriyor. Betiklerin tamamı `ornekler/` klasöründe, kopyalayıp kendi projenize taşıyabilirsiniz.
+
+## Sekiz proje
+
+| Proje | Ne öğretir | Donanım | Süre |
+| --- | --- | --- | --- |
+| [1. Tablo Verisiyle Uçtan Uca ML](/ornekler/klasik-ml/) | Pipeline, baseline, çapraz doğrulama, metrik okuma, model kaydı | CPU yeterli | Saniyeler |
+| [2. Veri Temizleme Atölyesi](/ornekler/veri-temizleme/) | Normalizasyon, PII maskeleme, kalite filtresi, tekrar temizliği, SFT formatı | CPU yeterli | Dakikalar |
+| [3. Türkçe Sohbet Asistanı](/ornekler/turkce-asistan/) | QLoRA ile LLM fine-tuning, eğitim izleme, GGUF'a dönüştürme, Ollama'da çalıştırma | GPU (VRAM'e göre 8–12 GB+) | Saatler |
+| [4. Görsel Stil LoRA](/ornekler/gorsel-lora/) | Difüzyon modelinde LoRA eğitimi, caption hazırlama, ComfyUI'da kullanım | GPU (VRAM'e göre 8–16 GB+) | 1–3 saat |
+| [5. Yerel RAG Asistanı](/ornekler/yerel-rag/) | Embedding, vektör arama, belgeye dayalı cevap, getirim testi, kapsam dışı soru | CPU yeterli (Ollama + 2 küçük model) | Dakikalar |
+| [6. Vikipedi'den Türkçe RAG](/ornekler/viki-rag/) | Veriyi canlı API'den çekme, parçalama (chunking) ve örtüşme, 100+ parçalık korpus | CPU yeterli (Ollama + internet) | ~5 dakika |
+| [7. Ajan Döngüsü](/ornekler/ajan-dongusu/) | Araç çağırma, tur sayacı, kataloğun token gideri, `tool_choice` ve `format`ın gerçek davranışı | CPU yeterli (Ollama + internet) | ~8 dakika |
+| [8. Prompt Enjeksiyonu Deneyi](/ornekler/enjeksiyon-deni/) | Korpusa gömülü kötü niyetli metin, canary anahtarı, sızıntı kanalı, iki kanal × üç savunma, 31 hücre | CPU yeterli (Ollama; korpus önbelleği varsa internet bile gerekmez) | ~36 dakika |
+
+:::note[Hangi kısımlar bu makinede çalıştırıldı?]
+1, 2, 5, 6, 7 ve 8 numaralı projelerin tamamı **bu projede gerçekten çalıştırıldı**; sayfalarındaki tüm çıktı ve sayılar gerçek bir çalıştırmadan alınmıştır. 5, 6, 7 ve 8 numaralı projeler hiç GPU istemez: Ollama üzerinde bge-m3 (embedding) ve qwen2.5:3b (cevap üretimi) modelleriyle tamamen CPU'da koşar; 6 ve 7 numaralı projeler korpusu ilk koşumda Vikipedi'den indirir, 8 numaralı proje o indirmenin çıktısını (korpus + vektör önbelleği) yeniden kullandığı için kendi koşumunda internete ihtiyaç duymadı. 3 ve 4 numaralı projelerin **GPU'da çalışan eğitim adımları çalıştırılmadı** (bu makinede GPU yok). Ancak CPU'da çalışabilen kısımlar gerçekten koşturuldu: proje 3'te veri hazırlama betiği `hazirla.py` (gerçek veri setiyle), proje 4'te veri denetim betiği `veri_kontrol.py` (bilerek kusurlu üretilmiş test görselleriyle) gerçek çıktılarıyla sayfalarında. GPU gerektiren betikler güncel resmî araç sürümlerine göre yazıldı ve söz dizimi denetiminden geçirildi; kendi GPU'nuzda ilk çalıştırmada küçük sürüm farklarına bağlı düzeltmeler gerekebilir. Bu ayrımı her sayfanın başındaki kutuda açıkça belirtiyoruz; `çalıştırılmadı` etiketi gölgelenmemelidir.
+:::
+
+Bu sekiz örnek ayrı sayfarda durur; oysa bir hat kurulursa örneklerin bir kısmı aynı hattın istasyonu olur: veri indirme → temizleme → CPU'da eğitim → değerlendirme → Ollama'da çalıştırma. Hangi örneklerin o hatta durduğu, her birinin kaydının hangi dosyada olduğu ve hattın nerede koptuğu tek bir yerde: [Uçtan Uca Tek Hat](/ornekler/ucdan-uca/). O sayfa yeni ölçüm üretmez — yalnızca istasyon sırasını, kanıt kadesini ve kayıt dosyasının adını taşır; yürünmemiş kolları da kendi adıyla söyler.
+
+## Ortak kurulum: sanal ortam ve klasör düzeni
+
+Projelerin hiçbiri sisteme kurulum gerektirmez — hepsi kendi sanal ortamında çalışır. Proje kökünde bir kez:
+
+```bash
+# Proje kökünde (.venv yoksa):
+python -m venv .venv
+.venv\Scripts\activate          # Windows
+# source .venv/bin/activate     # macOS / Linux
+```
+
+Klasör düzeni:
+
+```text
+ornekler/
+├── klasik-ml/
+│   ├── tablo_modeli.py         # betik
+│   ├── veri/breast_cancer.csv  # veri (projeye dahil)
+│   └── cikti/                  # model.joblib, rapor.txt, çalıştırma çıktısı
+├── veri-temizleme/
+│   ├── atolye.py               # betik (veri internetten çekilir)
+│   └── cikti/                  # temiz_veri.jsonl, rapor.json, çalıştırma kaydı
+└── yerel-rag/
+    ├── rag.py                  # betik (yalnızca Ollama API'si + standart kütüphane)
+    ├── olc.py                  # ölçüm betiği (hit@k, MRR, parafraz, eşik)
+    └── cikti/                  # çalıştırma kayıtları
+```
+
+(6. projenin klasörü `viki-rag/` de aynı düzeni izler: `viki_rag.py` + çalıştırma kaydı; veri sabit dosya değil, çalışma anında Vikipedi'den gelir. 7. projenin `ajan-dongusu/` klasörü de öyle: `ajan.py` + iki keşif betiği + `cikti/korpus.json` ve `cikti/ajan-kaydi.txt`. 8. projenin `enjeksiyon-deni/` klasörü tek betik + dört kayıt dosyası taşır (`enjeksiyon-kaydi.txt`, iki duman koşumu ve `sizan/` altındaki sızıntı dosyaları); korpusu ve vektörleri 6-7. projelerin çıktısından okur, onları **yazmaz**.)
+
+Her projenin sayfasında kendi `pip install` komutu var; ortak bir gereksinim dosyası tutmuyoruz ki projeler bağımsız kopyalanabilsin.
+
+:::tip[Hangi sırayla?]
+Yeni başlıyorsanız **1 → 2** sırasıyla gidin: ikisi de GPU'suz, dakikalar içinde biter ve rehberin temel kavramlarını (metrik, sızıntı, PII, tekrar) elle tutulur hale getirir. Elinizde GPU varsa 3 ve 4'ten hangisi ilginizi çekiyorsa onunla başlayabilirsiniz — ikisi bağımsızdır. GPU'suz LLM yoluna ilgi duyanlar 5'i, sonra canlı veriyle ölçeklenen 6'yı izleyebilir. Hangi projenin donanımınıza uyduğundan emin değilseniz ana sayfadaki [yöntem seçici](/) size üç soruda yol gösterir.
+:::
+
+:::caution[Bu projelerin model lisansı: araştırma amaçlı]
+5, 6, 7 ve 8 numaralı projeler ile sitedeki ölçüm kafeslerinin cevap üretme modeli `qwen2.5:3b-instruct-q4_K_M`. Ollama'nın bu etiketle dağıttığı paketin `LICENSE` alanında **Qwen RESEARCH LICENSE AGREEMENT** metni duruyor: kullanım "research or evaluation purposes only", ticari kullanım için Alibaba Cloud'dan ayrı lisans istenmesi, dağıtılan türev modellerde "Built with Qwen"/"Improved using Qwen" ibaresi ve bir `"Notice"` atıf dosyası şart koşuluyor. Yani bu örnekleri kendi makinenizde koşmak lisansın izin verdiği alanda; çıktüyü bir ürüne taşıyacaksanız taban modeli değiştirin veya lisans isteyin. Ölçülmüş envanter (üç yerel modelin lisans metinleri, bayt/satır sayıları ve madde alıntıları): [Lisans, Kişisel Veri ve Model Kartı](/kullanim/lisans-ve-model-karti/).
+:::
+
+## Betikleri kendi verinizle kullanma
+
+Her sayfanın sonunda "kendin denemek için" bölümü var; kabaca desen şudur:
+
+1. Betiği kopyalayın, veri yolunu kendi dosyanıza çevirin.
+2. Bir kez **hatasız** çalıştırıp çıktıyı inceleyin.
+3. Değiştirdiğiniz her şeyi tek tek değiştirin ve çıktının nasıl değiştiğini izleyin — bu projelerin asıl amacı bu izleme alışkanlığıdır.
+
+:::caution[Sayılara şüpheyle yaklaşın]
+Sayfalardaki metrikler o günkü veri seti ve kütüphane sürümleriyle alınmıştır. Sabit `random_state` değerleri sayesinde aynı sürümlerle tekrarlanabilirler; sürümler değişirse son rakamlar oynayabilir. "Kendi çalıştırmamda şu çıktı" cümlesini kurmadan hiçbir sayıya güvenmeyin — bu rehberin genel ilkesi.
+:::

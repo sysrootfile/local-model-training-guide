@@ -1,0 +1,208 @@
+---
+title: "VRAM Hesabı: Modelim Sığar mı?"
+description: Model ağırlıkları, gradyanlar, optimizer durumları ve aktivasyonların VRAM'de kapladığı yeri öğrenin; eğitim yöntemine ve ekran kartınıza göre yaklaşık bellek ihtiyacını hesaplayın.
+dogrulama: 2026-10-19
+---
+
+import VramCalculator from '../../../components/VramCalculator.astro';
+
+Ekran kartında bir model eğitmeye çalışıp `CUDA out of memory` hatası almak, bu alandaki en yaygın ilk deneyimdir. İyi haber: bu hata büyülü değil, aritmetiktir. Bu sayfada VRAM'in (ekran kartı belleği) hangi kalemler tarafından "yendiğini" öğrenecek ve "modelim sığar mı?" sorusunu toplama-çarpma ile yanıtlayabileceksiniz.
+
+:::note
+Buradaki tüm değerler **yaklaşık kaba tahminlerdir**. Gerçek tüketim; kütüphane sürümüne, eğitim çerçevesine, çekirdek (kernel) seçimlerine ve sürücü sürümüne göre %10-30 oynayabilir. Amaç, pahalı bir karar öncesinde doğru büyüklük mertebesini bilmektir.
+:::
+
+## VRAM'i Ne Yer? Dört Kalem
+
+Bir eğitim başlattığınızda ekran kartı belleği dört kalem arasında paylaşılır. Bu kalemleri anlamak, hatayı "sihirden" çıkarıp "aritmetiğe" çevirir.
+
+### 1. Model ağırlıkları (weights)
+
+Modelinizin öğrendiği tüm sayılar; bir LLM'de milyonlarca ila milyarlarca ondalık değer. Her parametre, saklandığı hassasiyete (fp16, 4-bit...) göre yer kaplar.
+
+> **Analoji:** Bavulun kendisi. İster çıkarım (inference) yapın ister eğitin, ağırlıklar her zaman bellekte durur.
+
+### 2. Gradyanlar (gradients)
+
+Eğitim sırasında "her ağırlığı hangi yöne, ne kadar düzeltmeliyim?" sorusunun cevabı olan sayılar. Ciddi olan şu: **her ağırlık için bir gradyan** tutulur; yani fp16'da gradyanlar, ağırlıkların kendisi kadar yer kaplar.
+
+> **Analoji:** Her eşyanın üzerine yapıştırılan düzeltme notları. Yalnızca eğitim "yolculuğunda" vardır; çıkarımda gerekmez.
+
+### 3. Optimizer durumları
+
+En sık gözden kaçan ve çoğu zaman **en büyük** kalem. AdamW optimizer'ı, her parametre için fp32 hassasiyetinde iki ek kopya tutar: momentum (m) ve varyans (v). Bu, parametre başına 4 + 4 = **8 bayt** demektir. Karşılaştırma: modelin kendi ağırlıkları fp16'da yalnızca 2 bayt/parametredir.
+
+> **Analoji:** Düzeltme notlarının arşiv kopyaları. Her eşya için iki defter birden tutuyorsunuz; bagaj bu yüzden beklediğinizden çok daha ağır.
+
+:::tip
+Sıkışırsanız optimizer de bir kaldıraçtır: SGD + momentum, AdamW'nin 8 baytı yerine yaklaşık 4 bayt/parametre tutar. Karşılığında öğrenme oranı (learning rate) seçimine karşı daha hassastır.
+:::
+
+### 4. Aktivasyonlar (activations)
+
+İleri geçiş (forward pass) sırasında katmanların ürettiği ara çıktılar; geri yayılım (backpropagation) için saklanmaları gerekir. İki şeye bağlıdırlar:
+
+- **Toplu iş boyutu (batch size):** aynı anda işlenen örnek sayısı,
+- **Dizi uzunluğu (sequence length):** her örnekteki token sayısı.
+
+Aktivasyon tüketimi bu ikisiyle hızla (dikkat katmanlarında neredeyse karesiyle) büyür. **Gradyan kontrol noktalama (gradient checkpointing)** ile ciddi biçimde düşürülebilir: ara çıktılar saklanmaz, geri yayılımda yeniden hesaplanır.
+
+> **Analoji:** Çalışma masanızın üstü. Aynı anda ne kadar çok iş açarsanız (batch) masa o kadar dolar; iş bitince temizlenir.
+
+## Sayı Formatı: Parametre Başına Kaç Bayt?
+
+Tüm hesabın tek yapı taşı şu: parametre başına bayt sayısı.
+
+| Hassasiyet | Tür | Parametre başına | 7B model ağırlıkları |
+| --- | --- | --- | --- |
+| fp32 | Tam hassasiyet | 4 bayt | ~28 GB |
+| fp16 / bf16 | Yarım hassasiyet (eğitimde standart) | 2 bayt | ~14 GB |
+| int8 | 8-bit nicemleme | 1 bayt | ~7 GB |
+| 4-bit (NF4) | 4-bit nicemleme (QLoRA'nın temeli) | ~0.5 bayt | ~3.5-4 GB |
+
+:::note
+Çapraz kontrol: 7 milyar parametre × 4 bayt = 28 GB, × 2 bayt = 14 GB, × 1 bayt = 7 GB, × 0.5 bayt ≈ 3.5 GB. 4-bit ağırlıklar pratikte nicemleme meta verileriyle birlikte ~0.5-0.6 bayt/parametre tutar.
+:::
+
+## Hızlı Tahmin: Hesaplayıcı
+
+Model boyutunu, hassasiyeti ve eğitim yöntemini seçin; hesaplayıcı yaklaşık VRAM ihtiyacını sizin için çıkarsın:
+
+<VramCalculator />
+
+## Eğitim Yöntemine Göre Toplam Hesap
+
+Şimdi dört kalemi yöntemlere göre birleştirelim. Aşağıdaki kurallar **1 milyar parametre (1B) başına** ve "kaba tahmin" olarak okunmalıdır.
+
+### Tam ince ayar (full fine-tuning): fp16 + AdamW
+
+Tüm parametreler güncellenir; dört kalemin tamamı ödenir:
+
+```text title="Parametre başına maliyet (yaklaşık)"
+ağırlıklar       :  2 bayt   (fp16)
+gradyanlar       :  2 bayt   (fp16)
+AdamW durumları  :  8 bayt   (momentum + varyans, fp32)
+ara tamponlar    :  ~2-4 bayt (aktivasyonlar, CUDA bağlamı, pay)
+--------------------------------------------------
+toplam           :  ~14-16 bayt/parametre
+                     → 1B parametre ≈ 14-16 GB
+```
+
+Yani 8B'lik bir modeli tam ince ayarla eğitmek kabaca **112-128 GB** VRAM ister; tek tüketici kartıyla gerçekçi değildir. Pratikte bu yüzden LoRA/QLoRA tercih edilir.
+
+### LoRA (düşük dereceli uyarlama)
+
+Temel ağırlıklar **dondurulur**; yalnızca küçük "adaptör" matrisleri eğitilir (toplam parametrelerin tipik olarak %0.1-1'i):
+
+- Temel ağırlıklar (fp16): **2 GB / 1B**
+- Adaptör + gradyanları + optimizer durumları (küçük): genellikle 1 GB altı
+- Aktivasyonlar: dizi uzunluğuna göre **1-3 GB**
+
+Kural: **2 GB × (milyar parametre) + 1-3 GB ek**. Ayrıntı: [LoRA ve QLoRA](/llm/lora-qlora/).
+
+### QLoRA: 4-bit taban + LoRA
+
+Temel ağırlıklar 4-bit'e nicemlenir (quantization), üzerine LoRA adaptörleri eğitilir:
+
+- 4-bit temel ağırlıklar: **~0.5 GB / 1B**
+- Adaptör + aktivasyonlar: **1-3 GB ek**
+
+Kural: **0.5 GB × (milyar parametre) + 1-3 GB ek**. Nicemlemenin kendisi için: [Nicemleme Rehberi](/kullanim/quantization/).
+
+### Sadece çıkarım (inference)
+
+- Ağırlıklar (seçilen hassasiyette) + **KV önbelleği (KV cache)**.
+
+KV önbelleği, modelin cevap üretirken önceki token'lar için sakladığı anahtar-değer vektörleridir; bağlam (context) uzadıkça ve eşzamanlı istek sayısı arttıkça büyür. Tek istekte kısa bağlamda yaklaşık 0.5-2 GB; 8K+ bağlamda birkaç GB'ı bulabilir. Mekanizmanın kendisi: [Transformer Mimarisi](/temeller/transformer/). Yerel dağıtım için: [Ollama Rehberi](/kullanim/ollama/).
+
+:::note[Bu büyümenin ölçülmüş bir örneği var]
+[Eşzamanlılık](/kullanim/eszamanlilik/) sayfasında aynı model üç sunucu ayarında koşuldu ve `/api/ps`'in bildirdiği boyut yuva sayısıyla birlikte şöyle gitti: `-np 1` → 2 168 371 280 bayt, `-np 2` → 2 412 794 346 bayt, `-np 4` → 2 716 000 582 bayt. Toplam **+522 MiB**, tek model kopyasıyla — ama **eşit adımlarla değil**: ilk ek yuva ≈233 MiB getirirken sonraki ikisinin başına ≈145 MiB düşüyor. Günlükteki sebep de satır satır görünür: yuva başına 4096 token bağlam ayrılıyor (`-c 4096 / 8192 / 16384`), yani bağlam yuvalar arasında bölünmüyor, toplanıyor. İki sınır: ölçüm **CPU RAM** tarafında yapıldı (`size_vram` 0), ve artışın ne kadarı KV önbelleği, ne kadarı yuva başına hesap tamponu, ne kadarı çok yuvaya geçişte bir kez açılan yapılar — **ayrıştırmalı değil**; üç nokta bir neden seçmeye yetmez, yalnız birim fiyatın sabit olmadığını söylüyor.
+:::
+
+## Örnek Hesaplar
+
+Varsayımlar: çıkarımda 1-2K token bağlam ve tek istek; eğitimde küçük batch (1-2) ve kısa-orta dizi (512-2.048 token). Tüm değerler **yaklaşık GB**:
+
+| Model | Çıkarım 4-bit | Çıkarım fp16 | QLoRA eğitimi | LoRA eğitimi | Tam ince ayar (fp16) |
+| --- | --- | --- | --- | --- | --- |
+| 1B | ~2 | ~3-4 | ~3-4 | ~5-6 | ~14-18 |
+| 3B | ~3-4 | ~7-9 | ~5-7 | ~9-12 | ~42-48 |
+| 4B | ~3-5 | ~9-11 | ~6-8 | ~11-14 | ~56-64 |
+| 8B | ~5-7 | ~17-19 | ~9-12 | ~20-24 | ~112-128 |
+| 14B | ~9-12 | ~29-32 | ~14-18 | ~32-40 | ~200-240 |
+| 32B | ~18-22 | ~65-70 | ~26-34 | ~70-85 | ~450-500 |
+| 70B | ~36-45 | ~140-150 | ~50-70 | ~150-180 | Çoklu GPU şart |
+
+:::caution
+Eğitim sütunları küçük batch ve kısa-orta dizi varsayar. Dizi uzunluğunu 4K üzerine çıkarırsanız LoRA/QLoRA satırlarında 3-8 GB ek bekleyin. 70B satırındaki değerler birden fazla GPU dağıtımında anlamlıdır; tek 24 GB'lık kartta 70B'yi QLoRA ile eğitmek bile gerçekçi değildir.
+:::
+
+:::tip
+Tabloyu kendiniz doğrulamak isterseniz 7B üzerinden deneyin: QLoRA için 7 × 0.5 ≈ 3.5 GB ağırlık + 2-8 GB ek → ~6-12 GB; fp16 çıkarım için 7 × 2 = 14 GB ağırlık + KV önbelleği → ~15-17 GB. Tablodaki 8B satırına en yakın değerlerle uyuştuğunu göreceksiniz.
+:::
+
+## Cihazıma Ne Sığar?
+
+| VRAM | Konforlu | Sınırda / dikkat |
+| --- | --- | --- |
+| 4 GB | 0.5-2B model 4-bit çıkarım | 1-2B QLoRA ancak çok kısa diziyle; 3B üstü eğitim sığmaz |
+| 6 GB | 1-2B QLoRA; 4B'ye kadar 4-bit çıkarım | 4B QLoRA küçük batch ile denenebilir |
+| 8 GB | 3-4B QLoRA (kısa dizi); 7-8B 4-bit çıkarım | 8B QLoRA sınırda; 7-8B LoRA beklemeyin |
+| 12 GB | 4B QLoRA rahat; 3B LoRA; 8B QLoRA (kısa dizi) | 8B QLoRA'da uzun dizi zor |
+| 16 GB | 8B QLoRA rahat; 7-8B LoRA (kısa dizi); 14B 4-bit çıkarım | 14B QLoRA sınırda |
+| 24 GB | 8B QLoRA uzun dizilerle; 7-8B LoRA rahat | 14B QLoRA sınırda; 14B LoRA genelde yetmez |
+| 48 GB (workstation sınıfı) | 13-14B LoRA rahat; 32B QLoRA (kısa dizi) | 32B LoRA için 80 GB sınıfı gerekir |
+| 80 GB (A100/H100 sınıfı) | 13-14B LoRA geniş dizilerle; 70B 4-bit çıkarım | 70B eğitimi ya da 32B+ LoRA çoklu GPU ister |
+
+2026 itibarıyla boyut sınıflarına göre popüler aileler:
+
+- **0.6-2B:** Qwen3 (0.6B / 1.7B), Gemma 3 (1B), Llama 3.2 (1B)
+- **3-4B:** Qwen3 (4B), Gemma 3 (4B), Llama 3.2 (3B), Phi-4-mini, SmolLM3
+- **8B:** Qwen3-8B — ince ayar karşılaştırmalarında sınıfının en iyilerinden
+- **12B ve üzeri:** Gemma 3 (12B), Mistral Small, Llama 4
+
+:::note
+Kartınızın kaç GB olduğunu bilmiyorsanız: Windows'ta **Görev Yöneticisi → Performans → GPU** ya da `nvidia-smi` çıktısındaki "Memory-Usage" satırı toplam değeri gösterir. Model sürümleri ve boyutları dönem dönem değişir; seçim yapmadan önce ilgili model kartını kontrol edin.
+:::
+
+## VRAM Yetmiyorsa: Çözüm Sırası
+
+`CUDA out of memory` aldığınızda "daha büyük kart" ilk refleks olmasın. Şu sırayla deneyin; işlerin çoğu ilk dört adımda kurtulur:
+
+1. **Toplu iş boyutunu (batch size) küçültün.** Aktivasyonları doğrudan azaltır, en hızlı kazanç. Gerekirse batch 1'e inin.
+2. **Gradyan biriktirme (gradient accumulation) kullanın.** Küçük batch'leri birleştirip "büyük batch" etkisi verir; bellek artmaz, yalnızca süre uzar. Ayarlar: [Hiperparametreler](/llm/hiperparametreler/).
+3. **Dizi uzunluğunu kısaltın.** Aktivasyonlar dizi uzunluğuyla, dikkat katmanlarında neredeyse karesiyle büyür; 2.048'den 1.024'e inmek ciddi yer açar.
+4. **Gradyan kontrol noktalamayı (gradient checkpointing) açın.** Saklanan ara çıktıları geri yayılımda yeniden hesaplar; yaklaşık %20-30 yavaşlama karşılığında büyük bellek kazancı sağlar.
+5. **4-bit nicemlemeye (QLoRA) geçin.** Ağırlıkları ~0.5 bayt/parametreye indirir: [Nicemleme Rehberi](/kullanim/quantization/).
+6. **LoRA kullanın.** Tam ince ayar yerine adaptör eğitirseniz optimizer durumları maliyeti neredeyse sıfırlanır: [LoRA ve QLoRA](/llm/lora-qlora/).
+7. **Buluta taşıyın.** Donanım gerçekten yetmiyorsa saatlik GPU kiralayın: [Bulut Seçenekleri](/donanim/bulut-secenekleri/).
+
+Adım adım hata çözümü ve daha fazla senaryo için: [Sorun Giderme](/llm/sorun-giderme/).
+
+## Windows'ta VRAM İzleme
+
+Eğitimi başlatmadan önce ve başlattıktan hemen sonra belleği izlemek, OOM hatasını "görerek" önlemenizi sağlar:
+
+- **Görev Yöneticisi → Performans → GPU:** "Ayrılmış GPU belleği" grafiği kullanımın toplam VRAM'e oranını gösterir.
+- **`nvidia-smi`:** anlık özet. Terminalde çalıştırın:
+
+```bash title="PowerShell / CMD"
+nvidia-smi
+```
+
+İki saniyede bir yenilenen canlı takip için:
+
+```bash title="PowerShell / CMD"
+nvidia-smi -l 2
+```
+
+:::tip
+Masaüstü, tarayıcı ve oyunlar da VRAM yer. Windows'ta eğitim öncesi ağır sekmeleri kapatmak, sınırda çalışan bir 24 GB QLoRA işine 1-2 GB nefes alanı açabilir. Görev Yöneticisi toplam kullanımı gösterir; sürecinizin payını görmek için `nvidia-smi` daha temiz bir tablo verir.
+:::
+
+## Sırada Ne Var?
+
+- Belleği en verimli kullanan yöntem: [LoRA ve QLoRA](/llm/lora-qlora/)
+- Batch, dizi ve biriktirme ayarları: [Hiperparametreler](/llm/hiperparametreler/)
+- Ortamı kurmaya başlayın: [Yerel Kurulum (Windows)](/donanim/yerel-kurulum/)
+- Bu hesabın çalışma anındaki karşılığı, CPU'da ölçülmüş sayılarla: [Hız ve Maliyet](/kullanim/hiz-ve-maliyet/) — `num_ctx` 512'den 8192'ye çıkınca yerleşik boyut 2,0 GB'dan 2,4 GB'ya yükseliyordu.

@@ -1,0 +1,29 @@
+koşum başlangıcı: 2026-10-20 11:45:23
+kol=e duman=True model=paraphrase-multilingual-MiniLM-L12-v2 tohum=1234 adım=8 batch=16 lr=2e-05
+
+==============================================================================
+KOL E: /api/embed GİDERİ (24 parça tek istekte vs 24 ayrı istekte)
+==============================================================================
+ön kayıtlı kural: her yan 1 tekrar; iki yanın tekrar toplamlarının min-maks aralıkları çakışırsa 'fark ölçülemedi' yayımlanır, çakışmazsa p50'si düşük olan yan kazanır. Sıra tekrarlar arasında dönüşümlü.
+parça=24 tekrar=1 ölçüm isteği=25 (+1 ısıtma, +1 tahliye sayılmaz)
+Ollama sürümü: 0.40.6
+ölçüm öncesi /api/ps: []
+ısıtma (sayılmaz): 16.47 sn duvar | sunucu 16.45 sn | yükleme 11.92 sn | 583 token | 24 vektör
+ısıtma sonrası /api/ps: [{'ad': 'bge-m3:latest', 'boyut': 1244166879, 'vram': 0, 'bitis': '2026-10-20T11:50:40.3906297+03:00'}]
+
+tekrar 1/1 (sıra: batch -> teker)
+  batch : 4.61 sn duvar | sunucu 4.60 sn | yükleme 0.01 sn | 583 token | 24 vektör
+  teker : 4.93 sn duvar | sunucu 4.88 sn | istek p50 0.206 / p95 0.244 / maks 0.252 sn | 583 token
+
+==============================================================================
+KOL E ÖZET
+==============================================================================
+tek istek (24 parça)  : p50 4.61 sn | p95 4.61 sn | min 4.61 | maks 4.61 | ort 4.61 | toplam 4.61 sn
+24 ayrı istek         : p50 4.93 sn | p95 4.93 sn | min 4.93 | maks 4.93 | ort 4.93 | toplam 4.93 sn
+fark (teker - batch) p50: +0.32 sn | oran: 1.07x
+hüküm: tek tekrar (duman): hüküm kurulmaz
+ölçüm sonrası /api/ps: [{'ad': 'bge-m3:latest', 'boyut': 1244166879, 'vram': 0, 'bitis': '2026-10-20T11:50:49.9432516+03:00'}]
+tahliye isteği (sayılmaz): 0.07 sn | 1 vektör
+tahliye sonrası /api/ps: []
+kol e toplam süre: 26.24 sn
+koşum bitişi: 2026-10-20 11:45:50
