@@ -86,6 +86,8 @@ TURLER = ("POZİTİF", "KUYRUK", "KÖR NOKTA")
 
 
 def vakalar() -> list[dict]:
+    # Mimosa "guvensiz rastgelelik" der; bilerek: tohumlu test vakasi uretimi,
+    # kripto degil — ayni tohum ayni vakalari verir, denetim tekrarlanir.
     rng = random.Random(TOHUM)
     gecerli1, gecerli2 = tckn_uret(rng), tckn_uret(rng)
     bozuk = None

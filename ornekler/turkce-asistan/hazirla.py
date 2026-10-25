@@ -214,6 +214,8 @@ def main() -> None:
     # 4) Train/test ayrımı --------------------------------------------------
     # NEDEN sabit seed: aynı betiği iki kez çalıştırınca aynı dosyalar çıksın;
     # test setine eğitim sızmasın diye ayrım tek yerde ve bir kez yapılır.
+    # Mimosa "guvensiz rastgelelik" der; bilerek: olcum tohumu, kripto degil
+    # (secrets'a gecmek ayni veri kumelerini yeniden uretilemez yapardi).
     baslik(f"4) Train/test ayrımı (%{100 * (1 - secenekler.test_orani):.0f} / "
            f"%{100 * secenekler.test_orani:.0f}, seed={SEED})")
     rastgele = random.Random(SEED)
