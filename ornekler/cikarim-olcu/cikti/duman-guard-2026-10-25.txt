@@ -1,0 +1,44 @@
+model: qwen2.5:3b-instruct-q4_K_M | embedding: bge-m3 | cpu (%100), Ollama yerel
+süreler Ollama'nın döndürdüğü alanlardan; 'duvar' = HTTP dahil gerçek bekleme
+
+==============================================================================
+E1 — SOĞUK / SICAK: model bellekte değilken ne ödenir
+==============================================================================
+  A. keep_alive=0 (çağrı sonrası boşalttı) duvar    4.7 | sunucu   4.66 | yük  0.02 | ön-yük    37 tok /  0.88 sn [  41.9 tok/sn, 3 önb.] | çözme   16 tok /  1.03 sn [  15.5 tok/sn]
+  boşaltma sonrası ps    : qwen2.5:3b-instruct-q4_K_M 357c53fb659c 2.2 GB 100% CPU 4096 llamacpp Stopping...
+  B. soğuk çağrı (model yeniden yüklendi) duvar   30.5 | sunucu  30.48 | yük  0.01 | ön-yük    37 tok /  0.10 sn [ 368.5 tok/sn, 36 önb.] | çözme   16 tok /  1.51 sn [  10.6 tok/sn]
+                                 ^ sunucu içinde hesap dışı 28.9 sn: total_duration - (yük + ön-yükleme + çözme)
+  C. sıcak çağrı (bellekte hazır) duvar   91.5 | sunucu  91.45 | yük  0.01 | ön-yük    37 tok /  0.07 sn [ 558.2 tok/sn, 36 önb.] | çözme   16 tok /  1.01 sn [  15.8 tok/sn]
+                                 ^ sunucu içinde hesap dışı 90.4 sn: total_duration - (yük + ön-yükleme + çözme)
+  ollama ps (sıcak)      : qwen2.5:3b-instruct-q4_K_M 357c53fb659c 2.2 GB 100% CPU 4096 llamacpp Stopping...
+
+==============================================================================
+E2 — ÇÖZME HIZI: üretilecek token sayısına göre
+==============================================================================
+  num_predict=8                  duvar   90.9 | sunucu  90.94 | yük  0.01 | ön-yük    44 tok /  0.62 sn [  71.0 tok/sn, 24 önb.] | çözme    7 tok /  0.40 sn [  17.5 tok/sn]
+                                 ^ sunucu içinde hesap dışı 89.9 sn: total_duration - (yük + ön-yükleme + çözme)
+  num_predict=32                 duvar   91.5 | sunucu  91.53 | yük  0.01 | ön-yük    45 tok /  0.60 sn [  75.6 tok/sn, 24 önb.] | çözme   15 tok /  0.96 sn [  15.6 tok/sn]
+                                 ^ sunucu içinde hesap dışı 90.0 sn: total_duration - (yük + ön-yükleme + çözme)
+  num_predict=128                duvar   15.6 | sunucu  15.57 | yük 13.26 | ön-yük    46 tok /  1.24 sn [  37.1 tok/sn, 0 önb.] | çözme   16 tok /  1.05 sn [  15.2 tok/sn]
+
+==============================================================================
+E3 — ÖN-YÜKLEME EĞRİSİ + Türkçe karakter/token oranı
+==============================================================================
+  prompt    476 karakter (x1)    duvar    9.7 | sunucu   9.71 | yük  3.23 | ön-yük   211 tok /  5.43 sn [  38.9 tok/sn, 0 önb.] | çözme   16 tok /  1.04 sn [  15.4 tok/sn]
+  prompt    952 karakter (x2)    duvar    6.2 | sunucu   6.24 | yük  0.01 | ön-yük   373 tok /  4.95 sn [  75.3 tok/sn, 183 önb.] | çözme   16 tok /  1.27 sn [  12.6 tok/sn]
+  prompt   1904 karakter (x4)    duvar    9.9 | sunucu   9.87 | yük  0.01 | ön-yük   691 tok /  8.68 sn [  79.6 tok/sn, 342 önb.] | çözme   16 tok /  1.17 sn [  13.6 tok/sn]
+  prompt   3808 karakter (x8)    duvar   18.1 | sunucu  18.13 | yük  0.01 | ön-yük  1327 tok / 16.74 sn [  79.3 tok/sn, 660 önb.] | çözme   16 tok /  1.37 sn [  11.7 tok/sn]
+  fark    476 karakter ->  162 token => Türkçe 2.94 karakter/token (şablon gideri dışlandı)
+       farkın ön-yükleme süresi 4.95 sn -> 32.7 tok/sn
+  fark    952 karakter ->  318 token => Türkçe 2.99 karakter/token (şablon gideri dışlandı)
+       farkın ön-yükleme süresi 8.68 sn -> 36.6 tok/sn
+  fark   1904 karakter ->  636 token => Türkçe 2.99 karakter/token (şablon gideri dışlandı)
+       farkın ön-yükleme süresi 16.74 sn -> 38.0 tok/sn
+
+==============================================================================
+E7 — İLK TOKEN SÜRESİ (TTFT): akış modunda kullanıcı ne bekler
+==============================================================================
+  kısa prompt          ilk token 0.85 sn | 40 token | toplam 3.5 sn | son 2.68 sn
+  uzun prompt (Vikipedi x4) ilk token 12.01 sn | 40 token | toplam 15.0 sn | son 3.02 sn
+
+bitti.

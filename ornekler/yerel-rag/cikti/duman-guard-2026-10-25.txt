@@ -1,0 +1,19 @@
+[indeks] 8 belge vektörleştirildi (11.2 sn, boyut=1024)
+==============================================================
+GETİRİM TESTİ — doğru belge ilk k'ta geldi mi?
+==============================================================
+  [OK |OK ] İade sürem var mı, ne kadar sürede iade edebilirim?
+        beklenen: iade  bulunan: ['iade', 'hasar', 'kvkk']
+  [OK |OK ] Kargom hasarlı geldi, ne yapmalıyım?
+        beklenen: hasar  bulunan: ['hasar', 'iade', 'teslimat']
+  [OK |OK ] Siparişim kaç günde teslim olur?
+        beklenen: teslimat  bulunan: ['teslimat', 'iade', 'hasar']
+  [OK |OK ] Kişisel verilerimin silinmesini isteyebilir miyim?
+        beklenen: kvkk  bulunan: ['kvkk', 'iade', 'hasar']
+  [OK |OK ] Kapıda ödeme ek ücret gerektiriyor mu?
+        beklenen: odeme  bulunan: ['odeme', 'ek-hizmet', 'kampanya']
+  [OK |OK ] Öğrencilere indirim var mı?
+        beklenen: kampanya  bulunan: ['kampanya', 'odeme', 'ek-hizmet']
+
+  hit@1: 6/6   hit@3: 6/6
+

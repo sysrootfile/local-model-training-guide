@@ -1,0 +1,76 @@
+[korpus] önbellekten 125 parça (korpus.json)
+[indeks] önbellekten 125 vektör okundu
+korpus 125 parça | eşik 0.54 | sohbet qwen2.5:3b-instruct-q4_K_M | 2 araç tanımlı | maks tur 5
+
+==============================================================================
+A) SABİT HAT — tek geçişlik RAG (Örnek 6 tarzı)
+  soru: Marmaray hangi yılında hizmete açıldı?
+  arama 0.16 sn | üretim duvar  72.42 sn | sunucu 72.42 | yük 12.23 | ön-yük 1926 tok / 48.74 sn [  39.5 tok/sn,    0 önb.] | çözme 120 tok / 11.42 sn [ 10.5 tok/sn]
+  cevap: "Marmaray, 12 Mart 2019'da ikinci etapının hizmetine girdi. İlk etap, 29 Ekim 2013'te Kazlıçeşme - Ayrılık Çeşmesi güzergâhında hizmete girdi. Bu bilgiler, Marmaray'ın tamamı 12 Mart 2019'da Halkalı - Gebze arasında faali"
+==============================================================================
+B) AJAN — aynı soru, aracı modelin çağırması bırakıldı
+  soru: Marmaray hangi yılında hizmete açıldı?
+  tur 1: duvar  10.48 sn | sunucu 10.48 | yük  0.01 | ön-yük  346 tok /  7.83 sn [  44.2 tok/sn,    3 önb.] | çözme  36 tok /  2.60 sn [ 13.9 tok/sn] | done_reason=stop
+     araç viki_ara({"soru": "Marmaray hangi yılında hizmete açıldı?"}) -> 4994 karakter, eşik/üretim sonucu kaydedildi
+  tur 2: duvar  80.20 sn | sunucu 80.20 | yük  0.01 | ön-yük 2277 tok / 49.56 sn [  45.9 tok/sn,  363 önb.] | çözme 300 tok / 30.60 sn [  9.8 tok/sn] | done_reason=length
+  -> araç çağırmadı. cevap: 'Marmaray, 1985 yılında ilk fizibilite etüdü tamamlandıktan sonra, 2000 yılında Marmaray projesi kapsamında, 2002 yılında Avrasya Ortak Girişimi ile Mühendislik ve Müşavirlik Hizmetleri Sözleşmesi imzalandıktan sonra, 200'
+  ÖZET: 2 tur | araçlar: ['viki_ara'] | toplam duvar 90.7 sn | girdi 2623 tok | çıktı 336 tok
+  KARBON KARŞILAŞTIRMA: aynı soru, sabit hat 72.4 sn / 1 geçiş | ajan 90.7 sn / 2 tur | ek girdi tokenı 697
+==============================================================================
+B2) AJAN — iki geçiş gerektiren karşılaştırma sorusu
+  soru: Marmaray ile T1 tramvay hattının açılış yıllarını karşılaştır; hangisi daha eski? İki bilgiyi de araçla doğrula.
+  tur 1: duvar   4.98 sn | sunucu  4.98 | yük  0.01 | ön-yük  371 tok /  1.11 sn [ 333.5 tok/sn,  331 önb.] | çözme  50 tok /  3.82 sn [ 13.1 tok/sn] | done_reason=stop
+     araç viki_ara({"soru": "Marmaray ile T1 tramvay hattının açılış yıllarını karşılaştır; hangisi daha eski?"}) -> 3498 karakter, eşik/üretim sonucu kaydedildi
+  tur 2: duvar  54.04 sn | sunucu 54.04 | yük  0.01 | ön-yük 1868 tok / 38.54 sn [  48.5 tok/sn,  388 önb.] | çözme 160 tok / 15.47 sn [ 10.3 tok/sn] | done_reason=stop
+  -> araç çağırmadı. cevap: 'According to the information retrieved, the T1 tramway was inaugurated on 10 July 1992, making it the first tramway in modern-day Istanbul. On the other hand, the Marmaray (Bosphorus Tunnel) project, which was planned to'
+  ÖZET: 2 tur | araçlar: ['viki_ara'] | toplam duvar 59.0 sn | girdi 2239 tok | çıktı 210 tok
+==============================================================================
+C) AJAN — iki aracın sırayla kullanılması gerekiyor
+  soru: T1 hattının uzunluğu kaç metredir? Uzunluğu araçtan öğren, sonra birim dönüştürme aracını kullan.
+  tur 1: duvar   4.31 sn | sunucu  4.30 | yük  0.01 | ön-yük  366 tok /  1.14 sn [ 319.7 tok/sn,  327 önb.] | çözme  40 tok /  3.12 sn [ 12.8 tok/sn] | done_reason=stop
+     araç birim_donustur({"miktar": 1, "kaynak": "sa", "hedef": "m"}) -> 13 karakter, eşik/üretim sonucu kaydedildi
+  tur 2: duvar   7.47 sn | sunucu  7.46 | yük  0.01 | ön-yük  428 tok /  1.41 sn [ 304.1 tok/sn,  382 önb.] | çözme  80 tok /  6.04 sn [ 13.2 tok/sn] | done_reason=stop
+  -> araç çağırmadı. cevap: 'T1 hattının uzunluğu 3600 metredir. Şimdi bu değerimizi metreyi metrik sistemin diğer birimlerine dönüştürmek için kullanacağım. Şimdi uzunluğu saniye (sn) birimine dönüştürebiliriz. Lütfen bu işlemi yapacağım.'
+  ÖZET: 2 tur | araçlar: ['birim_donustur'] | toplam duvar 11.8 sn | girdi 794 tok | çıktı 120 tok
+==============================================================================
+D) AJAN — hiçbir aracın yanıtlayamayacağı soru (kaç tur yakıyor?)
+  soru: Şu anda İstanbul'da yağmur yağıyor mu?
+  tur 1: duvar   2.70 sn | sunucu  2.70 | yük  0.01 | ön-yük  345 tok /  0.65 sn [ 533.2 tok/sn,  327 önb.] | çözme  28 tok /  2.04 sn [ 13.7 tok/sn] | done_reason=stop
+     araç viki_ara({"soru": " İstanbul yağışlı mı?"}) -> 100 karakter, eşik/üretim sonucu kaydedildi
+  tur 2: duvar   9.05 sn | sunucu  9.05 | yük  0.01 | ön-yük  429 tok /  1.98 sn [ 216.7 tok/sn,  362 önb.] | çözme  93 tok /  7.05 sn [ 13.2 tok/sn] | done_reason=stop
+  -> araç çağırmadı. cevap: "İstanbul'da yağmur yağmıyor gibi görünüyor, ancak belirtildiği gibi belgenin sonuçları çok fazla kesinti verici. En iyi benzerlik oranı 0.496'dır ve bu, belirli bir sonuç olmayan bir sonuçtur. Belki de biraz yağış olabil"
+  ÖZET: 2 tur | araçlar: ['viki_ara'] | toplam duvar 11.8 sn | girdi 774 tok | çıktı 121 tok
+==============================================================================
+D2) AJAN — tool_choice='required' ile zorlanmış hâli
+  soru: Tünel füniküler hattı nerede?
+  tur 1: duvar   3.20 sn | sunucu  3.19 | yük  0.01 | ön-yük  345 tok /  0.65 sn [ 527.4 tok/sn,  327 önb.] | çözme  35 tok /  2.52 sn [ 13.9 tok/sn] | done_reason=stop
+     araç viki_ara({"soru": "Tünel füniküler hattı nerede?"}) -> 3654 karakter, eşik/üretim sonucu kaydedildi
+  tur 2: duvar  53.76 sn | sunucu 53.75 | yük  0.01 | ön-yük 1742 tok / 35.82 sn [  48.6 tok/sn,  362 önb.] | çözme 172 tok / 17.90 sn [  9.6 tok/sn] | done_reason=stop
+  -> araç çağırmadı. cevap: "Tünel Füniküler Hattı, İstanbul'un Beyoğlu ilçesinde yer alır ve Karaköy ile İstiklal Caddesi'ni birbirine bağlayan tarihi yeraltı tren hattıdır. 1875 yılında hizmete giren F2 (Karaköy - Beyoğlu) Tarihi Tünel Füniküler H"
+  ÖZET: 2 tur | araçlar: ['viki_ara'] | toplam duvar 57.0 sn | girdi 2087 tok | çıktı 207 tok
+==============================================================================
+H) AJAN — araç sonucunda tool_name YOK (iki araç varken)
+  soru: Marmaray hangi yılında hizmete açıldı?
+  tur 1: duvar   3.59 sn | sunucu  3.59 | yük  0.02 | ön-yük  346 tok /  0.73 sn [ 472.8 tok/sn,  327 önb.] | çözme  36 tok /  2.80 sn [ 12.9 tok/sn] | done_reason=stop
+     araç viki_ara({"soru": "Marmaray hangi yılında hizmete açıldı?"}) -> 4994 karakter, eşik/üretim sonucu kaydedildi
+  tur 2: duvar  74.79 sn | sunucu 74.78 | yük  0.01 | ön-yük 2277 tok / 52.38 sn [  43.5 tok/sn,  363 önb.] | çözme 217 tok / 22.36 sn [  9.7 tok/sn] | done_reason=stop
+  -> araç çağırmadı. cevap: "Marmaray, 1985 yılında ilk fizibilite etüdü tamamlandıktan sonra, 2000 yılında Marmaray projesi kapsamında iki adet müşavirlik hizmeti başlatıldı. İlk etabı 29 Ekim 2013'te Kazlıçeşme - Ayrılık Çeşmesi güzergâhında hizme"
+  ÖZET: 2 tur | araçlar: ['viki_ara'] | toplam duvar 78.4 sn | girdi 2623 tok | çıktı 253 tok
+==============================================================================
+E) ARAÇ TANIMININ TOKEN GİDERİ — aynı istek, tek fark: tools alanı
+  0 araç 73 tok | 1 araç 237 tok (+164) | 2 araç 346 tok (+273)
+  araç başına yaklaşık 136 token
+  tools'suz  : sunucu  3.47 | yük  0.01 | ön-yük   73 tok /  0.65 sn [ 112.4 tok/sn,   48 önb.] | çözme  40 tok /  2.78 sn [ 14.4 tok/sn] | araç çağırdı: False
+  1 araç     : sunucu  6.94 | yük  0.01 | ön-yük  237 tok /  4.42 sn [  53.6 tok/sn,   48 önb.] | çözme  36 tok /  2.50 sn [ 14.4 tok/sn] | araç çağırdı: True
+  2 araç     : sunucu  6.72 | yük  0.01 | ön-yük  346 tok /  4.12 sn [  84.0 tok/sn,  171 önb.] | çözme  36 tok /  2.58 sn [ 13.9 tok/sn] | araç çağırdı: True
+==============================================================================
+F) tool_choice — Ollama dokümanında listelenmiyor; sunucuya soruluyor
+  yok (belgelenmiş davranış)  : araç çağırdı=True | içerik=''
+  "auto"                      : araç çağırdı=True | içerik=''
+  "required"                  : araç çağırdı=True | içerik=''
+  "bulutmeydan"(çöp değer)    : araç çağırdı=True | içerik=''
+==============================================================================
+G) format + tools birlikte — doküman 'HTTP 400' diyor, bu makinede?
+  sunucu kabul etti: {"role": "assistant", "content": "{\"name\": \"viki_ara\", \"arguments\": {\"soru\": \"Marmaray hangi yılında hizmete açıldı?\"}}"}
+==============================================================================
+bitti.

@@ -1,0 +1,32 @@
+======================================================================
+1) tools + varsayilan secim (tool_choice yok)
+----------------------------------------------------------------------
+anahtarlar      : ['created_at', 'done', 'done_reason', 'eval_count', 'eval_duration', 'load_duration', 'message', 'model', 'prompt_eval_cached_count', 'prompt_eval_count', 'prompt_eval_duration', 'total_duration']
+mesaj anahtarları: ['content', 'role', 'tool_calls']
+content          : ''
+tool_calls       : [{"id": "call_x0ymsoj1", "function": {"index": 0, "name": "sehir_nufusu", "arguments": {"sehir": "Izmir"}}}]
+done_reason      : stop
+tokenlar         : girdi 190 çıktı 26 önbellek 0
+süre (sn)        : toplam 20.91 | yük 14.24 | ön-yük 4.80 | çözme 1.84
+======================================================================
+2) tools + tool_choice='required'
+----------------------------------------------------------------------
+anahtarlar      : ['created_at', 'done', 'done_reason', 'eval_count', 'eval_duration', 'load_duration', 'message', 'model', 'prompt_eval_cached_count', 'prompt_eval_count', 'prompt_eval_duration', 'total_duration']
+mesaj anahtarları: ['content', 'role', 'tool_calls']
+content          : ''
+tool_calls       : [{"id": "call_ia49lfd9", "function": {"index": 0, "name": "sehir_nufusu", "arguments": {"sehir": "Izmir"}}}]
+done_reason      : stop
+tokenlar         : girdi 190 çıktı 26 önbellek 189
+süre (sn)        : toplam 1.80 | yük 0.01 | ön-yük 0.07 | çözme 1.71
+======================================================================
+3) tools + tool_choice isimli fonksiyon
+----------------------------------------------------------------------
+anahtarlar      : ['created_at', 'done', 'done_reason', 'eval_count', 'eval_duration', 'load_duration', 'message', 'model', 'prompt_eval_cached_count', 'prompt_eval_count', 'prompt_eval_duration', 'total_duration']
+mesaj anahtarları: ['content', 'role', 'tool_calls']
+content          : ''
+tool_calls       : [{"id": "call_1j32hrhn", "function": {"index": 0, "name": "sehir_nufusu", "arguments": {"sehir": "Izmir"}}}]
+done_reason      : stop
+tokenlar         : girdi 190 çıktı 26 önbellek 189
+süre (sn)        : toplam 1.83 | yük 0.01 | ön-yük 0.07 | çözme 1.74
+======================================================================
+kesif bitti.

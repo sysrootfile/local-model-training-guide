@@ -1,0 +1,86 @@
+TEKRARLANABILIRLIK OLCUM KAFESI
+  baslangic: 2026-10-25 18:01:58
+  python 3.12.10 | Windows 11
+  ollama 0.40.10 | model qwen2.5:3b-instruct-q4_K_M | tekrar 2 | varsayilan num_predict 48
+  DUMAN TESTI: A1-A3 + D2-D3, iki tekrar, K0 tek istek
+
+K0 - VARSAYILAN NUM_PREDICT ARAMASI
+   gonderim: options = {temperature: 0} (num_predict YOK)
+  K0.1: duvar 127.09 sn | ctki token 1557 | bitis stop
+
+A1 | kapali | T=0.0 | seed=- | format=yok | num_predict=48 | 2 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yanitiniz tek kelime olsun, yildan bask
+   1. [c8758b5170] duvar  1.43 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2011'
+   2. [c8758b5170] duvar  0.40 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2011'
+
+A2 | kapali | T=0.0 | seed=1234 | format=yok | num_predict=48 | 2 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yanitiniz tek kelime olsun, yildan bask
+   1. [c8758b5170] duvar  0.39 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2011'
+   2. [c8758b5170] duvar  0.35 sn | girdi   68 | ctki   5 | bitis stop   | AYNI | '2011'
+
+A3 | kapali | T=0.8 | seed=- | format=yok | num_predict=48 | 2 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yanitiniz tek kelime olsun, yildan bask
+   1. [7b7a53e239] duvar  0.36 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2020'
+   2. [8038da89e4] duvar  0.36 sn | girdi   68 | ctki   5 | bitis stop   | FARKLI | '2013'
+
+D2 | json | T=0.8 | seed=- | format=sema | num_predict=300 | 2 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yalnizca iki alanli JSON yaz: yil (sayi
+   1. [3eb9aab11a] duvar  6.22 sn | girdi   74 | ctki  78 | bitis stop   | FARKLI | JSON ok yil=2017 alanlar=gerekce,yil | '{ "yil": 2017, "gerekce": "Marmaray 2017 yılında Akdeniz Bölgesi ve Karade'
+   2. [4e9df354c1] duvar  6.20 sn | girdi   74 | ctki  90 | bitis stop   | FARKLI | JSON ok yil=2011 alanlar=gerekce,yil | '{ "yil": 2011, "gerekce": "Marmaray, Türkiye\'nin ikinci büyük ulaşım proje'
+
+D3 | json | T=0.8 | seed=- | format=sema | num_predict=48 | 2 tekrar
+   istem: Marmaray hangi yilinda hizmete acildi? Yalnizca iki alanli JSON yaz: yil (sayi
+   1. [67b9bcf477] duvar  3.40 sn | girdi   74 | ctki  48 | bitis length | FARKLI | JSON BOZUK yil=None alanlar=- | '{ "yil": 2012, "gerekce": "Marmaray, Yunanistan\'nın Marmaranya köşesindeki'
+   2. [19bd8950c0] duvar  2.75 sn | girdi   74 | ctki  39 | bitis stop   | FARKLI | JSON ok yil=2022 alanlar=gerekce,yil | '{ "yil": 2022, "gerekce": "Marmaray 2022\'de hizmete acıldı." }'
+
+=========================================================
+OZET (kol A)
+=========================================================
+hucre  n  benzersiz  en-sik-oran  uz-ort  uz-min/max  ctki-ort  duvar
+A1      2          1         1.00     4.0    4/4         5.0     1.8 sn
+A2      2          1         1.00     4.0    4/4         5.0     0.7 sn
+A3      2          2         0.50     4.0    4/4         5.0     0.7 sn
+D2      2          2         0.50   207.5  205/210      84.0    12.4 sn
+D3      2          2         0.50    82.0   62/102      43.5     6.1 sn
+
+A1     bitis: {'stop': 2} | not: sicaklik 0, tohum yok
+A2     bitis: {'stop': 2} | not: sicaklik 0, tohum 1234
+A3     bitis: {'stop': 2} | not: sicaklik 0,8, tohum yok
+D2     bitis: {'stop': 2} | JSON okunan 2/2 | yil kodlari: 2011,2017 | alan setleri: 1 cesit | not: format=sema, sicaklik 0,8, tohum yok
+D3     bitis: {'length': 1, 'stop': 1} | JSON okunan 1/2 | yil kodlari: 2022,None | alan setleri: 2 cesit | not: format=sema AMA num_predict 48
+
+=========================================================
+KOL B - SCIKIT-LEARN TOHUM VARYANSI
+=========================================================
+   veri: breast_cancer.csv | satir 569 | özellik 30
+
+B1 | bolme + model tohumu birlikte degisir
+  tohum 0   | egitim 455 test 114 | RF 0.9474 | Lojistik 0.9825
+  tohum 1   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9912
+  tohum 2   | egitim 455 test 114 | RF 0.9825 | Lojistik 0.9825
+  tohum 7   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9649
+  tohum 42  | egitim 455 test 114 | RF 0.9474 | Lojistik 0.9825
+
+B2 | bolme SABIT (42), yalniz model tohumu degisir
+  tohum 0   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9825
+  tohum 1   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9825
+  tohum 2   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9825
+  tohum 7   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9825
+  tohum 42  | egitim 455 test 114 | RF 0.9474 | Lojistik 0.9825
+
+B3 | model tohumu SABIT (42), yalniz bolme degisir
+  tohum 0   | egitim 455 test 114 | RF 0.9386 | Lojistik 0.9825
+  tohum 1   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9912
+  tohum 2   | egitim 455 test 114 | RF 0.9825 | Lojistik 0.9825
+  tohum 7   | egitim 455 test 114 | RF 0.9561 | Lojistik 0.9649
+  tohum 42  | egitim 455 test 114 | RF 0.9474 | Lojistik 0.9825
+
+OZET (kol B, bes tohum)
+B1-rf    min 0.9474 | ort 0.9579 | max 0.9825 | acik 0.0351
+B1-lr    min 0.9649 | ort 0.9807 | max 0.9912 | acik 0.0263
+B2-rf    min 0.9474 | ort 0.9544 | max 0.9561 | acik 0.0088
+B2-lr    min 0.9825 | ort 0.9825 | max 0.9825 | acik 0.0000
+B3-rf    min 0.9386 | ort 0.9561 | max 0.9825 | acik 0.0439
+B3-lr    min 0.9649 | ort 0.9807 | max 0.9912 | acik 0.0263
+
+bitti: 2026-10-25 18:05:09

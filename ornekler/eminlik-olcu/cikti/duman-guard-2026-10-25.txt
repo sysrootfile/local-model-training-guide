@@ -1,0 +1,116 @@
+EMINLIK OLCUM KAFESI
+  baslangic: 2026-10-25 17:17:33
+  python 3.12.10 | Windows 11
+  ollama 0.40.10 | sohbet qwen2.5:3b-instruct-q4_K_M | gomme bge-m3
+  mod: DUMAN | kol: olcum
+  sozlesme notu: eval_count logprob kayindan 1 fazladir (probda olculen off-by-one); ortalamalar KAYIT sayisina alinir
+
+=========================================================
+KOL B - CEVAP-HARF OLASILIGI (P(True) kalibi, T=0, num_predict=1)
+=========================================================
+  istem kalibi (bir kerelik):
+  'cigi (tokenizer sozlugui) kactir?\nSIKKLAR:\nA) 128.256\nB) 151.936\nC) 262.208\nD) 50.257\n\nYalnizca dogru sikkin harfini yaz. Baska hicbir karakter yazma.'
+B1  |  6.99 sn | bilgi     | altin A secim C    | P(altin) 0.0000   | en yuksek C
+     P vektoru  A=0.0000 B=0.0296 C=0.9701 D=0.0003
+B2  |  6.72 sn | bilgi     | altin B secim C    | P(altin) 0.0000   | en yuksek C
+     P vektoru  A=0.0000 B=0.0000 C=1.0000 D=0.0000
+B3  |  7.34 sn | bilgi     | altin C secim C    | P(altin) 1.0000   | en yuksek C
+     P vektoru  A=0.0000 B=0.0000 C=1.0000 D=0.0000
+B4  |  8.24 sn | bilgi     | altin D secim B    | P(altin) 0.0000   | en yuksek B
+     P vektoru  A=0.0006 B=0.9993 C=0.0000 D=0.0000
+B5  |  7.13 sn | bilgi     | altin A secim C    | P(altin) 0.0000   | en yuksek C
+     P vektoru  A=0.0000 B=0.0000 C=1.0000 D=0.0000
+B6  |  6.83 sn | bilgi     | altin B secim C    | P(altin) 0.0059   | en yuksek C
+     P vektoru  A=0.0000 B=0.0059 C=0.9941 D=0.0000
+
+---------------------------------------------------------
+KOL B OZETI
+  onemli: esik, SECILEN harfin olasiligi uzerinden taranir (uretimde altin
+  etiket bilinmez). P(altin) satirlari YALNIZ analiz degeridir, esik kurmaz.
+  bilgi sorulari: toplam 6 | olculen 6 | aday-eksik (metrik disi) 0 | harf disi secim (bicim kirilmasi) 0
+  dogru secim 1/6 (0.17)
+  secim harfi dagilimi: A:0 B:1 C:5 D:0 | en sik 0.83
+  [GECERSIZLIK KAPISI] tek bir harf secimlerin yarisindan cogunu aldi: bu kolda P(secilen) konum yanliliginin olcusudur, bilginin degil. Esik/risk tablolaru bu durumda ayirici sayilmaz; serbest metin kolu (D/G) ayni sorularin icerik kontroludur.
+  dogru secimlerin P(secilen): min 1.0000 | ort 1.0000 | max 1.0000
+  yanlis secimlerin P(secilen): min 0.9701 | ort 0.9927 | max 1.0000
+  ayrisma payi (en kotu dogru - en iyi yanlis): -0.0000
+  [analiz] P(altin) dogrularda: ort 1.0000 (min 1.0000 max 1.0000)
+  [analiz] P(altin) yanlislarda: ort 0.0012 (min 0.0000 max 0.0059)
+  esik tarasi (P(secilen) >= tau -> cevap ver; yoksa cekil):
+    tau 0.30  | kapsama 1.00 ( 6/6) | risk 0.833
+    tau 0.40  | kapsama 1.00 ( 6/6) | risk 0.833
+    tau 0.50  | kapsama 1.00 ( 6/6) | risk 0.833
+    tau 0.60  | kapsama 1.00 ( 6/6) | risk 0.833
+    tau 0.70  | kapsama 1.00 ( 6/6) | risk 0.833
+    tau 0.80  | kapsama 1.00 ( 6/6) | risk 0.833
+    tau 0.90  | kapsama 1.00 ( 6/6) | risk 0.833
+    tau 0.95  | kapsama 1.00 ( 6/6) | risk 0.833
+    tau 0.99  | kapsama 0.83 ( 5/6) | risk 0.800
+
+=========================================================
+KOL C - SICAKLIK DONEN LOGPROB'U DEGISTIRIYOR MU (seed=1234)
+=========================================================
+C1  | T=0.0 P=0.0001 sec=C | T=0.7 P=0.0001 sec=C | T=1.0 P=0.0001 sec=C
+      P araligi 0.00000  -> sicaklik logprob'u DEGISTIRMIYOR
+C2  | T=0.0 P=0.0000 sec=C | T=0.7 P=0.0000 sec=C | T=1.0 P=0.0000 sec=C
+      P araligi 0.00000  -> sicaklik logprob'u DEGISTIRMIYOR
+C3  | T=0.0 P=1.0000 sec=C | T=0.7 P=1.0000 sec=C | T=1.0 P=1.0000 sec=C
+      P araligi 0.00000  -> sicaklik logprob'u DEGISTIRMIYOR
+
+=========================================================
+KOL D - SERBEST CEVAP: ORTALAMA LOGPROB + KIRPIK ENTROPI (ALT SINIR)
+=========================================================
+D1  |  7.51 sn | ctki  32 | kayit  32 (0 yok) | ort lp  -0.2713 | kirpik ent ort 0.5537 max 2.3301
+      cevap "D) 50.257\n\nLlama 3'un kelime dairagiği (tokenizer sozcuk say" | dogru '128.256'
+D2  |  5.96 sn | ctki  11 | kayit  10 (1 yok) | ort lp  -0.1389 | kirpik ent ort 0.3050 max 1.7166
+      cevap 'B) 151.936' | dogru '151.936'
+D3  |  7.54 sn | ctki  32 | kayit  32 (0 yok) | ort lp  -0.3720 | kirpik ent ort 0.7171 max 2.5827
+      cevap "Gemma 3'un kelime dagarcigi 262.208'dır. Bu değer, belirli b" | dogru '262.208'
+
+=========================================================
+KOL E - OZ-TUTARLILIK (2 ornek/soru, T=0,8, seed yok)
+=========================================================
+E1  | anlasma 1.00 (C:2) | cogunluk C | altin A | cogunluk YANLIS
+E2  | anlasma 1.00 (C:2) | cogunluk C | altin B | cogunluk YANLIS
+E3  | anlasma 1.00 (C:2) | cogunluk C | altin C | cogunluk DOGRU
+
+  E toplami: 6 secim | harf dagilimi A:0 B:0 C:6 D:0 | en sik 1.00 | anlasma ort 1.00
+  not: anlasma 1,00'e yakinse oz-tutarlilik ornekleminde cesitlilik yoktur; semantik entropi ~0 cikar ve bu bir bulgudur, olcum hatasi degil
+
+=========================================================
+KOL F - SEMANTIK KUMELEME (bge-m3 kosinus; yontem sapmasi belgeli)
+=========================================================
+
+  kosinus esigi 0.70
+    F1  | ornek  2 | talimat yankisi 0 | kume 1 | cogunluk 1.00 | sem-ent -0.0000
+    F2  | ornek  2 | talimat yankisi 0 | kume 2 | cogunluk 0.50 | sem-ent 0.6931
+    F3  | ornek  2 | talimat yankisi 0 | kume 1 | cogunluk 1.00 | sem-ent -0.0000
+    ozet: kume sayisi ort 1.33 (min 1 max 2) | semantik entropi ort 0.2310
+
+  kosinus esigi 0.80
+    F1  | ornek  2 | talimat yankisi 0 | kume 1 | cogunluk 1.00 | sem-ent -0.0000
+    F2  | ornek  2 | talimat yankisi 0 | kume 2 | cogunluk 0.50 | sem-ent 0.6931
+    F3  | ornek  2 | talimat yankisi 0 | kume 1 | cogunluk 1.00 | sem-ent -0.0000
+    ozet: kume sayisi ort 1.33 (min 1 max 2) | semantik entropi ort 0.2310
+
+=========================================================
+KOL G - SOZLU GUVEN (0-100) | sayi YALNIZ GUVEN: etiketinden okunur
+=========================================================
+  istem kalibi (bir kerelik):
+  'e dagarcigi (tokenizer sozlugui) kactir?\nSIKKLAR:\nA) 128.256\nB) 151.936\nC) 262.208\nD) 50.257\n\nBirinci satira secigin metnini yaz. Ikinci satir tam olarak GUVEN: ile baslasin ve sonrasinda 0 ile 100 arasinda tek bir tam sayi olsun.'
+G1  | 31.54 sn | guven 26   | GUVEN etiketi 1 | cevap dogru mu HAYIR | "Birinci Satır: Llama 3'un kelime dagarcigi (tokenizer sozlugui) kaçtır"
+G2  | 90.77 sn | guven 85   | GUVEN etiketi 1 | cevap dogru mu HAYIR | "Birinci Satır: Qwen3'un kelime dagacığı hangi değerdir? /  / İkinci Sa"
+G3  | 90.78 sn | guven YOK  | GUVEN etiketi 0 | cevap dogru mu HAYIR | "Gemma 3'un kelime dagarcigi hangi değerdir? Bu soruyu cevaplayan doğru"
+
+  G ozet: ayristirilabilen 2/3
+  genel guven ortalamasi 55.5 | min 26 | max 85
+  yanlis cevaplarin guveni: n=2 ort 55.5 (min 26 max 85)
+  [UYARI] 1 soruda GUVEN: etiketi (veya etiketten okunabilir 0-100 sayisi) YOK -> bu sorular yukaridaki ortalamalara GIRMEZ, ayri sayilir
+  -> b.json yazildi (6 kayit)
+  -> c.json yazildi (9 kayit)
+  -> d.json yazildi (3 kayit)
+  -> e.json yazildi (6 kayit)
+  -> serbest.json yazildi (3 kayit)
+  -> g.json yazildi (3 kayit)
+
+bitti: 2026-10-25 17:35:07

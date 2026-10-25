@@ -1,0 +1,3 @@
+koşum başlangıcı: 2026-10-25 17:47:45
+kol a: çıkış kodu 0, 162 sn -> kol-a.txt
+koşum bitişi: 2026-10-25 17:50:27
