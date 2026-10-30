@@ -91,7 +91,7 @@ def iste(payload, bekle=600, url=None):
     req = urllib.request.Request(
         _url_dogrula(url or OLLAMA_CHAT),
         data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json", "User-Agent": "model-egitimi-rehberi/1.0"},
+        headers={"Content-Type": "application/json", "User-Agent": "local-model-training-guide/1.0"},
     )
     t0 = time.time()
     with urllib.request.urlopen(req, timeout=bekle) as r:
