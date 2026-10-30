@@ -10,6 +10,7 @@ const root = path.join(new URL('.', import.meta.url).pathname.replace(/^\/([A-Za
 const docsDir = path.join(root, 'src', 'content', 'docs');
 const strict = process.argv.includes('--strict');
 const BAYAT_GUN = 90;
+const YAKLASAN_GUN = 75;
 const COK_BAYAT_GUN = 180;
 
 function walk(dir, out = []) {
@@ -62,9 +63,12 @@ console.log('\nTarih dagilimi:');
 for (const [t, n] of Object.entries(dagilim).sort()) console.log(`  ${t}  ${n} sayfa`);
 
 const bayat = satirlar.filter((s) => s.gun >= BAYAT_GUN);
+const yaklasan = satirlar.filter((s) => s.gun >= YAKLASAN_GUN && s.gun < BAYAT_GUN);
 const cokBayat = satirlar.filter((s) => s.gun >= COK_BAYAT_GUN);
 console.log(`\nBayat (>=${BAYAT_GUN} gun): ${bayat.length}`);
 for (const s of bayat) console.log(`  ${s.gun} gun  ${s.damga}  ${s.g}`);
+console.log(`Bakim yaklasiyor (${YAKLASAN_GUN}-${BAYAT_GUN - 1} gun): ${yaklasan.length}`);
+for (const s of yaklasan) console.log(`  ${s.gun} gun  ${s.damga}  ${s.g}`);
 console.log(`Cok bayat (>=${COK_BAYAT_GUN} gun): ${cokBayat.length}`);
 
 if (hatalar.length) {

@@ -143,6 +143,7 @@ export default defineConfig({
             { slug: 'kaynaklar/sozluk' },
             { slug: 'kaynaklar/faydali-linkler' },
             { slug: 'kaynaklar/dogrulama-mekanizmasi' },
+            { slug: 'kaynaklar/agent-ve-cok-makine' },
             { slug: 'kaynaklar/kapsam-haritasi' },
           ],
         },
