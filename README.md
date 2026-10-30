@@ -143,6 +143,12 @@ import { Code } from 'astro-expressive-code/components';
 <Code code={kod} lang="python" title="ornekler/klasik-ml/tablo_modeli.py" />
 ```
 
+## Lisans
+
+İçerik (sayfalar ve belgeler) **CC BY-SA 4.0**, çalışan kod (betikler, denetim araçları, site kodu)
+**MIT** lisansıyla yayımlanır; ayrımın sınır çizgisi, Vikipedi atfı ve lisans metinleri
+[LICENSE.md](LICENSE.md) dosyasındadır.
+
 ## Notlar
 
 - Site şu an **yalnızca yerel** kullanım için yapılandırıldı (herhangi bir yayın adresi tanımlı değil). Yayınlamak istediğinde `astro.config.mjs` içine `site:` eklenmesi önerilir.

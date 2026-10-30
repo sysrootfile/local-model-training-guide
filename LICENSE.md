@@ -1,0 +1,56 @@
+# Lisans
+
+Bu depo iki lisansla yayımlanır; hangi dosyanın hangi lisansa tabi olduğu içerik türüyle belirlenir.
+
+## İçerik: CC BY-SA 4.0
+
+`src/content/docs/` altındaki tüm sayfalar ile `README.md`, `QODER.md` ve `ornekler/*/README.md`
+belgeleri **Creative Commons Atıf-AynıLisanslaPaylaş 4.0 Uluslararası (CC BY-SA 4.0)** lisansıyla
+yayımlanır.
+
+- Lisansın tam metni: <https://creativecommons.org/licenses/by-sa/4.0/legalcode> (bu depoda
+  `LICENSE-CC-BY-SA-4.0.txt` dosyasında da durur).
+- Kısa özeti: içeriği **atıf vererek** paylaşabilir ve uyarlayabilirsiniz; uyarladığınız sürümleri
+  **aynı lisansla** paylaşmak zorundasınız.
+- Atıf biçimi önerisi: "Model Eğitimi Rehberi" — kaynak adres + bu lisansın adı.
+
+**Vikipedi atfı:** Örnek betiklerde ve ölçüm kafeslerinin korpuslarında
+[tr.wikipedia.org](https://tr.wikipedia.org/) maddelerinden alıntı parçalar kullanılmıştır; Vikipedi
+metinleri CC BY-SA lisansıyla yayımlanır ve kullanılan parçaların kaynak maddeleri ilgili kafesin
+README'sinde sayılır.
+
+## Kod: MIT
+
+`ornekler/` altındaki betikler, `scripts/` altındaki denetim araçları, `src/` altındaki site kodu ve
+`astro.config.mjs` **MIT Lisansı**yla yayımlanır:
+
+```
+MIT License
+
+Copyright (c) 2026 model-egitimi-rehberi katkıcıları
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+## Sınır çizgisi neye göre
+
+- **Sayfa metni ve belgeler** (öğretici içerik, ölçüm bulgularının anlatımı) → CC BY-SA 4.0.
+- **Çalışan her şey** (Python betikleri, denetim araçları, site bileşenleri, yapılandırma) → MIT.
+- Bir dosyanın sınırdaki durumu belirsizse: içinde çalıştırılabilir kod varsa MIT, insan okur
+  metinse CC BY-SA 4.0.
