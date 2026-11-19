@@ -36,4 +36,6 @@ for (const f of files) {
 }
 
 console.log(broken.length === 0 ? `TÜM İÇ LİNKLER TAMAM (${files.length} sayfa tarandı)` : `KIRIK: ${broken.length}`);
+// Kirik link varsa cikis 1: betik CI'da "basarili" sayilmamali (QODER.md: cikis kodu kanittir).
+if (broken.length) process.exitCode = 1;
 broken.slice(0, 40).forEach((b) => console.log(b));

@@ -1,7 +1,7 @@
 ---
 title: "Eminlik ve Kalibrasyon: Model Kendinden Ne Kadar Emin?"
 description: "Ollama'da logprobs ve top_logprobs fiilen ne üretir, kayıt sayısı ile üretilen token sayısı neden farklıdır, P(True) kalıbı Türkçe çoktan seçmelide konum yanılgısına mı düşüyor, sıcaklık bildirilen olasılığı değiştiriyor mu, sözlü güven kaç soruda okunabiliyor — 2026-10-17 kayıtlarından ölçülmüş sayılar."
-dogrulama: 2026-10-19
+dogrulama: 2026-11-19
 ---
 
 Bir modelin "bilmiyorum" demesini istemek, ürettiği metnin kalitesinden ayrı bir iştir. Bunu yapmanın tek yolu modele iç durumunu sormak değil; üç ayrı güven kaynağı var: **üretim olasılığı** (model doğru şıkkı token token ne kadar olası görüyor), **öz-tutarlılık** (aynı soruyu örnekleyince aynı cevaba mı düşüyor) ve **sözlü beyan** (model kendine kaç puan veriyor). Bu sayfa üç kaynağı da bu makinede koştu ve bir de dördüncü şeyi ölçtü: **Ollama'nın `logprobs` alanı belgeye göre mi davranıyor, yoksa belgeyi okurken sandığımızdan farklı mı?**
@@ -167,7 +167,7 @@ Bu haliyle sözlü güven bu makinede kullanılamaz: 10 sorudan 3'ü okunamıyor
 - [Can LLMs Express Their Uncertainty? (arXiv:2306.13063)](https://arxiv.org/abs/2306.13063) — Xiong ve ark.; sözlü beyanlarda aşırı güven ve ölçek tuzakları.
 - [Know Your Limits: A Survey of Abstention in Large Language Models (arXiv:2407.18418)](https://arxiv.org/abs/2407.18418) — Wen ve ark., TACL 2025; kaçınmanın hangi yolla sağlandığının sınıflandırması.
 - [When Quantization Affects Confidence of Large Language Models? (arXiv:2405.00632)](https://arxiv.org/abs/2405.00632) — Proskurina ve ark.; nicemlemenin güven dağılımını kaydırması — bu sayfada **ölçülmedi**.
-- [Revisiting Accuracy-Confidence Consistency in Neural Networks (NeurIPS 2021, cilt 34, 15682–15694)](https://proceedings.neurips.cc/paper/2021/hash/c91e5a8a9e1a6b4e04c05e90edbf2bcb-Abstract.html) — Minderer ve ark.; küçük örneklemde ECE tahmincisinin neden yanıltıcı olduğu.
+- [Verified Uncertainty Calibration (arXiv:1909.10155)](https://arxiv.org/abs/1909.10155) — Kumar, Liang ve Ma, NeurIPS 2019; küçük örneklemde ECE tahmincisinin neden yanıltıcı (yanlı ölçtüğü) olduğu.
 - [Çıkarım Parametreleri](/kullanim/cikarim-parametreleri/) — `logprobs` alanının belge tarafı ve bu sayfanın kapattığı "denenmedi" notu.
 - [Tekrarlanabilirlik](/kullanim/tekrarlanabilirlik/) — T=0 aynılığı, `num_predict` tavanı ve şema/içerik ayrımı; bu sayfanın H ve A7–A8 satırlarının tamamlayıcısı.
 - [Tokenizasyon](/temeller/tokenizasyon/) — Türkçenin alt-kelime bölünmesinin dili.

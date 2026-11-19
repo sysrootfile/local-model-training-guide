@@ -1,7 +1,7 @@
 ---
 title: "Benchmark'lar ve Gerçek Değerlendirme"
 description: "2026 itibarıyla benchmark manzarası, benchmark'ların dikkatli okunması, Türkçe değerlendirme kaynakları, insan ve LLM yargıcı, lm-evaluation-harness kullanımı ve kendi mini test setinizi kurma rehberi."
-dogrulama: 2026-10-17
+dogrulama: 2026-11-19
 ---
 
 Bir modelin ne kadar iyi olduğunu söylemek zordur çünkü "iyi" göreve bağlıdır. **Benchmark**, belirli görevlerden oluşan standart bir soru seti ve o setteki başarıyı ölçen bir puandır. Model kartlarında gördüğünüz "MMLU: 74,3" gibi sayılar buradan gelir.
@@ -256,4 +256,4 @@ Son adım: Modelleri kağıt üzerinde değil, gerçek ortamda da deneyin — [O
 - [Cetvel (arXiv:2508.16431)](https://arxiv.org/abs/2508.16431) — Türkçe görev paketi; kod ve sonuçlar [KUIS-AI/cetvel](https://github.com/KUIS-AI/cetvel) deposunda.
 - [TR-MMLU (arXiv:2501.00593)](https://arxiv.org/abs/2501.00593) — Türkiye eğitim müfredatı odaklı Türkçe bilgi seti.
 - [lm-evaluation-harness (GitHub)](https://github.com/EleutherAI/lm-evaluation-harness) — çok sayıda benchmark'ı tek komutla koşan araç.
-- [Epoch AI — AI Benchmarks Dashboard](https://epoch.ai/data/ai-benchmarks-dashboard) — GPQA, MMLU ve daha fazlası için bağımsız, güncel skor izleme panosu.
+- [Epoch AI — Benchmarking Hub](https://epoch.ai/benchmarks) — GPQA, MMLU ve daha fazlası için bağımsız, güncel skor izleme panosu.

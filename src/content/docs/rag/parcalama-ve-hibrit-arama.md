@@ -1,7 +1,7 @@
 ---
 title: "Parçalama ve Hibrit Arama: Getirimi İyileştirmenin İki Kolu"
 description: "RAG'de getirimi belirleyen iki ayar — parça boyutu ve sınırları, ile sözlük ve vektör aramasının birleştirilmesi. BM25 ve RRF'nin nasıl çalıştığı, Türkçede sözcüğe bölme tuzakları ve bu rehberin korpusunda ölçülen sonuçlar."
-dogrulama: 2026-10-17
+dogrulama: 2026-11-19
 ---
 
 [RAG karar sayfası](/rag/rag-mi-ince-ayar-mi/) boru hattının ne zaman gerekli olduğunu, [değerlendirme sayfası](/rag/rag-degerlendirme/) ise getirimin nasıl ölçüleceğini anlattı. Ölçüm size "arama şaşırdı" diyorsa iki kola bakarsınız: **neyi indekslediğinize** (parçalama) ve **nasıl aradığınıza** (arama yöntemi). Bu sayfa ikisini de ele alıyor; sonundaki deney, üç yöntemi aynı 125 parçalık Türkçe korpusta gerçekten yarıştırdı.
@@ -34,7 +34,7 @@ Tavanı büyütmenin bedeli sanıldığı kadar tek yönlü değil: [Gömme Mode
 
 ### Araştırma ne diyor, ne demiyor
 
-Chroma'nın 2024 parçalama değerlendirmesi ([Evaluating chunking strategies for retrieval](https://docs.trychroma.com/trials/evaluating-chunking-strategies-for-retrieval)) beş ayrı korpusta farklı bölmeler arasında **geri çağırmada 9 puana varan** fark buldu; 200 token civarı özyinelemeli bölme, örtüşmesiz hâliyle güçlü çıktı; küme-temelli semantik bölmeyse en yüksek hassasiyeti (IoU) verdi. İki uyarı:
+Chroma'nın 2024 parçalama değerlendirmesi ([Evaluating chunking strategies for retrieval](https://www.trychroma.com/research/evaluating-chunking)) beş ayrı korpusta farklı bölmeler arasında **geri çağırmada 9 puana varan** fark buldu; 200 token civarı özyinelemeli bölme, örtüşmesiz hâliyle güçlü çıktı; küme-temelli semantik bölmeyse en yüksek hassasiyeti (IoU) verdi. İki uyarı:
 
 1. Çalışma **yalnızca aramayı** ölçtü, üretimi ölçmedi. Parça "doğru" ama okunması kötü olabilir.
 2. Yazarların kendi bölmeleriyle karşılaştırma yapıldı; yani "en iyi ayar" korpusa ve gömme modeline bağlı kaldı. Bu sayfanın aşağıdaki deneyi de aynı dersi **kendi korpusunda** sayıyla gösteriyor: **ayar başkasının sayısıyla seçilmez.**
@@ -220,7 +220,7 @@ python hibrit.py        # ikinci koşum: önbellek gömmeyi atlar, yalnızca sı
 - [Elasticsearch RRF retriever belgesi](https://www.elastic.co/docs/reference/elasticsearch/rest-apis/reciprocal-rank-fusion) — `rank_constant` (varsayılan 60) ve `rank_window_size`.
 - [Weaviate hybrid search belgesi](https://docs.weaviate.io/weaviate/search/hybrid) — `alpha` ve `rankedFusion`/`relativeScoreFusion` modları.
 - [Qdrant arama belgesi](https://qdrant.tech/documentation/concepts/search/) — `Query::Hybrid` (dense + sparse) ve RRF/DBRF birleştirme modları.
-- [Chroma, "Evaluating chunking strategies for retrieval" (2024)](https://docs.trychroma.com/trials/evaluating-chunking-strategies-for-retrieval) — beş korpusda böleme stratejilerinin geri çağırma/hassasiyet karşılaştırması.
+- [Chroma, "Evaluating chunking strategies for retrieval" (2024)](https://www.trychroma.com/research/evaluating-chunking) — beş korpusda böleme stratejilerinin geri çağırma/hassasiyet karşılaştırması.
 - [Günther ve ark., "Late Chunking: Improving RAG through Chunk-Aware Context Embeddings" (2024)](https://arxiv.org/abs/2409.04701) — geç parçalama yöntemi ve referans uygulaması.
 - [Anthropic, "Contextual Retrieval" (2024)](https://www.anthropic.com/news/contextual-retrieval) — parçaya bağlam ekleyip yeniden sıralamayı birleştiren yaklaşım; sayılar tedarikçi tarafından ölçülmüştür.
 - [BAAI/bge-reranker-v2-m3 model kartı](https://huggingface.co/BAAI/bge-reranker-v2-m3) — yerelde çalıştırılabilir çok dilli cross-encoder; desteklenen dil listesi Türkçe için dikkatli okunmalı.
