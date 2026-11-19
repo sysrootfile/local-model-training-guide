@@ -1,0 +1,5 @@
+# Herkese açık taramaya izin ver. Site haritası astro.config.mjs'teki site+base'den üretilir.
+User-agent: *
+Allow: /
+
+Sitemap: https://sysrootfile.github.io/local-model-training-guide/sitemap-index.xml

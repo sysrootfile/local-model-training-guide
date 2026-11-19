@@ -2,6 +2,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const dist = new URL('../dist', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1');
+// GitHub Pages proje base'i — astro.config.mjs'teki `base` ile aynı değeri taşır.
+// Pages düzeninde site /local-model-training-guide altında servis edilir: base öneki
+// taşımayan mutlak href sitede 404'tür, bu yüzden onlar da kırık sayılır.
+const BASE = '/local-model-training-guide';
 
 function walk(dir, out = []) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -19,15 +23,20 @@ for (const f of files) {
   const html = fs.readFileSync(f, 'utf8');
   const links = [...html.matchAll(/href="(\/[^"#]*)/g)].map((m) => m[1]);
   for (const l of new Set(links)) {
-    if (l.startsWith('/_astro') || l.startsWith('/pagefind')) {
-      if (!fs.existsSync(path.join(dist, l))) broken.push(`${f} -> ${l} (asset)`);
+    if (!l.startsWith(BASE)) {
+      broken.push(`${f} -> ${l} (base öneki yok)`);
       continue;
     }
-    if (/\.(png|svg|webp|ico|css|js|xml|txt|woff2?|json)$/.test(l)) {
-      if (!fs.existsSync(path.join(dist, l))) broken.push(`${f} -> ${l} (asset)`);
+    const hedef = l.slice(BASE.length) || '/';
+    if (hedef.startsWith('/_astro') || hedef.startsWith('/pagefind')) {
+      if (!fs.existsSync(path.join(dist, hedef))) broken.push(`${f} -> ${l} (asset)`);
       continue;
     }
-    let p = l.split('#')[0].split('?')[0];
+    if (/\.(png|svg|webp|ico|css|js|xml|txt|woff2?|json)$/.test(hedef)) {
+      if (!fs.existsSync(path.join(dist, hedef))) broken.push(`${f} -> ${l} (asset)`);
+      continue;
+    }
+    let p = hedef.split('#')[0].split('?')[0];
     if (!p.endsWith('/')) p += '/';
     const target = path.join(dist, p, 'index.html');
     const target2 = path.join(dist, p);

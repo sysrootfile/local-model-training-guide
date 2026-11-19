@@ -38,6 +38,8 @@ export const onRequest = defineRouteMiddleware((context) => {
       'Buradaki sayıları ve sürüm adlarını güncel varsaymayın.';
   }
 
-  metin += ' Nasıl çalışır: <a href="/kaynaklar/dogrulama-mekanizmasi/">Doğrulama Mekaniği</a>.';
+  // Base önekli adres (GitHub Pages): BASE_URL '/' ise önek yok, değilse base'i taşı.
+  const kok = import.meta.env.BASE_URL === '/' ? '' : import.meta.env.BASE_URL;
+  metin += ` Nasıl çalışır: <a href="${kok}/kaynaklar/dogrulama-mekanizmasi/">Doğrulama Mekaniği</a>.`;
   entry.data.banner = { content: metin };
 });

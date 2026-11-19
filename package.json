@@ -2,11 +2,11 @@
   "name": "local-model-training-guide",
   "version": "0.1.0",
   "private": true,
-  "license": "SEE LICENSE.md",
+  "license": "SEE LICENSE IN LICENSE.md",
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/base-onekle.mjs",
     "dogrula": "node scripts/dogrulama-kontrol.mjs",
     "preview": "astro preview"
   },

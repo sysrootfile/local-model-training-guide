@@ -3,6 +3,12 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
 export default defineConfig({
+  // GitHub Pages proje adresi (2026-11-19 kararı): https://sysrootfile.github.io/local-model-training-guide
+  // base öneki sayfa gövdesi linklerine Starlight tarafından otomatik eklenmediği için
+  // duzeltme derleme sonrası scripts/base-onekle.mjs ile yapılır; scripts/link-check.mjs
+  // bu düzeni denetler.
+  site: 'https://sysrootfile.github.io',
+  base: '/local-model-training-guide',
   integrations: [
     starlight({
       title: 'Model Eğitimi Rehberi',

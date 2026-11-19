@@ -31,7 +31,7 @@ Ana sayfada ayrıca etkileşimli bir **yöntem seçici** ve VRAM sayfasında bir
 npm install     # bağımlılıkları kur
 npm run dev     # geliştirme sunucusu → http://localhost:4321
 npm run build   # üretim derlemesi → dist/
-npm run preview # derlenmiş siteyi önizle (arama burada çalışır)
+npm run preview # derlenmiş siteyi önizle → http://localhost:4321/local-model-training-guide/ (arama burada çalışır)
 ```
 
 ## Proje Yapısı
@@ -159,6 +159,6 @@ import { Code } from 'astro-expressive-code/components';
 
 ## Notlar
 
-- Site şu an **yalnızca yerel** kullanım için yapılandırıldı (herhangi bir yayın adresi tanımlı değil). Yayınlamak istediğinde `astro.config.mjs` içine `site:` eklenmesi önerilir.
+- Site GitHub Pages'te yayında: <https://sysrootfile.github.io/local-model-training-guide/> (`astro.config.mjs` içinde `site:` + `base: /local-model-training-guide`). Base öneki yüzünden tüm mutlak linkler `/local-model-training-guide` ile başlar; `scripts/link-check.mjs` ve `src/starlightRouteData.ts` bu düzeni bilir.
 - Fiyat/sürüm gibi değişken bilgiler "2026 itibarıyla" notuyla verilmiştir; güncel değerleri ilgili resmî kaynaktan doğrulayın.
 - İçerikler öğretici amaçlıdır; üretim ortamına almadan önce test edin.

@@ -40,25 +40,28 @@ Astro 7 + Starlight tabanlı, Türkçe model eğitimi rehberi sitesinin kaynağ�
   Çeviri politikası README "Çok dillilik" bölümünde.
 - Makine yolu sızıntısı 0 (2026-11-06'daki 2 dosya o tarihten beri temizlenmişti); gizli anahtar
   taraması temiz.
+- Yayın kuruldu (2026-11-19 kararı: GitHub Pages + depo public): `site: https://sysrootfile.github.io`
+  + `base: /local-model-training-guide`; canonical/sitemap/robots.txt üretimi açık. Base kuplingi
+  çözüldü: Starlight içerik linklerini otomatik önekliyor (rehype gerekmedi), banner linki
+  `BASE_URL`'den okuyor (`src/starlightRouteData.ts`), `scripts/link-check.mjs` base-önekli
+  Pages düzenini denetliyor. Deploy: `.github/workflows/yayin.yml`, Pages API ile
+  `build_type=workflow` olarak açıldı.
+- Norm dosyaları: `CHANGELOG.md` (Keep a Changelog, 0.1.0), `CONTRIBUTING.md`,
+  `public/robots.txt`.
+- Damga takvimi: `.github/workflows/damga-takvimi.yml` — her ayın 1'inde `dogrula --strict`
+  koşar; bayat sayfa varsa depoya issue açar/günceller.
+- Sürüm kararı kaydı: `package.json` `0.1.0` + `private: true` bilinçli — bu depo npm paketi
+  değil; `private: true` yanlışlıkla publish'i engeller, sürüm numarası site yayınlarının
+  işaretidir (CHANGELOG taşır).
 
 ## Sıradaki işler
-1. `astro.config.mjs` içine `site:` tanımla. Dikkat: GitHub Pages
-   (`sysrootfile.github.io/local-model-training-guide`) seçilirse `base: '/local-model-training-guide'`
-   de gerekir; o zaman `src/starlightRouteData.ts`'deki `/kaynaklar/dogrulama-mekanizmasi/` mutlak
-   linki ve `scripts/link-check.mjs`'in `/`-köklü href varsayımı da base'e uyarlanmalı. Kök alan
-   adı (özel domain / Vercel) seçilirse yalnız `site:` yeter.
-2. Alan adı + hosting kararı; yayın ilk kez fiilen yapılacak. İsteyen `gh repo edit
-   sysrootfile/local-model-training-guide --visibility public` ile depoyu açabilir.
-3. `package.json` sürümü `0.1.0` ve `private: true`; yayın kararıyla uyumla.
-4. Damga tazeliği takvimi: damgaların çoğu 2026-10-15/19, 90 gün Ocak 2027'de doluyor. CI şu an
-   `dogrula`yı strict olmayan kipte koşuyor (bayat kırmez, eksik damga kırar); zorlayıcı istenirse
-   iş akışına `npm run dogrula -- --strict` yazılır.
-5. İngilizce çeviri planı: altyapı hazır; hangi sayfaların önce çevrileceği (öneri: açılış +
+1. İngilizce çeviri planı: altyapı hazır; hangi sayfaların önce çevrileceği (öneri: açılış +
    `baslangic/` üçlüsü + `llm/lora-qlora`) ve çevirinin kimin yapacağına karar ver. Sayfa başına
    damga kuralı İngilizceler için de geçerli.
-6. İsteğe bağlı: `ornekler/klasik-ml` ve `ornekler/veri-temizleme` için README. README satır 70-73
+2. İsteğe bağlı: `ornekler/klasik-ml` ve `ornekler/veri-temizleme` için README. README satır 70-73
    bilinçli tercih diyor, karar sana ait.
 
 ## Ölçülmemiş kapılar
 - GPU isteyen eğitim betiklerinin (turkce-asistan, gorsel-lora) fiilen koşumu.
-- CI'ın GitHub tarafında ilk yeşil koşumu (bu push'ın Actions sayfasından doğrulanacak).
+- Pages canlı adresinin ilk dış doğrulaması (push sonrası `yayin` iş akışı + curl).
+- `damga-takvimi`'nin ilk ay turu (ilk tetik: 2026-12-01).
