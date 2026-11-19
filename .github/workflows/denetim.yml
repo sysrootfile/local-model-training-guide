@@ -1,0 +1,23 @@
+# Uc kapilar: derleme + ic link + damga denetimi.
+# QODER.md "Bir sayfa bittiğinde sıra" bölümünün otomatiği; üç betik de
+# kırık çıktıda sıfırdan farklı çıkış kodu döner, iş akışı kırmızıya düşer.
+name: denetim
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  kapilar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 26
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: node scripts/link-check.mjs
+      - run: npm run dogrula
