@@ -123,7 +123,8 @@ Yazım ve ölçüm kuralları (kanıt kademeleri, "sayı yalnız bitmiş günlü
 **Çok dillilik (İngilizce sayfa):** İngilizceler `src/content/docs/en/<bölüm>/<sayfa>.md` altına
 girer; sidebar listesi her iki yerelde aynıdır (İngilizce'de henüz çevrilmemiş adresler Türkçe
 içerik + "çevrilmemiş" uyarısıyla açılır). Damga kuralı aynıdır: `dogrulama:` zorunlu. Çeviri
-orijinaldeki iddiaları taşır; orijinalden fazlasını iddia edemez. Arayüz metinleri
+orijinaldeki iddiaları taşır; orijinalden fazlasını iddia edemez. İç linkler `/en/` önekiyle
+**açıkça** yazılır — Starlight içerik linklerini otomatik yerelleştirmez. Arayüz metinleri
 `src/content/i18n/en.json` içinde.
 
 2. Sayfayı `astro.config.mjs` içindeki `sidebar` listesine ekle:

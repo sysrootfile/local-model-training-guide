@@ -6,6 +6,11 @@ Biçim: [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/); sürümleme
 
 ## [Yayınlanmamış]
 
+### Ekler
+- İlk İngilizce içerik sayfaları: `en/baslangic/giris`, `en/baslangic/kavramlar`,
+  `en/baslangic/yol-haritasi`, `en/llm/lora-qlora` — çevrilmemiş `/en/` adresleri Türkçe
+  içerik + "çevrilmemiş" uyarısıyla açılmaya devam eder.
+
 ## [0.1.0] — 2026-11-19
 
 İlk sürüm: 13 bölümde 66 sayfalık Türkçe model eğitimi rehberi + İngilizce ikinci dil

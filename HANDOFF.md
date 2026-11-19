@@ -55,9 +55,10 @@ Astro 7 + Starlight tabanlı, Türkçe model eğitimi rehberi sitesinin kaynağ�
   işaretidir (CHANGELOG taşır).
 
 ## Sıradaki işler
-1. İngilizce çeviri planı: altyapı hazır; hangi sayfaların önce çevrileceği (öneri: açılış +
-   `baslangic/` üçlüsü + `llm/lora-qlora`) ve çevirinin kimin yapacağına karar ver. Sayfa başına
-   damga kuralı İngilizceler için de geçerli.
+1. İngilizce çeviri: ilk tohum seti yayında (açılış `en/index` + `en/baslangic/` üçlüsü +
+   `en/llm/lora-qlora`, damgalar 2026-11-19). Kalan ~60 sayfa aynı kuralla çevrilir: linkler
+   `/en/` önekiyle açıkça yazılır, kod örnekleri İngilizceye çevrilir, damga zorunlu.
+   Sıradan adaylar: `temeller/` üçlüsü + `donanim/vram-hesabi` + `kullanim/quantization`.
 2. İsteğe bağlı: `ornekler/klasik-ml` ve `ornekler/veri-temizleme` için README. README satır 70-73
    bilinçli tercih diyor, karar sana ait.
 
