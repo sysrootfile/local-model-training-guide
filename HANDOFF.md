@@ -34,6 +34,10 @@ Astro 7 + Starlight tabanlı, Türkçe model eğitimi rehberi sitesinin kaynağ�
   dahili host).
 - Üç kapı koşuldu: build ✅ (66 sayfa), link-check ✅ (66 sayfa), `dogrula` ✅ (65 damga, 0 bayat).
 - CI kuruldu: `.github/workflows/denetim.yml` — push/PR'da `npm ci` → build → link-check → dogrula.
+- İkinci dil altyapısı: Starlight i18n ile `en` yereli eklendi (Türkçe kök kaldı, URL'ler değişmedi).
+  `src/content/i18n/en.json` arayüz metinleri + İngilizce açılış sayfası (`en/index.mdx`) hazır;
+  çevrilmemiş `/en/...` adresleri Türkçe içerik + Starlight "çevrilmemiş" uyarısıyla açılıyor.
+  Çeviri politikası README "Çok dillilik" bölümünde.
 - Makine yolu sızıntısı 0 (2026-11-06'daki 2 dosya o tarihten beri temizlenmişti); gizli anahtar
   taraması temiz.
 
@@ -49,7 +53,10 @@ Astro 7 + Starlight tabanlı, Türkçe model eğitimi rehberi sitesinin kaynağ�
 4. Damga tazeliği takvimi: damgaların çoğu 2026-10-15/19, 90 gün Ocak 2027'de doluyor. CI şu an
    `dogrula`yı strict olmayan kipte koşuyor (bayat kırmez, eksik damga kırar); zorlayıcı istenirse
    iş akışına `npm run dogrula -- --strict` yazılır.
-5. İsteğe bağlı: `ornekler/klasik-ml` ve `ornekler/veri-temizleme` için README. README satır 70-73
+5. İngilizce çeviri planı: altyapı hazır; hangi sayfaların önce çevrileceği (öneri: açılış +
+   `baslangic/` üçlüsü + `llm/lora-qlora`) ve çevirinin kimin yapacağına karar ver. Sayfa başına
+   damga kuralı İngilizceler için de geçerli.
+6. İsteğe bağlı: `ornekler/klasik-ml` ve `ornekler/veri-temizleme` için README. README satır 70-73
    bilinçli tercih diyor, karar sana ait.
 
 ## Ölçülmemiş kapılar

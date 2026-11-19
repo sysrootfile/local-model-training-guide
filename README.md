@@ -1,6 +1,6 @@
 # Model Eğitimi Rehberi
 
-Türkçe, sıfırdan ileri seviyeye **model eğitimi** rehberi. Veri bulmaktan kendi modelini çalıştırmaya kadar tüm adımları kapsayan, tamamen Türkçe bir dokümantasyon sitesi.
+Türkçe, sıfırdan ileri seviyeye **model eğitimi** rehberi. Veri bulmaktan kendi modelini çalıştırmaya kadar tüm adımları kapsayan, ana dili Türkçe bir dokümantasyon sitesi; İngilizce ikinci dil olarak kademeli ekleniyor (aşağıda **Çok dillilik**).
 
 ## Kapsam
 
@@ -22,6 +22,7 @@ Ana sayfada ayrıca etkileşimli bir **yöntem seçici** ve VRAM sayfasında bir
 - [Astro](https://astro.build) 7 + [Starlight](https://starlight.astro.build) 0.42
 - İçerik: Markdown / MDX (`src/content/docs/`)
 - Arama: Pagefind (Starlight ile gelir, `build` sonrası çalışır)
+- Çok dillilik: Starlight i18n — Türkçe kök yerel (URL'ler öneksiz), İngilizce `/en/` altında; çevrilmemiş adresler Türkçe içerik + "çevrilmemiş" uyarısıyla açılır
 - Tema: `src/styles/custom.css` (indigo-mor aksan paleti, açık/koyu tema)
 
 ## Çalıştırma
@@ -43,8 +44,9 @@ src/
 │   └── VramCalculator.astro     # VRAM tahmin hesaplayıcı
 ├── content.config.ts            # içerik koleksiyonları (docs + i18n)
 ├── content/
-│   ├── i18n/tr.json             # arayüz metinleri (Türkçe)
-│   └── docs/                    # TÜM SAYFALAR (bölüm klasörleri halinde)
+│   ├── i18n/tr.json             # arayüz metinleri (Türkçe kök)
+│   ├── i18n/en.json             # arayüz metinleri (İngilizce)
+│   └── docs/                    # TÜM SAYFALAR (bölüm klasörleri halinde; İngilizceler en/ altında)
 │       ├── index.mdx            # ana sayfa (splash)
 │       ├── baslangic/ temeller/ donanim/ veri/
 │       ├── llm/ gorsel/ klasik-ml/ degerlendirme/
@@ -117,6 +119,12 @@ Yazım ve ölçüm kuralları (kanıt kademeleri, "sayı yalnız bitmiş günlü
    `dogrulama:` **zorunludur**: o sayfanın iddialarının en son ne zaman gözden geçirildiği. Damgasız,
    biçimi bozuk ya da gelecek tarihli sayfa `npm run dogrula`yı kırar (çıktı 1). Metin değiştiyse
    tarihi bugüne çek; değişmediyse çekme.
+
+**Çok dillilik (İngilizce sayfa):** İngilizceler `src/content/docs/en/<bölüm>/<sayfa>.md` altına
+girer; sidebar listesi her iki yerelde aynıdır (İngilizce'de henüz çevrilmemiş adresler Türkçe
+içerik + "çevrilmemiş" uyarısıyla açılır). Damga kuralı aynıdır: `dogrulama:` zorunlu. Çeviri
+orijinaldeki iddiaları taşır; orijinalden fazlasını iddia edemez. Arayüz metinleri
+`src/content/i18n/en.json` içinde.
 
 2. Sayfayı `astro.config.mjs` içindeki `sidebar` listesine ekle:
 

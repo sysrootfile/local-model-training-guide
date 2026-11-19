@@ -1,0 +1,85 @@
+---
+title: Model Training Guide
+description: A Turkish-first, beginner-to-advanced model training guide — data finding, data preparation, fine-tuning, LoRA/QLoRA, evaluation and publishing. English translation in progress.
+template: splash
+hero:
+  title: Model Training Guide
+  tagline: From finding data to running your own model — step by step, measured and verified. LLM fine-tuning, vision models and classic machine learning in one guide.
+  image:
+    file: ../../../assets/hero.png
+    alt: Illustration of a neural network and a training loop
+  actions:
+    - text: Start the Guide
+      link: /en/baslangic/giris/
+      icon: right-arrow
+      variant: primary
+    - text: How Claims Are Verified
+      link: /en/kaynaklar/dogrulama-mekanizmasi/
+      icon: right-arrow
+      variant: minimal
+dogrulama: 2026-11-19
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+:::note[About the language]
+This guide is written in **Turkish**, and the English translation is in progress. Pages not
+yet translated are served in Turkish, with a notice at the top of the page. The Turkish
+original is the canonical version — translations may not carry claims the original does not.
+:::
+
+<h2>What This Guide Covers</h2>
+
+<CardGrid>
+  <Card title="Fundamentals" icon="puzzle">
+    [Transformers](/en/temeller/transformer/), [tokenization](/en/temeller/tokenizasyon/)
+    and how training actually works — intuitive but solid.
+  </Card>
+  <Card title="Hardware and Setup" icon="laptop">
+    [VRAM math](/en/donanim/vram-hesabi/) with an interactive calculator, [local setup on
+    Windows](/en/donanim/yerel-kurulum/) and [cloud options](/en/donanim/bulut-secenekleri/).
+  </Card>
+  <Card title="Data" icon="document">
+    Where to find data, which format to use, how to clean it — including [Turkish data
+    sources](/en/veri/veri-nereden-bulunur/).
+  </Card>
+  <Card title="LLM Training" icon="rocket">
+    [LoRA/QLoRA](/en/llm/lora-qlora/), [SFT](/en/llm/sft/), [DPO/RLHF](/en/llm/dpo-rlhf/),
+    tool comparisons and a [step-by-step first training](/en/llm/adim-adim-egitim/).
+  </Card>
+  <Card title="RAG and Agents" icon="robot">
+    [RAG or fine-tuning?](/en/rag/rag-mi-ince-ayar-mi/) — decide first, then
+    [chunk and search](/en/rag/parcalama-ve-hibrit-arama/) properly. [Agents and tool
+    calling](/en/ajan/ajan-mi-sabit-hat-mi/), and the [prompt injection](/en/ajan/prompt-enjeksiyonu/)
+    risk.
+  </Card>
+  <Card title="Evaluation" icon="information">
+    How to read [loss curves](/en/degerlendirme/loss-ve-metrikler/) and what each
+    [benchmark](/en/degerlendirme/benchmarklar/) actually measures.
+  </Card>
+  <Card title="Serving and Publishing" icon="play">
+    [Quantization](/en/kullanim/quantization/), [Ollama](/en/kullanim/ollama/),
+    [serving an API](/en/kullanim/sunma-api/) and [sharing on Hugging Face](/en/kullanim/huggingface-paylasim/).
+    Measured on real hardware: [latency and cost](/en/kullanim/hiz-ve-maliyet/),
+    [repeatability](/en/kullanim/tekrarlanabilirlik/),
+    [confidence calibration](/en/kullanim/eminlik-ve-kalibrasyon/).
+  </Card>
+  <Card title="Runnable Projects" icon="hammer">
+    Eight worked projects with committed run logs: [tabular ML](/en/ornekler/klasik-ml/),
+    [data cleaning](/en/ornekler/veri-temizleme/), [local RAG](/en/ornekler/yerel-rag/),
+    [an agent loop](/en/ornekler/ajan-dongusu/) and a [prompt injection
+    experiment](/en/ornekler/enjeksiyon-deni/).
+  </Card>
+</CardGrid>
+
+<h2>Why Turkish First?</h2>
+
+Because there is almost no beginner-to-advanced, hands-on model-training material written in
+Turkish. The Turkish original is the complete guide — this English surface grows page by page.
+If you read Turkish at any level, [start here](/baslangic/giris/).
+
+:::tip
+Every page carries a `dogrulama` (verification) stamp — the date its claims were last reviewed.
+Pages more than 90 days old show a staleness banner. The full mechanism:
+[Doğrulama Mekaniği](/en/kaynaklar/dogrulama-mekanizmasi/).
+:::
