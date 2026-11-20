@@ -69,9 +69,8 @@ ornekler/                        # 14 klasör: 10 ÖLÇÜM KAFESİ + 4 PROJE BET
 .hfcache/                        # kafeslerin indirdiği ağırlıklar (HF_HOME betiklerin içinde kurulu)
 ```
 
-Her `ornekler/<klasör>/` altında `cikti/` var. 12 klasörde ayrıca `README.md` var — **koşum komutları,
-bağımlılıklar ve kayıt dosyası adları orada durur**; `klasik-ml` ve `veri-temizleme`de README yok,
-koşum kayıtları doğrudan `cikti/` içinde. Bu dosya o komutları yeniden yazmaz (yazsaydı bayatlayan bir
+Her `ornekler/<klasör>/` altında `cikti/` var ve **koşum komutları,
+bağımlılıklar ve kayıt dosyası adları o klasörün `README.md`sinde durur**. Bu dosya o komutları yeniden yazmaz (yazsaydı bayatlayan bir
 kopya olurdu).
 
 ### Örnek projeleri çalıştırma

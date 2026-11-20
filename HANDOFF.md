@@ -60,8 +60,9 @@ Astro 7 + Starlight tabanlı, Türkçe model eğitimi rehberi sitesinin kaynağ�
    splash) bilinçli olarak tek dilli kaldı. MDX import yolları EN ağacında bir seviye derin
    (`../../../../../ornekler/...`). Not: `VramCalculator` bileşeni Türkçe arayüzlü; EN
    `vram-hesabi` sayfası gömmedi, Türkçe sayfaya notla yönlendiriyor.
-2. İsteğe bağlı: `ornekler/klasik-ml` ve `ornekler/veri-temizleme` için README. README satır 70-73
-   bilinçli tercih diyor, karar sana ait.
+2. **README eksiği kapatıldı (2026-11-20):** `ornekler/klasik-ml/README.md` ve
+   `ornekler/veri-temizleme/README.md` yazıldı; README ana sayfadaki "bu ikisinde README yok"
+   paragrafı güncellendi. Depoda artık 14 örneğin 14'ünde README var.
 
 ## Ölçülmemiş kapılar
 - GPU isteyen eğitim betiklerinin (turkce-asistan, gorsel-lora) fiilen koşumu.

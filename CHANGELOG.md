@@ -36,6 +36,9 @@ Biçim: [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/); sürümleme
   enjeksiyon-deni, ucdan-uca) — İngilizce çeviri 65/66 sayfayla tamamlandı; yalnız TR ana
   sayfa tek dilli kaldı. EN index kartları gerçek EN linkleriyle tazelendi; MDX `?raw`
   import yolları EN ağacına göre derinleştirildi.
+- Kapanış: `ornekler/klasik-ml/README.md` ve `ornekler/veri-temizleme/README.md` yazıldı —
+  14 örneğin tamamında artık koşum komutlarını taşıyan README var; README ana sayfasındaki
+  eski tercih notu güncellendi.
 
 ## [0.1.0] — 2026-11-19
 
