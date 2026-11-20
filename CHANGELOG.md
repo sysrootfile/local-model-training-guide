@@ -27,6 +27,10 @@ Biçim: [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/); sürümleme
   cikarim-parametreleri, tekrarlanabilirlik, hiz-ve-maliyet, eminlik-ve-kalibrasyon,
   eszamanlilik, sunma-api, huggingface-paylasim, lisans-ve-model-karti) — kullanım bölümü TAM;
   İngilizce sayfa sayısı 45'e ulaştı.
+- Yedinci çeviri serisi: `en/gorsel/` ikilisi (diffusion-temelleri, lora-egitimi),
+  `en/klasik-ml/` ikilisi (temeller, ilk-model) ve `en/kaynaklar/` altılısı (faydali-linkler,
+  agent-ve-cok-makine, sss, dogrulama-mekanizmasi, sozluk, kapsam-haritasi) — İngilizce sayfa
+  sayısı 55'e ulaştı; yalnız `ornekler/` onlusu kaldı.
 
 ## [0.1.0] — 2026-11-19
 

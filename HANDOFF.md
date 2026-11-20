@@ -55,11 +55,11 @@ Astro 7 + Starlight tabanlı, Türkçe model eğitimi rehberi sitesinin kaynağ�
   işaretidir (CHANGELOG taşır).
 
 ## Sıradaki işler
-1. İngilizce çeviri: 45 sayfa canlı (önceki 35 + `kullanim/`'in kalan 10 sayfası — bölüm TAM;
-   damgalar 2026-11-19/20). Kalan ~19 sayfa aynı kuralla çevrilir: `gorsel/` ikilisi +
-   `klasik-ml/` ikilisi + `ornekler/` onlusu + `kaynaklar/` altılısı (18) + EN index güncellemesi.
-   Not: `VramCalculator` bileşeni Türkçe arayüzlü; EN `vram-hesabi` sayfası gömmedi, Türkçe
-   sayfaya notla yönlendiriyor.
+1. İngilizce çeviri: 55 sayfa canlı (önceki 45 + `gorsel/` ikilisi + `klasik-ml/` ikilisi +
+   `kaynaklar/` altılısı; damgalar 2026-11-19/20). Kalan ~9 sayfa aynı kuralla çevrilir:
+   `ornekler/` onlusu (genel-bakis, klasik-ml, veri-temizleme, turkce-asistan, gorsel-lora,
+   yerel-rag, viki-rag, ajan-dongusu, enjeksiyon-deni, ucdan-uca). Not: `VramCalculator`
+   bileşeni Türkçe arayüzlü; EN `vram-hesabi` sayfası gömmedi, Türkçe sayfaya notla yönlendiriyor.
 2. İsteğe bağlı: `ornekler/klasik-ml` ve `ornekler/veri-temizleme` için README. README satır 70-73
    bilinçli tercih diyor, karar sana ait.
 
