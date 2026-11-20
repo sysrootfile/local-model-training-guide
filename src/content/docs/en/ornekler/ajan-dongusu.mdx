@@ -1,0 +1,120 @@
+---
+title: "Example 7: The Agent Loop"
+description: "Example 6's RAG pipeline wrapped into a tool, with the decision left to the model — a seven-trial measurement script: the turn count, the token expense, the cut answer and tool_choice's real behavior, in a single record."
+dogrulama: 2026-11-20
+---
+
+import ajanKod from '../../../../../ornekler/ajan-dongusu/ajan.py?raw';
+import { Code } from 'astro-expressive-code/components';
+
+This is our **seventh runnable example project**. [Example 6](/en/ornekler/viki-rag/) built a fixed line over the same corpus: embed the question, retrieve pieces, read the context, answer. In this project that line's retrieval step becomes a **tool** and we leave the decision to the model: will it call the tool, with which arguments, for how many turns? The aim isn't building an agent but producing a measurement record showing **what the agent costs on this machine and where, how, it breaks**. No GPU; Ollama and the internet suffice.
+
+:::note[Ran on this machine]
+The script genuinely ran; all the numbers on the page come from the `cikti/ajan-log.txt` record (**2026-10-16, 02:11-02:18**, a single process, no other Ollama request; Python 3.12, Ollama 0.40.4 (the machine moved to 0.40.6 on 2026-10-19; the numbers on this page weren't re-measured on that version), `bge-m3` + `qwen2.5:3b-instruct-q4_K_M`, AMD Ryzen 5 2600, CPU). The run took **7.5 minutes**; the first calls include the cold start (`ollama ps` was empty). Since the corpus comes from a live source, the piece counts and similarity scores may wobble in your run. The script requires no external Python packages.
+:::
+
+## 1) What are we doing?
+
+Two pipelines, the same 125-piece Wikipedia corpus, the same questions:
+
+```text
+THE FIXED LINE (Example 6)   question ──► embed ──► retrieve pieces ──► context + question ──► model ──► answer
+                      (the pass count fixed in code: 1 generation)
+
+THE AGENT LOOP (Example 7) question + THE TOOL CATALOG ──► model
+                          │                          │
+                          │                    tool_calls? ── no ──► the answer
+                          │                          │
+                          └── yes: RUN the tool ──┘  add the result to the message list
+                                              └──► ask the model again (the turn counter +1)
+```
+
+The script's seven trials measure these:
+
+| Trial | The question / setup | What it seeks |
+| --- | --- | --- |
+| A | "In which year did Marmaray enter service?" | The fixed line: a single pass's wall time and tokens |
+| B | The same question, with the tool catalog | In how many turns and seconds the agent does the same job |
+| B2 | A comparison question asking for two facts | Does the loop genuinely make two passes? |
+| C | A length question + a unit conversion | Are the two tools chosen in sequence? |
+| D | "Is it raining in Istanbul right now?" | How many turns does a question no tool can answer burn? |
+| E | The same prompt, 0 / 1 / 2 tools | The tool catalog's token expense |
+| F | `tool_choice` in four forms | Does the undocumented field do anything? |
+| G | `format: "json"` + `tools` | What happens when the two meet in the same request? |
+| H | No `tool_name` in the tool message | Is the field really needed? |
+
+## 2) The setup
+
+```bash
+ollama pull bge-m3                        # for the retrieval tool
+ollama pull qwen2.5:3b-instruct-q4_K_M    # for the tool decision and the answer
+
+cd ornekler/ajan-dongusu
+# Ollama must be running; send no other Ollama request during the run
+PYTHONUTF8=1 ../../.venv/Scripts/python.exe -u ajan.py > cikti/ajan-log.txt 2>&1
+```
+
+On the first run the script downloads the corpus from Wikipedia and writes it into `cikti/korpus.json`; later runs read that file. This is a deliberate choice: pulling the full corpus repeatedly on the same day had produced **HTTP 429** at Wikimedia (it happened in the `olc.py` run). If the embedding vectors match [Example 6 / hybrid search's](/en/rag/parcalama-ve-hibrit-arama/) cache (`../viki-rag/cikti/vektor-index.json.gz`), vectorization is skipped — skipped in this run, with the line `[index] 125 vectors read from cache` falling into the record.
+
+Two helper exploration scripts are in the same folder too: `kesif.py` prints the tool call's request/response fields one by one, and `kesif_dongu.py` compares the tool message's three forms (`tool_name`, plain `content`, `tool_call_id`). Their logs: `cikti/kesif.txt` and `cikti/kesif-dongu.txt`.
+
+## 3) The whole script
+
+<Code code={ajanKod} lang="python" title="ornekler/ajan-dongusu/ajan.py" />
+
+## 4) Line by Line
+
+### a) A tool is a function signature
+
+There are two functions in the catalog: `viki_ara(question)` is the wrapped form of Example 6's `retrieve()` call, and `birim_donustur(amount, source, target)` is pure math with no RAG job. The latter was added deliberately: a single-tool catalog doesn't show that the model is making a **choice**; two tools make the choice measurable.
+
+When `viki_ara` turns a finding away, it returns **an explanation instead of empty text**:
+
+```python
+if best < v6.WEAK_THRESHOLD:
+    return (f"(Below threshold: the best similarity {best:.3f} < {v6.WEAK_THRESHOLD}. "
+            f"There may be no answer in the documents; tell the user this.)")
+```
+
+`WEAK_THRESHOLD = 0.54` is a value chosen with [Example 6's `olc.py` measurement](/en/rag/rag-degerlendirme/) on this corpus; the tool honors it. In scenario D the model saw this text and told the user "the best similarity ratio is 0.496" — so the threshold message did its job (saying the document's insufficiency instead of a fabricated date) but **leaked the internal number**. When writing your tool's text, also write the chance of it being shown to the user.
+
+### b) The loop: the exit condition and the counter
+
+The ceiling inside `agent()` is `MAX_TURNS = 5`, the generation ceiling `NUM_PREDICT = 300`. The loop closes the moment `tool_calls` comes back empty; with the `for/else` structure, a turn stuck to the counter is logged on a separate line. No scenario in the run went to a 3rd turn — the counter idled, but `NUM_PREDICT` didn't: B's second turn produced exactly 300 tokens and was cut with `done_reason=length`.
+
+### c) The phase breakdown: where the cost is born
+
+`phase()` turns every response's Ollama fields into a single line: `total_duration`, `load_duration`, `prompt_eval_count`, **`prompt_eval_cached_count`**, `prompt_eval_duration`, `eval_count`, `eval_duration`. The fourth field is critical: it shows how many tokens came free from the cache. In scenario B the second turn read 2,277 tokens of which only **363** came from cache — the whole 4,994 characters returned by the tool were paid again. If you want to see the same table with the naked eye, repeat the run with `stream: true`; then the first-token latency is added too (this script doesn't try streaming mode).
+
+## 5) Five Readings from the Run
+
+| Reading | The number in the record | What it means |
+| --- | --- | --- |
+| On the same question, the agent longer than the fixed line | fixed 78.8 s (10.79 retrieval + 68.03 generation) / agent 95.2 s; the extra input 697 tokens | The price isn't born from the turn but from the tool result entering the second turn's prompt |
+| The answer was cut | B turn 2: 300 tok, `done_reason=length` | A half answer isn't an error in the log; monitoring that doesn't read `done_reason` doesn't see it |
+| The catalog isn't money but isn't free either | base 73 → 1 tool 237 → 2 tools 346 tokens | The two-tool catalog adds +273 tokens at the head of every turn |
+| `tool_choice` rejected nothing | none / `auto` / `required` / a garbage value: all four HTTP 200 and called a tool | The field is undocumented; the test wasn't discriminating, but it isn't worth leaning on either |
+| `format` replaced the tools | JSON text inside `content`, no `tool_calls` field | The structured-output mode silences the tool protocol |
+
+The full table, the turn-by-turn breakdown and the other scenarios' (B2, C, D, D2, H) failures: [Agent Measurement](/en/ajan/ajan-olcumu/).
+
+:::caution[There's a flaw we deliberately didn't fix in the script]
+`birim_donustur()` should have separated time and length units; the written check `UNITS[source] * UNITS[target] <= 0` looks at the product and never fires with positive factors. In scenario C the model produced the arguments `{"amount": 1, "source": "h", "target": "m"}`, the tool said `1 h = 3600 m`, and the model wrote "the T1 line's length is 3600 meters". Since the numbers on the page were measured **with this flawed form**, the code was left as it is and a note was put above the line. The lesson is twofold: a flaw in the measuring instrument is mistaken for the model's flaw — there's no point arguing an agent's fabrication when the tool doesn't reject a bad argument.
+:::
+
+## 6) Try it with your own tool
+
+1. Instead of `viki_ara`, write a tool reading your own data (a `sqlite` query, an HTTP request, a file search). The signature doesn't change: a name, a one-sentence description, the required arguments.
+2. Raise the tool count to two and define two tools that **resemble each other**; you'll see scenario C's wrong choice yourself. This is the cheapest way of measuring catalog-reading capacity.
+3. Lower `NUM_PREDICT` from 300 to 80: watch the `done_reason=length` lines multiply. On small models, a long-answer ceiling eats your latency budget before the answer's quality.
+4. Lower `MAX_TURNS` to 2 and re-run scenario D; how much the turn ceiling cuts the latency is measured in a single line.
+5. Write a request sending the `format: "json"` addendum together with `tools` (`G`). Seeing that the "structured output + tools" behavior you know from cloud APIs differs locally is this page's most instructive line.
+
+## 7) From here on
+
+- All the numbers and their reading: [Agent Measurement](/en/ajan/ajan-olcumu/)
+- The request/response format, the template requirement, MCP's scope: [Tool-Calling Mechanics and MCP](/en/ajan/arac-cagirma-ve-mcp/)
+- The map of the agent-or-fixed-line decision: [Agent or a Fixed RAG Pipeline?](/en/ajan/ajan-mi-sabit-hat-mi/)
+- The fixed line the tool wrapped: [Example 6: Turkish RAG from Wikipedia](/en/ornekler/viki-rag/)
+- How the threshold value was measured: [RAG Evaluation](/en/rag/rag-degerlendirme/)
+- Pre-fill, the cache and the `num_ctx` truncation: [Speed and Cost](/en/kullanim/hiz-ve-maliyet/)

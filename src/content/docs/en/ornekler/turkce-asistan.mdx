@@ -1,0 +1,216 @@
+---
+title: "Example 3: The Turkish Chat Assistant"
+description: "A three-script end-to-end project fine-tuning the Qwen3-4B model with QLoRA on Turkish chat data, converting it to GGUF and running it in Ollama. The data-preparation stage with real run outputs."
+dogrulama: 2026-11-20
+---
+
+import hazirla from '../../../../../ornekler/turkce-asistan/hazirla.py?raw';
+import egitim from '../../../../../ornekler/turkce-asistan/egitim.py?raw';
+import sor from '../../../../../ornekler/turkce-asistan/sor.py?raw';
+import { Code } from 'astro-expressive-code/components';
+
+This is our third **runnable example project**: it does a **QLoRA fine-tune** of the Qwen3-4B model with a Turkish chat dataset, converts the adapter to **GGUF**, and runs it in **Ollama** as a local Turkish assistant. It's a real end-to-end project where the concepts from the [LoRA and QLoRA](/en/llm/lora-qlora/) and [SFT](/en/llm/sft/) pages meet in a single pipeline.
+
+:::note[Which script ran on this machine?]
+`hazirla.py` (data preparation) was **genuinely run** on this machine: the dataset was downloaded live from Hugging Face and passed through the pipeline (Python 3.12, `datasets` 5.1.0, CPU). All the data numbers below come from that run. `egitim.py` and `sor.py` **weren't run on this machine because they need a GPU**; the scripts were written against the official APIs of the current Unsloth / TRL versions as of 2026, but on your own GPU small version-related fixes may be needed on the first run. No loss value of the training is presented on this page as a "real run"; only the output shape is shown.
+:::
+
+## 1) What are we doing?
+
+**The goal:** to train a general-purpose Qwen3-4B model with Turkish instruction-answer pairs, turning it into an assistant "speaking Turkish in a specific style"; then to make this model a single-file (GGUF) form that can run even on a GPU-less machine.
+
+The pipeline has four stages — each stage's output is the next one's input:
+
+```text
+Hugging Face: AlicanKiraz0/Turkish-SFT-Dataset-v1.0    (~5,579 rows, MIT license)
+        │
+        │  hazirla.py ── field mapping + the quality filter + a 95%/5% split
+        ▼
+cikti/egitim.jsonl + cikti/test.jsonl        (chat format: {"messages": [...]})
+        │
+        │  egitim.py ── LoRA (r=16) on 4-bit Qwen3-4B, assistant_only_loss
+        ▼
+cikti/lora-model                             (the adapter: a few tens of MB beside the base model)
+        │
+        │  egitim.py --gguf ── merge the adapter + quantize to the Q4_K_M level
+        ▼
+cikti/gguf/*.gguf (Q4_K_M)                    (the merged + quantized model)
+        │
+        │  Modelfile + ollama create turkce-asistan -f Modelfile
+        ▼
+Ollama: turkce-asistan                       (local, Turkish chat)
+```
+
+The project's proof is `sor.py`: it asks **the same question** to the base model and the LoRA'd model, printing the answers side by side. The answer to "did training change anything?" is that side-by-side output.
+
+## 2) The setup
+
+Data preparation runs on CPU; training wants a GPU. In the virtual environment at the project root (you can create it as on the [Local Setup](/en/donanim/yerel-kurulum/) page):
+
+```bash
+# 1) Data preparation (CPU suffices):
+pip install datasets
+
+# 2) Training and GGUF (a GPU is needed):
+pip install unsloth trl peft accelerate bitsandbytes datasets matplotlib
+```
+
+:::caution[WSL2 is recommended on Windows]
+The Unsloth + bitsandbytes setup and the llama.cpp compilation behind GGUF production regularly jam on Windows. Running this project on **WSL2, Linux or a cloud GPU** will be far smoother. The setup commands are still changing fast; verify the most current version from Unsloth's own documentation.
+:::
+
+The hardware matching (consistent with the method on the [VRAM Math](/en/donanim/vram-hesabi/) page):
+
+| VRAM | What you can do | Its counterpart in this project |
+| --- | --- | --- |
+| 8 GB | A 1.7B model comfortably with QLoRA; 4B only borderline with batch 1 + a short `--max-length` | `--model unsloth/Qwen3-1.7B-unsloth-bnb-4bit` |
+| 12 GB | 4B QLoRA comfortably (this project's default); `sor.py` can load the two models together | The default flow works as is |
+| 16 GB+ | An 8B model with QLoRA, or a bigger batch/length on 4B | `--model unsloth/Qwen3-8B-unsloth-bnb-4bit` |
+
+If you have no GPU, there's the cloud option (approximate prices as of 2026): **RunPod** RTX 4090 ~$0.34-0.74/hour, **Vast.ai** RTX 4090 ~$0.13-0.47/hour. A 4B QLoRA training on a rented 4090 typically takes 1-2 hours; i.e. a one-off training comes in under a few dollars. For the comparison and the step-by-step guide: [Cloud GPU Options](/en/donanim/bulut-secenekleri/).
+
+## 3) The whole scripts
+
+The three scripts run in sequence; each writes into the `cikti/` folder the file the next one reads. The comment lines explain the **why** of every decision.
+
+### a) hazirla.py — downloading and preparing the data
+
+<Code code={hazirla} lang="python" title="ornekler/turkce-asistan/hazirla.py" />
+
+### b) egitim.py — the QLoRA training (and optional GGUF)
+
+<Code code={egitim} lang="python" title="ornekler/turkce-asistan/egitim.py" />
+
+### c) sor.py — the before/after comparison
+
+<Code code={sor} lang="python" title="ornekler/turkce-asistan/sor.py" />
+
+### The real run: data preparation (on this machine)
+
+The output below was taken from the real run made on this machine with the full dataset (progress bars and machine-specific file paths stripped; the numbers as they are):
+
+```text title="python hazirla.py (a real run)"
+1) The dataset: AlicanKiraz0/Turkish-SFT-Dataset-v1.0 (the train split)
+The raw record count: 5579
+The columns: ['system', 'user', 'assistant']
+
+2) Field mapping (the column names -> the messages schema)
+  the 'user' column -> the user role
+  the 'assistant' column -> the assistant role
+  the 'system' column -> the system role
+Mapped: 5579 | unmapped and dropped: 0
+
+3) The quality filter (empty / too short / question=answer)
+  dropped -> the answer too short: 4
+Remaining records: 5575
+
+4) The train/test split (95% / 5%, seed=42)
+Training: 5297 | Test: 278
+
+5) Saving (the chat format: messages)
+Written: cikti/egitim.jsonl (5,297 records)
+Written: cikti/test.jsonl (278 records)
+Written: cikti/rapor.json
+```
+
+The records in the output files are exactly in this form — a real example from `egitim.jsonl`:
+
+```json title="cikti/egitim.jsonl — a real record (row 147, long fields truncated)"
+{"messages": [
+  {"role": "system",    "content": "Sen, Türkçe'nin tüm inceliklerini kavramış ..."},
+  {"role": "user",      "content": "Başarı kriterlerini ölçüm planına bağlayan iki cümle yaz."},
+  {"role": "assistant", "content": "Başarı kriterleri, ölçüm planında tanımlanan performans göstergeleriyle doğrudan eşleştirilerek, hedeflenen sonuçların ne kadar gerçekleştiği izlenir. Ölçüm planı ise ..."}
+]}
+```
+
+The numbers' honest reading: since the dataset is maintained, the quality filter dropped only **4 records** ("the answer too short"); field mapping succeeded on all 5,579 records. This is an expected result — the real surprise is here: this set's answers are **very long** (the assistant answers' median ~7,000 characters, the longest ~15,700). So the `--max-length` value needs to be chosen deliberately in training (see section 6).
+
+:::tip[Try the pipeline with small data first]
+If you're running it for the first time, don't go straight to the full training: produce a small set with `python hazirla.py --limit 200` and run `python egitim.py --epoch 1`. You'll see the pipeline works start to finish (saving and the plot included); then move to the real training with the full data.
+:::
+
+## 4) The flow explained step by step
+
+You saw the scripts above; here we open the four critical decisions between the lines.
+
+### a) Why 4-bit loading? (QLoRA's "Q")
+
+A 4B-parameter model asks for about 8 GB of VRAM in fp16 — for the weights alone. The 4-bit-quantized version (`unsloth/Qwen3-4B-unsloth-bnb-4bit`) drops to ~2.5 GB; and the LoRA adapter trained on top adds only a few tens of MB. The QLoRA paper (arXiv:2305.14314) showed a well-tuned 4-bit + LoRA training comes very close to fp16 LoRA. Details: [LoRA and QLoRA](/en/llm/lora-qlora/).
+
+### b) Why r=16, alpha=16, and why all seven projections?
+
+The `r` determines the adapter's capacity and `lora_alpha` the update's scale; 16/16 is the balanced start Unsloth recommends for the Qwen family. The seven modules in the `target_modules` list are the model's **all attention** (`q/k/v/o`) and **MLP** (`gate/up/down`) projections: targeting only `q_proj`/`v_proj` uses less VRAM but seriously constrains the learning capacity — that's the most common source of the "the model isn't changing" complaint.
+
+### c) Why `assistant_only_loss=True`?
+
+Without the loss mask, the model learns to predict **the user's question and the system text too**; that's both a waste of time and trains the model in a direction we don't want. With `assistant_only_loss=True` the loss is computed only from the assistant's answer tokens. The condition: the data being in the chat format (`messages`) — that's exactly why `hazirla.py` writes the output in the `messages` form. The concept itself: [SFT](/en/llm/sft/).
+
+:::caution[The silent-ignore trap]
+In TRL, when `assistant_only_loss=True` was used together with `use_liger_kernel=True`, the masks were being **silently** dropped for a while (TRL issue #3781). The script in this project doesn't use the liger kernel; if you use it, verify the loss mask is genuinely applied.
+:::
+
+### d) Why isn't the chat template written by hand?
+
+Qwen3's chat pattern (`<|im_start|>role ... <|im_end|>`) was taught to the model in pretraining and comes with the tokenizer. Hand-building this pattern or adding a special token absent from the template breaks things two ways: (1) the special tokens the model knows are missed, (2) the pattern used in training doesn't match the one at inference and the model "breaks". That's why in the script the template is applied **only** via `tokenizer.apply_chat_template(...)` — nowhere is there `add_special_tokens` or hand-built ChatML text. With a similar rationale the eos token (`<|im_end|>` in Qwen3) is taken as it is from the tokenizer; the script prints and verifies it. The general rule: [Tokenization](/en/temeller/tokenizasyon/), the data-format side: [Data Formats](/en/veri/veri-formatlari/).
+
+## 5) After training: GGUF, Ollama and the comparison
+
+### Produce the GGUF and add it to Ollama
+
+With `python egitim.py --gguf` the adapter is merged and a GGUF quantized to the Q4_K_M level is written under `cikti/gguf/`. Why Q4_K_M and why GGUF: we explained on the [Quantization](/en/kullanim/quantization/) and [Ollama](/en/kullanim/ollama/) pages. Put this `Modelfile` beside the GGUF and turn it into a model with one command:
+
+```dockerfile title="cikti/gguf/Modelfile"
+# The GGUF file in the same folder
+FROM ./model.gguf
+
+PARAMETER temperature 0.7
+PARAMETER top_p 0.9
+PARAMETER stop "<|im_end|>"
+
+# The Turkish system prompt: it must carry the same spirit as in training
+SYSTEM """You are a helpful assistant speaking Turkish. You answer questions briefly, clearly and correctly. On a topic you don't know, you say openly that you're unsure."""
+```
+
+```bash
+ollama create turkce-asistan -f Modelfile
+ollama run turkce-asistan
+```
+
+### Before/after: `sor.py`
+
+`python sor.py` asks the same Turkish question first to the base model, then to the LoRA'd model, printing the two answers side by side. The output's shape is this (the texts below are **illustrative**; they weren't taken from a real run, since there's no GPU on this machine):
+
+```text title="sor.py's output shape (illustrative)"
+Question: Could you briefly introduce yourself? On what subjects can you help?
+
+THE BASE MODEL (before)                     | THE LORA'D MODEL (after)
+--------------------------------------------+--------------------------------------------
+<the base model gives a general, long answer>   | <the LoRA'd model answers close to the
+                                                |  training data's style, in the tone you aimed for>
+```
+
+Note: Qwen3 is a hybrid "thinking" model; the template opens the thinking block by default. For the chat comparison `sor.py` turns it off with `apply_chat_template(..., enable_thinking=False)` — otherwise the answers start with a long internal deliberation text.
+
+## 6) Common traps
+
+| Trap | Symptom | Fix |
+| --- | --- | --- |
+| Turning on `bf16` on a GPU without bf16 like the T4 | NaN loss or a crash | `--fp16`; the script already detects the hardware and drops to fp16 if needed |
+| Hand-writing the ChatML pattern / adding special tokens | The model breaks, the loss doesn't drop | Always let the template be applied by `tokenizer.apply_chat_template` |
+| `assistant_only_loss` + plain `text` data | An error or loss = 0 (all labels masked) | The data must be in the `messages` form; `hazirla.py` produces that |
+| Leaving `--max-length` at the default | Long answers' ends get cut, the model learns half sentences | On this set the answers are long (median ~7,000 characters): try `--max-length 4096`, watch the VRAM |
+| bitsandbytes / llama.cpp on Windows | A compilation error at setup or the GGUF step | Use WSL2, Linux or a cloud GPU |
+| Running `sor.py` with 4B on an 8 GB card | CUDA out of memory (the two models load together) | Try with `--base unsloth/Qwen3-1.7B-unsloth-bnb-4bit` |
+| The answer in Ollama never ends | The `stop` token is missing | Add `PARAMETER stop "<\|im_end\|>"` to the Modelfile |
+
+:::danger[While working with your own data]
+Two mistakes silently throw the model in the bin: (1) the training and test examples mixing — training on the same question and then saying "it knew it in the test"; `hazirla.py` makes the split in one place with a fixed seed. (2) Multiple copies of the same question — the model memorizes the question instead of learning the answer. If you're merging data from different sources, apply the pipeline in [Example 2: The Data Cleaning Workshop](/en/ornekler/veri-temizleme/) for dedup.
+:::
+
+## 7) The next steps
+
+- If you want to **merge the adapter by hand** (e.g. you'll work with a different quantization tool): [LoRA Merging](/en/kullanim/lora-birlestirme/).
+- **Sharing the model:** to publish the adapter or the GGUF version on Hugging Face, [Sharing on Hugging Face](/en/kullanim/huggingface-paylasim/).
+- **If the training jams** (the loss not dropping, overflow, slowness): [Troubleshooting](/en/llm/sorun-giderme/) and [Hyperparameters](/en/llm/hiperparametreler/).
+- **Trying with your own data:** we used a ready dataset in this project; to produce your own instruction pairs see [Create Your Own Dataset](/en/veri/kendi-verini-olustur/), and to refine ready data the [Data Cleaning](/en/veri/veri-temizleme/) pages — the `hazirla.py --veri-seti` parameter accepts any HF dataset.
+- **The VRAM plan:** before moving to the next size up (8B), draw your budget with [VRAM Math](/en/donanim/vram-hesabi/); continue with the [Cloud GPU Options](/en/donanim/bulut-secenekleri/) price comparison.

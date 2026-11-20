@@ -1,0 +1,166 @@
+---
+title: "Example 2: The Data Cleaning Workshop"
+description: "An end-to-end script downloading a real Turkish instruction dataset from Hugging Face and passing it through normalization, PII masking, quality filtering and deduplication into the SFT format. With real run outputs."
+dogrulama: 2026-11-20
+---
+
+import kod from '../../../../../ornekler/veri-temizleme/atolye.py?raw';
+import { Code } from 'astro-expressive-code/components';
+
+This is our second **runnable example project**: it downloads a real Turkish instruction dataset from the internet and applies the steps described on the [Data Cleaning](/en/veri/veri-temizleme/) and [Create Your Own Dataset](/en/veri/kendi-verini-olustur/) pages **in a single script, on real data**. The result: a `.jsonl` file directly usable in an SFT (fine-tuning) training.
+
+:::note[Ran on this machine]
+The script was **genuinely run** in this project: 3,000 records were pulled live from Hugging Face and passed through the cleaning pipeline (Python 3.12, `datasets` 5.1.0, `ftfy` 6.3.1, `datasketch` 2.0.0). All the numbers below come from that run. Running it requires an internet connection (~a few MB download); no GPU needed.
+:::
+
+## 1) The cleaning pipeline
+
+The script follows this order — the order matters, because every step eases the next:
+
+```text
+Hugging Face (streaming) ──► Field mapping ──► Normalization ──► PII masking
+                                                                     │
+        temiz_veri.jsonl (the SFT format) ◄── Near dedup ◄── Exact dedup ◄── Quality filters
+```
+
+- **Normalize first, then PII:** it's unthinkable without it, because in a mojibake'd text `ali@example.com` doesn't look broken like "Ã¼", but the phone/TCKN patterns can break. The tools run more reliably on clean text.
+- **The quality filter before dedup:** detecting the repeat of an entirely broken record is meaningless — we first get rid of the useless records.
+- **Dedup last:** both exact duplicates (verbatim identical) and near duplicates (similarity ≥ 0.8 with MinHash + LSH) are removed.
+
+## 2) The setup
+
+```bash
+pip install datasets ftfy datasketch
+```
+
+Then run from this project's folder:
+
+```bash
+cd ornekler/veri-temizleme
+python atolye.py                    # default: 3,000 examples
+python atolye.py --ornek 500        # a quick trial
+python atolye.py --veri-seti atasoglu/instruction-turkish   # another dataset (327 rows)
+```
+
+## 3) The whole script
+
+<Code code={kod} lang="python" title="ornekler/veri-temizleme/atolye.py" />
+
+## 4) The real run output (3,000 records)
+
+The summary table and the noteworthy sections — the full output: `cikti/calistirma-kaydi.txt`:
+
+```text title="SUMMARY: Before -> After (a real run)"
+  Raw records pulled                      3000
+  After normalization                     3000
+  After PII masking                       3000
+  After the quality filters               2747
+  After exact dedup                       2747
+  After near dedup                        2747
+
+The clean-data ratio: 91.6%
+
+The quality filters' detail:
+  dropped -> output too short: 235
+  dropped -> low alphanumeric ratio (noise): 18
+```
+
+```text title="The mini-test section: the proof the tools work"
+Input       : Reach me at 0532 123 45 67; email: ali@example.com, TCKN: 10000000146.
+Masked      : Reach me at [PHONE]; email: [E-POSTA], TCKN: [TC-KIMLIK].  (masks: 3)
+
+Input       : Ä°stanbul'da hava Ã§ok gÃ¼zel, yarÄ±n da gÃ¼zel olacak.
+Normalized  : İstanbul'da hava çok güzel, yarın da güzel olacak.
+
+Input       : çok çok çok çok çok güzel güzel güzel güzel bir gün
+Repeat ratio: 0.33  (threshold: 0.3)   -> DROPPED by the quality filter
+```
+
+## 5) The numbers' honest reading
+
+We write this section especially openly, because there's a frequent misdirection in "cleaning script" demos: **if the dataset is already clean, the script looks like it does nothing.**
+
+**What happened in the real run?**
+
+| Step | Result | Commentary |
+| --- | --- | --- |
+| Normalization | **5,732 fields corrected** | Invisible characters, extra spaces, HTML residue — plentiful in the dataset |
+| PII masking | **1 record, 2 masks** | `merve/turkish_instructions` is largely clean; on real-world data this number is far higher. The number rose from 1 to 2 after the 2026-10-17 audit — the reason below (§6 d). |
+| The quality filter | **253 records dropped (8.4%)** | The dropped ones are outputs shorter than 20 characters: single-word or half answers like `'Tıp : Sağlık'`, `'göç'`, `'Güneş doğdu.'`, `'52.'` |
+| Exact duplicates | **0** | The dataset contains no verbatim duplicates |
+| Near duplicates | **0** | Threshold 0.8; no similar records emerged in this set |
+
+So: don't delete that code because the PII and dedup steps came out zero — **on a different dataset the first place to explode is there.** For evidence we added section 3 (the mini test) to the script: on three deliberately broken texts the masker really applies 3 masks, the mojibake really gets repaired, and the repeat ratio really crosses the threshold. We verify the tools work not with the numbers clean data hides, but with deliberately dirtied examples.
+
+:::tip[So is 0 duplicates normal?]
+Yes — that's the expected result on a small, maintained dataset. On crawl-sourced big datasets (like [FineWeb-2](https://huggingface.co/datasets/HuggingFaceFW/fineweb-2)) the same code usually discards **10-40% of the data** as duplicates. Dedup's value depends on your target dataset's dirtiness level — we can't know without measuring.
+:::
+
+## 6) Four subtleties to note in the code
+
+You saw the script [in full](#3-the-whole-script) above; here we open four critical details between the lines.
+
+### a) The Turkish lowercase trap (`tr_kucult`)
+
+Python's `lower()` function doesn't know Turkish:
+
+```python
+"İ".lower()   # -> "i̇"  (i + a combining dot — TWO characters!)
+"I".lower()   # -> "i"   (in Turkish the right one is "ı")
+```
+
+In duplicate detection we lowercase texts before comparing — if we convert wrongly, "İSTANBUL" and "istanbul" won't match, and missed duplicates form. The fix: `text.replace("İ", "i").replace("I", "ı").lower()` — the Turkish-specific mappings first, then the general `lower()`. The text this function produces is only a **comparison key**; we never change the data itself.
+
+### b) The TCKN checksum check (`tckn_gecerli_mi`)
+
+The `\d{11}` pattern catches every 11-digit number — an order number, an invoice no, even a piece of a phone. That's why after finding with the pattern we also verify the **checksum algorithm**: the 10th digit is the first 9 digits' check digit; the 11th, the last digit of the first 10's sum. The `10000000146` in our test text passes this check, so it gets masked; a random 11-digit number usually can't pass and is left untouched.
+
+### c) Why MinHash + LSH? (near duplicates)
+
+Comparing whether two texts are "more than 80% similar" for every pair is N² work on N records — billions of comparisons on 100,000 records. **MinHash** reduces every text to a small "fingerprint"; **LSH** (Locality-Sensitive Hashing) drops similar fingerprints into the same bucket, comparing only the candidate pairs. In this project we solve it in ~15 lines with the `datasketch` library; the method's theory is on the [Data Cleaning](/en/veri/veri-temizleme/) page.
+
+### d) The masking field list: if there are three fields, mask all three (the 2026-10-17 fix)
+
+A leak was found in this script's own output; what we found is the measurement of the repo scan on the [License, Personal Data and Model Card](/en/kullanim/lisans-ve-model-karti/) page. The problem wasn't inside the masker but **which fields it was applied to**: normalization ran over all three of `instruction`, `input`, `output`; PII masking was applied to only `instruction` and `output`. Whereas the script's SFT writer (`atolye.py:332`) embeds the `input` field into the user message with "Context: " prepended. The result: an unmasked email remained in a masked pipeline's *published output*.
+
+The same record's line, before and after the fix (`cikti/temiz_veri-old.jsonl` → `cikti/temiz_veri.jsonl`, record 1995):
+
+```text title="Before (input unmasked)"
+Context: Name: John Doe Phone: (123) 456-7890 Email: jdoe@email.com Current role: ...
+```
+
+```text title="After (all three fields masked)"
+Context: Name: John Doe Phone: (123) 456-7890 Email: [E-POSTA] Current role: ...
+```
+
+The fix is one line: adding the `input` field to the masking loop. The rest of the run stayed exactly the same (3,000 → 2,747, 5,732 corrected fields, the same drop reasons); only `pii_masking` in `rapor.json` went 1 → 2 and the single email hit remaining in the published output fell 1 → 0.
+
+:::caution[The line still isn't clean]
+Both lines still carry **Name: John Doe** and **(123) 456-7890**. A name-surname is no regex's job; and a US-formatted phone falls outside the Turkish phone rule's `5xx`/`2xx-4xx` pattern's scope. When the mask counter says "2", the line still carries personal data — a number that shouldn't be the masking step's *success measure*.
+:::
+
+:::note[The same name, two meanings]
+"John Doe" appears in the output in two records: in row 1995 as part of a contact block (Name/Phone/Email), and in row 2456 as a story character ("John Doe, when the strange man following her noticed..."). The latter isn't personal data, the former looks like it. There's no rule making this distinction automatically; on a small enough dataset to scan, looking by hand is right, and on big data documenting this class as **out of scope**. The full measurement: [License, Personal Data and Model Card](/en/kullanim/lisans-ve-model-karti/).
+:::
+
+## 7) Check the output
+
+```bash
+# How many records came out?
+wc -l cikti/temiz_veri.jsonl
+
+# Read the first record (for the Turkish characters, with Python):
+python -c "import json; print(json.dumps(json.loads(open('cikti/temiz_veri.jsonl', encoding='utf-8').readline()), ensure_ascii=False, indent=2))"
+```
+
+`cikti/rapor.json` stores all the numbers in structured form — when you want to compare multiple datasets, you read from there.
+
+:::caution[PII masking is a safety net, not magic]
+The patterns in this script (phone, email, IBAN, TCKN) catch the most common ones in the Turkish context. But: patternless personal data like name-surname, address, plate isn't caught. **Before publishing or sharing your data**, evaluate your obligations under personal-data law (in Turkey, [KVKK](https://www.kvkk.gov.tr/)); automatic tools help, they don't take over the responsibility. Details: [Data Cleaning](/en/veri/veri-temizleme/).
+:::
+
+## 8) From here on
+
+- The `temiz_veri.jsonl` you produced is exactly the **SFT training format** (a `messages` array). The training scripts on the [SFT](/en/llm/sft/) page read this file directly — the next step is [Step-by-Step Training](/en/llm/adim-adim-egitim/).
+- Compare different datasets: with the `--veri-seti` parameter try the sets on the [Where to Find Data](/en/veri/veri-nereden-bulunur/) page; putting the `cikti/rapor.json` files side by side reveals the sets' "raw dirtiness profiles".
+- If you want to generate your own data from scratch, see the [Create Your Own Dataset](/en/veri/kendi-verini-olustur/) page, and for the legal dimension the same page's KVKK and license section.

@@ -1,0 +1,159 @@
+---
+title: "Example 5: The Local RAG Assistant"
+description: "An end-to-end RAG pipeline running on Ollama with bge-m3 embedding and qwen2.5:3b — vectorization, cosine search, a document-grounded answer, a retrieval test and the out-of-scope question test. All on CPU, with real run outputs."
+dogrulama: 2026-11-20
+---
+
+import ragKod from '../../../../../ornekler/yerel-rag/rag.py?raw';
+import { Code } from 'astro-expressive-code/components';
+
+This is our fifth **runnable example project**: the **tangible form** of the decision the [RAG or Fine-Tuning?](/en/rag/rag-mi-ince-ayar-mi/) page describes. We vectorize a fictional shipping company's 8 policy documents, retrieve the documents most relevant to the user's question, and generate the answer **leaning only on those documents**. No GPU at all; everything runs on CPU, over Ollama.
+
+:::note[Ran on this machine]
+The script was **genuinely run** in this project and all the outputs on the page come from that run. The environment: Ollama 0.40.4 (the machine moved to 0.40.6 on 2026-10-19; the numbers on this page weren't re-measured on that version), `bge-m3` (embedding, 1024 dimensions), `qwen2.5:3b-instruct-q4_K_M` (answer generation), Python 3.12. The script **requires no external Python packages** — only the standard library and the Ollama API are used; no GPU needed. The full log: `cikti/calistirma-log-127.txt` (2026-10-16; the previous `localhost` run sits inside `cikti/calistirma-log.txt`).
+:::
+
+## 1) What are we doing?
+
+**The goal:** for "Bulut Kargo A.Ş." (entirely fictional) customer service, a support assistant knowing the company's policies. The model's own knowledge **doesn't contain** these policies — the answers lean only on the retrieved documents, i.e. [RAG](/en/rag/rag-mi-ince-ayar-mi/).
+
+The pipeline has four steps:
+
+```text
+8 policy documents ──► vectorizing with bge-m3 (/api/embeddings)
+        │
+        ▼
+    the vector index (in memory)
+        │   when a question arrives:
+        ▼
+the question vector × the document vectors ──► cosine similarity ──► the best 2 documents
+        │
+        ▼
+context + question ──► qwen2.5:3b (/api/chat) ──► a document-grounded answer + source
+```
+
+A deliberate simplification: in this example **each document is a single piece**. In real projects long documents are first split into pieces (256-1024 tokens) — the chunking decisions are in the "Local RAG Stack" section of the [RAG decision page](/en/rag/rag-mi-ince-ayar-mi/), and the measured results of chunk size with the search-arm choice are on the [Chunking and Hybrid Search](/en/rag/parcalama-ve-hibrit-arama/) page. Example 6 shows the price of this simplification: the same pipeline on a 125-piece corpus indexes on CPU in ~8 minutes (8 documents ~20 seconds).
+
+## 2) The setup
+
+No pip needed; only Ollama and two models:
+
+```bash
+ollama pull bge-m3                        # the embedding model (~1.2 GB)
+ollama pull qwen2.5:3b-instruct-q4_K_M    # answer generation (~1.9 GB)
+
+python rag.py                     # the whole demo: index + 3 questions + two tests
+python rag.py --soru "iade süresi ne kadar?"   # ask a single question
+python rag.py --test              # only the retrieval test (no generation, it's fast)
+```
+
+## 3) The whole script
+
+<Code code={ragKod} lang="python" title="ornekler/yerel-rag/rag.py" />
+
+## 4) The real run output
+
+```text title="Indexing (CPU, Ollama) — the 2026-10-16 run, the address http://127.0.0.1:11434"
+[index] 8 documents vectorized (4.1 s, size=1024)
+```
+
+The same line had measured **20.3 s** on 2026-10-15, while the script used `http://localhost:11434`. 8 requests × ~2.03 s of name-resolution overhead ≈ 16 s; the remaining gap the between-runs machine load. Details: [Speed and Cost](/en/kullanim/hiz-ve-maliyet/).
+
+```text title="The demo: two in-scope questions"
+[retrieval] best similarity: 0.709 -> return, damage
+[generation] 12.2 s
+[answer] [return] Your return period is 14 days, and you must make the
+return within 14 days of delivery.
+
+[retrieval] best similarity: 0.663 -> damage, return
+[generation] 12.4 s
+[answer] [damage] The policy I mentioned lets you notify our customer
+service, with a photo, within 48 hours of receiving a damaged package.
+Also, the compensation is limited to the shipment's declared value.
+```
+
+```text title="The out-of-scope test: 'How's the weather in Ankara?'"
+[retrieval] best similarity: 0.372 -> delivery, extra-service
+[generation] 7.6 s
+[answer] There's no information about this in the documents [return] [extra-service]
+```
+
+The similarity scores and answer texts were **verbatim identical** across the two runs; the generation times differ though (the previous run 32.9 / 14.7 / 10.1 s). Don't write the whole drop to the address change: the address's saving is ~2 s per request, i.e. at most ~6 s in the three-question demo. The remaining gap is the model's warmth: the old run was loading the chat model into memory for the first time, while this run came right after Example 6's run in the same session. This page's generation lines don't print the phased timings, so the split here is **estimated, not measured**; the phase-by-phase measurement is on the [Speed and Cost](/en/kullanim/hiz-ve-maliyet/) page.
+
+```text title="The retrieval test (6 questions, compared against the expected document)"
+  [OK |OK ] Do I have a return period, how long do I have to return?
+        expected: return  found: ['return', 'damage', 'kvkk']
+  [OK |OK ] My shipment arrived damaged, what should I do?
+        expected: damage  found: ['damage', 'return', 'delivery']
+  [OK |OK ] In how many days will my order be delivered?
+        expected: delivery  found: ['delivery', 'return', 'damage']
+  [OK |OK ] Can I request my personal data be deleted?
+        expected: kvkk  found: ['kvkk', 'return', 'damage']
+  [OK |OK ] Does cash on delivery require an extra fee?
+        expected: payment  found: ['payment', 'extra-service', 'campaign']
+  [OK |OK ] Is there a discount for students?
+        expected: campaign  found: ['campaign', 'payment', 'extra-service']
+
+  hit@1: 6/6   hit@3: 6/6
+```
+
+## 5) The numbers' honest reading
+
+| Number | Value | The honest reading |
+| --- | --- | --- |
+| Retrieval hits | hit@1 **6/6**, hit@3 **6/6** | The expected result for a small, well-separated corpus; **don't generalize** |
+| The similarity range (in scope) | 0.66-0.71 | The question-document pairs share the same topic |
+| Similarity (out of scope) | 0.372 | Markedly lower — a gap suitable for setting a threshold |
+| The answer generation time (CPU) | **7.6-12.4 s** (2026-10-16, the model warm) — 32.9 s in the run where the model first loaded to memory | A 3B q4 model, a laptop CPU. Its phased form: [Speed and Cost](/en/kullanim/hiz-ve-maliyet/) |
+| The embedding time | **4.1 s / 8 documents** (2026-10-16) — the same script 20.3 s with `localhost`, and inside `olc.py` 28.1 → **3.9 s** | The gap is mostly the ~2 s per-request Windows name-resolution overhead; the ranking and scores didn't change at all |
+
+:::note[The invisible 2 seconds now visible: the script uses 127.0.0.1]
+This script was measured on 2026-10-15 with `http://localhost:11434`; the measurement on the [Speed and Cost](/en/kullanim/hiz-ve-maliyet/) page found that on Windows the `localhost` name takes ~2.03 s per request, dropping to **0.00 s** with `127.0.0.1`. On 2026-10-16 the scripts' address was switched and they re-ran: the 8-document index fell **20.3 → 4.1 s** (in `olc.py` 28.1 → 3.9 s), while the similarity scores and hit@k lines stayed **exactly the same**. A one-word gain, but the real lesson is this: **in multi-request loops, wall time and the model's work are reported separately** — otherwise an 8-document index gets interpreted as "a slow embedding model".
+:::
+
+**Don't let hit@1 = 100% mislead you.** An 8-document corpus is an easy exam for an embedding model; when the document count reaches hundreds and thousands, the hit drops and you need to work with more tolerant measures like "is the right piece in the top 5?" (hit@5). The test frame in this script exists so you can make the same measurement with your own documents: add your own question-expected pairs to the `TEST_QUESTIONS` list.
+
+**The most instructive error came out in the out-of-scope test.** The model correctly said "There's no information about this in the documents" to the question absent from the documents — the system instruction worked. But while citing, it wrote `[return]`; whereas the documents added to the context were `delivery` and `extra-service`. So **a 1.9 GB small model can fabricate the citation too.** The lesson: in real systems you don't trust the source the model says; you record which documents were retrieved, and next to the answer *your* record is shown. The model's citation is only a hint, not proof.
+
+:::caution[The weak similarity threshold is specific to this corpus]
+The `WEAK_THRESHOLD = 0.35` value inside the script was chosen from the measurement on this corpus: while the in-scope questions don't fall below 0.66, the out-of-scope question stayed at 0.372. With a different embedding model or different documents this gap is entirely different — **the threshold isn't copied without being measured on your own data.** The script prints a warning below the threshold but doesn't block the answer; stopping the answer in critical systems is your choice.
+:::
+
+## 6) Four subtleties to note in the code
+
+### a) Why cosine similarity?
+
+Two vectors' cosine compares only their **directions**, not their lengths. If a long document and a short question are on the same topic, their directions are similar; cosine finds that near 1, and irrelevant topics come out near 0. The script computes it in 10 lines of pure Python — enough for 8 documents. When the document count goes to thousands, the N × N comparison gets expensive; at that point vector databases (Chroma, Qdrant) kick in with approximate nearest-neighbor (ANN) indexes: the [RAG decision page](/en/rag/rag-mi-ince-ayar-mi/).
+
+### b) The context format and the system instruction
+
+So the model can show the answer's source, the context is added with an `[id]` tag per piece (`[return] Return Policy: ...`). The system instruction sets three hard rules: use only the documents, if it's not in the documents say "there isn't", state the source. The out-of-scope test's "there isn't" answer proves that instruction works — but the same test's wrong citation gives the lesson in (a).
+
+### c) `stream: False` and `temperature: 0`
+
+Streaming is turned off in the `/api/chat` call — the script takes the whole answer in one piece and prints it (in interface apps streaming is turned on, shown token by token). `temperature: 0` turns off the sampling randomness: the same question, the same context, the same model → a reproducible demo. In products wanting creativity this setting is loosened.
+
+### d) The pre-check saves the user time
+
+`pre_check()` first looks at the Ollama server and the two models; if absent, it gives a Turkish, actionable error (`ollama pull ...`). Even in a 30-line script, saying clearly **where** the failure is saves you the "why doesn't it work?" labyrinth: [Troubleshooting](/en/llm/sorun-giderme/).
+
+## 7) Try it with your own documents
+
+Three steps suffice:
+
+1. Replace the `DOCUMENTS` list with your own documents (each piece 256-1024 tokens; chunk long documents).
+2. Write your own questions and the right piece's id into the `TEST_QUESTIONS` list; measure hit@1/hit@3 with `python rag.py --test`.
+3. If the names came out low, change the embedding model (e.g. multilingual alternatives) or play with the chunk size — [Ollama](/en/kullanim/ollama/) runs embedding models from the same endpoint.
+
+When the documents grow, the same logic moves into a vector database; the query-side code barely changes. The system's measurement side (hit@k, MRR, paraphrases, threshold separation) — with `olc.py`, which extends this script: [RAG Evaluation](/en/rag/rag-degerlendirme/).
+
+:::tip[Three models, three jobs]
+There are two models in this example and their jobs differ: `bge-m3` does the **understanding** (which document is relevant?), `qwen2.5:3b` the **generating** (how shall we say the answer?). RAG's strength comes from this split — you answer not with the generator model's knowledge but with the information retrieval found. That's why changing the generator model (bigger/smaller) doesn't affect retrieval quality; changing the embedding model **requires rebuilding the whole index**.
+:::
+
+## 8) From here on
+
+- The decision's full map: [RAG or Fine-Tuning?](/en/rag/rag-mi-ince-ayar-mi/)
+- Ollama setup, the OpenAI-compatible endpoint and interfaced RAG with Open WebUI: [Ollama](/en/kullanim/ollama/)
+- To measure and improve retrieval quality: [Loss and Metrics](/en/degerlendirme/loss-ve-metrikler/)
+- When RAG isn't enough and a behavior change is needed: [SFT](/en/llm/sft/) and [Step-by-Step Training](/en/llm/adim-adim-egitim/)

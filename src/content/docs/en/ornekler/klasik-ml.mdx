@@ -1,0 +1,135 @@
+---
+title: "Example 1: End-to-End ML on Tabular Data"
+description: "A complete scikit-learn workflow with the breast cancer diagnostic dataset — exploration, a baseline, cross-validation, test metrics and model persistence. With real run outputs."
+dogrulama: 2026-11-20
+---
+
+import kod from '../../../../../ornekler/klasik-ml/tablo_modeli.py?raw';
+import { Code } from 'astro-expressive-code/components';
+
+This page is the site's first **runnable example project**. Its aim isn't so much teaching something new as combining the right habits from the [Your First Model](/en/klasik-ml/ilk-model/) and [Loss and Metrics](/en/degerlendirme/loss-ve-metrikler/) pages **in a single realistic script**: explore the data, build a dumb baseline, pick the model with cross-validation, touch the test set only at the end, interpret the metric by the job's cost, and save and reload the model.
+
+:::note[Ran on this machine]
+The script and outputs below were **genuinely run** in this project (Python 3.12, scikit-learn 1.9.1, pandas 3.0.6). Thanks to the fixed `random_state=42` you're expected to get the same results with the same versions; small deviations are possible on other versions. Also, no GPU is needed — this example finishes on any laptop within seconds.
+:::
+
+## 1) What are we doing?
+
+The scenario: predicting whether a tumor is **malignant or benign** from 30 numeric measurements (cell nucleus measurements). The dataset is **Breast Cancer Wisconsin (Diagnostic)** — 569 patients, 30 features, two classes. We added the public CSV from the scikit-learn repo to the project as `veri/breast_cancer.csv`, so running it doesn't even need the internet.
+
+We chose the dataset deliberately because it shows three classic traps at once:
+
+| Trap | Its counterpart in this dataset |
+| --- | --- |
+| Class imbalance | 357 benign / 212 malignant — saying "always benign" gets you 63% accuracy |
+| A scale gap | while the mean radius is ~14, the mean area is ~654 — a scaler is a must |
+| Expensive-error asymmetry | missing a cancer (a false negative) is far more expensive than a false alarm |
+
+## 2) The setup
+
+Create a virtual environment (venv) as on the site's [Local Setup](/en/donanim/yerel-kurulum/) page and install the packages:
+
+```bash
+# At the project root, in a top-level folder:
+python -m venv .venv
+.venv\Scripts\activate        # Windows
+# source .venv/bin/activate   # macOS / Linux
+
+pip install pandas scikit-learn joblib
+```
+
+Then run the script from this project's folder:
+
+```bash
+cd ornekler/klasik-ml
+python tablo_modeli.py
+```
+
+## 3) The whole script
+
+One file, nine numbered steps. The comment lines explain the **why** of every decision:
+
+<Code code={kod} lang="python" title="ornekler/klasik-ml/tablo_modeli.py" />
+
+## 4) The real run output
+
+The summary that poured into the terminal when the script ran on this machine (the raw record: `cikti/calistirma-cikti.txt`):
+
+```text title="Summary output (a real run)"
+Class distribution:
+  0 (malignant): 212 patients
+  1 (benign   ): 357 patients
+  The imbalance ratio: 0.59
+
+Training set: 455 patients
+Test set     : 114 patients
+
+Baseline test accuracy: 0.6316
+
+5-fold cross-validation (on the training set):
+Logistic Regression   ROC-AUC: 0.9959 (+/- 0.0050)
+Random Forest         ROC-AUC: 0.9904 (+/- 0.0072)
+
+Test evaluation (never-seen data):
+Accuracy             : 0.9825
+Precision            : 0.9861
+Recall               : 0.9861
+F1 score             : 0.9861
+ROC-AUC              : 0.9954
+
+The confusion matrix (row: actual, column: prediction):
+[[41  1]
+ [ 1 71]]
+
+New-example prediction (with the saved model):
+The real label     : malignant
+The model's guess  : malignant
+The probabilities  : malignant 1.000 | benign 0.000
+```
+
+## 5) Reading the outputs — a number-reading exercise
+
+This section is actually a metric-reading lesson. What's behind each number?
+
+**Why does the baseline 0.6316 matter?** 63% of the data is benign. A model learning nothing gets 63.16% accuracy by saying "always benign". So the sentence "98% accuracy" gains value only as the contribution above this floor. The model's real contribution: **+35 points**, and above all, catching the malignants.
+
+**Why did we try two models?** Logistic Regression and Random Forest are two different families on tabular data. In 5-fold cross-validation LR took `0.9959 ± 0.0050` and RF `0.9904 ± 0.0072`. Both great, but LR is both simpler and slightly better — a linear boundary suffices on this dataset. **We don't make the complex model the default; we measure.**
+
+**What does the ± sign say?** `0.9959 ± 0.0050` is the mean and standard deviation of the scores the five folds gave. A small deviation means the model is steady; it isn't collapsing on different data slices.
+
+**How is the confusion matrix read?**
+
+```text
+              predicted: malignant   predicted: benign
+actual: malignant        41                  1      <- 1 false negative
+actual: benign            1                 71      <- 1 false positive
+```
+
+2 errors on 114 test patients: we missed one cancer patient (a false negative) and gave one healthy person an unnecessary alarm. In medical screening the former is far more expensive. That's why **recall** is the first metric to look at in this problem — 98.61%. In a different application (e.g. a spam filter) the priority could shift to precision; metric choice is made by the job's cost, and we dug deeper on the [Loss and Metrics](/en/degerlendirme/loss-ve-metrikler/) page.
+
+**What does "Probabilities: malignant 1.000" mean?** The saved model found a test patient malignant with near-absolute certainty. But note: a high probability doesn't mean a calibrated (matching the real frequency) probability — Logistic Regression usually calibrates reasonably, but that needs measuring separately.
+
+:::caution[The one-line insurance against leakage]
+If `StandardScaler` had been applied to all the data first, the test data's mean/standard deviation would have leaked into training. In the script the scaler and model are inside a `Pipeline`: `fit` sees only the training data, and at the `predict` stage the same transformation is applied to the test data. Leakage is invisible but inflates results — make the Pipeline a habit.
+:::
+
+## 6) To try it with your own data
+
+You can use this script as a template. The places to change:
+
+1. **Data loading (step 1):** replace the `pd.read_csv(...)` line with your own CSV. If your file has a header row, remove the `header=None` and `skiprows=1` parameters.
+2. **The target column:** change the `df["target"]` name to your own label column's name.
+3. **The class names (if any):** `class_name_0 / class_name_1` only prettify the report; if you have more than 2 classes, `classification_report` lists the labels automatically.
+4. **Metric choice:** in binary classification ask which error is expensive; make your `recall`, `precision` or `f1` choice accordingly.
+
+:::tip[The three most common mistakes]
+1. **Looking at the test set early:** make the model choice with cross-validation; save the test set for last (the order of steps 6 and 7 in the script isn't a coincidence).
+2. **Skipping the baseline:** every percentage without a floor is suspect.
+3. **Applying scaling/imputation to all the data:** the transformations live inside the Pipeline, with `fit` only on training.
+:::
+
+## 7) From here on
+
+- If the data quality in your raw data is problematic, first look at [Example 2: The Data Cleaning Workshop](/en/ornekler/veri-temizleme/) — it demonstrates PII masking, mojibake repair and deduplication in practice.
+- If you want to race different models on the same data, add a third family like `GradientBoostingClassifier` to the `models` dictionary and run the script as is; the comparison infrastructure is ready.
+- Before moving to deep learning on tabular data, remember the "simple model first" principle on the [Classic ML Fundamentals](/en/klasik-ml/temeller/) page — as in this example, it's usually enough.

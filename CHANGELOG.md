@@ -31,6 +31,11 @@ Biçim: [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/); sürümleme
   `en/klasik-ml/` ikilisi (temeller, ilk-model) ve `en/kaynaklar/` altılısı (faydali-linkler,
   agent-ve-cok-makine, sss, dogrulama-mekanizmasi, sozluk, kapsam-haritasi) — İngilizce sayfa
   sayısı 55'e ulaştı; yalnız `ornekler/` onlusu kaldı.
+- Sekizinci çeviri serisi (TAMAMLANMA): `en/ornekler/` onlusu (genel-bakis, klasik-ml,
+  veri-temizleme, turkce-asistan, gorsel-lora, yerel-rag, viki-rag, ajan-dongusu,
+  enjeksiyon-deni, ucdan-uca) — İngilizce çeviri 65/66 sayfayla tamamlandı; yalnız TR ana
+  sayfa tek dilli kaldı. EN index kartları gerçek EN linkleriyle tazelendi; MDX `?raw`
+  import yolları EN ağacına göre derinleştirildi.
 
 ## [0.1.0] — 2026-11-19
 

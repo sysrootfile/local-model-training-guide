@@ -1,0 +1,191 @@
+---
+title: "Example 6: Turkish RAG from Wikipedia"
+description: "Example 5's zero-pip pipeline with two new abilities — downloading the corpus from the Wikipedia API at runtime, and splitting long articles into overlapping pieces. A real 125-piece corpus, with real run outputs."
+dogrulama: 2026-11-20
+---
+
+import vikiKod from '../../../../../ornekler/viki-rag/viki_rag.py?raw';
+import { Code } from 'astro-expressive-code/components';
+
+This is our sixth **runnable example project** and [Example 5](/en/ornekler/yerel-rag/)'s natural continuation: the same zero-pip pipeline (retrieval with bge-m3, generation with qwen2.5:3b), but this time two abilities indispensable in the real world are added — **we don't write the data by hand, we download it from Turkish Wikipedia at runtime**, and **we split the long articles into overlapping pieces**. The subject: Istanbul public transit. No GPU at all; an internet connection and Ollama suffice.
+
+:::note[Ran on this machine]
+The script was **genuinely run** in this project and all the outputs on the page come from that run (2026-10-16; Python 3.12, Ollama 0.40.4 (the machine moved to 0.40.6 on 2026-10-19; the numbers on this page weren't re-measured on that version), `bge-m3` + `qwen2.5:3b-instruct-q4_K_M`, ordinary home internet). Since the corpus comes from a **live source**, in your run the piece counts and similarity scores may wobble a few points according to the articles' current content. The script requires no external Python packages. The full log: `cikti/calistirma-log-127.txt` (the previous `localhost` run: `cikti/calistirma-log.txt`).
+:::
+
+:::note[Two more measurement scripts exist on the same corpus]
+`olc.py` measures this corpus's in-scope/out-of-scope **similarity bands** and the separation margin (the 2026-10-16 log: `cikti/olc-log-127.txt`, the previous: `cikti/olc-log.txt`); `hibrit.py` **races** vector / BM25 / RRF hybrid retrieval on the same pieces (the log: `cikti/hibrit-log-127.txt`). Both's method and results are on the [Chunking and Hybrid Search](/en/rag/parcalama-ve-hibrit-arama/) page; the threshold correction below came from the `olc.py` measurement.
+:::
+
+## 1) What are we doing?
+
+**The goal:** a local question-answering assistant "knowing Istanbul public transit". The knowledge source is Wikipedia's 8 articles on Istanbul transit — the public transit overview, the metro, Marmaray, the Tünel, the T1 tram, the metrobus, İETT and the sea buses.
+
+The pipeline contains **two new steps** (the bold ones) relative to Example 5's diagram:
+
+```text
+the tr.wikipedia.org API (8 articles) ──► text cleaning ──► chunking (~800 characters + overlap)
+        │
+        ▼
+125 pieces ──► vectorizing with bge-m3 (/api/embeddings) ──► the index (in memory)
+        │   when a question arrives:
+        ▼
+the question vector × the piece vectors ──► cosine similarity ──► the best 4 pieces
+        │
+        ▼
+context + question ──► qwen2.5:3b (/api/chat) ──► the answer + an [Article#piece] source
+```
+
+In Example 5 every document was hand-written and a single piece; that was a deliberate simplification. In real projects the corpus **comes from outside** (the internet, files, a database) and is **long** — the two jobs those two facts create, data loading and chunking, are this page's real subject.
+
+## 2) The setup
+
+No pip needed; the internet, Ollama and two models:
+
+```bash
+ollama pull bge-m3                        # the embedding model (~1.2 GB)
+ollama pull qwen2.5:3b-instruct-q4_K_M    # answer generation (~1.9 GB)
+
+python viki_rag.py                              # the whole demo: the corpus + 2 questions + two tests
+python viki_rag.py --soru "Marmaray kaç kilometre?"   # ask a single question
+python viki_rag.py --test                       # only the retrieval test
+
+python olc.py                                   # measures the threshold bands (2 models, ~17 min)
+python hibrit.py                                # the vector / BM25 / RRF race (~10 min)
+```
+
+The two measurement scripts in the same folder import `viki_rag.py` — i.e. the corpus and the questions come from a single source; the logs are written under `cikti/`. All the numbers used on this page came from those logs.
+
+## 3) The whole script
+
+<Code code={vikiKod} lang="python" title="ornekler/viki-rag/viki_rag.py" />
+
+## 4) The real run output
+
+```text title="Data loading: 8 articles from the Wikipedia API"
+[data] Public transit in Istanbul: 16,740 characters -> 25 pieces
+[data] Istanbul Metro: 29,235 characters -> 42 pieces
+[data] Marmaray: 12,099 characters -> 17 pieces
+[data] Tünel (Istanbul): 4,390 characters -> 6 pieces
+[data] T1 (Istanbul Tram): 6,767 characters -> 7 pieces
+[data] Metrobüs: 2,463 characters -> 3 pieces
+[data] İETT: 13,148 characters -> 19 pieces
+[data] İstanbul Sea Buses: 4,019 characters -> 6 pieces
+[data] total: 125 pieces, 88,861 characters
+[data] The articles are published under the CC BY-SA license; they can't be reused without attribution.
+```
+
+```text title="Indexing (CPU, Ollama) — the 2026-10-16 run, the address http://127.0.0.1:11434"
+[index] 125 pieces vectorized (246.6 s, size=1024)
+```
+
+The same line had measured **501.8 s** on 2026-10-15, while the script used `http://localhost:11434`. The corpus, the model and the machine are the same; the only difference the address. The reason and the re-measurement: the box below and [Speed and Cost](/en/kullanim/hiz-ve-maliyet/).
+
+```text title="The demo: an in-scope question"
+[retrieval] best similarity: 0.670 -> Marmaray#9, Marmaray#1, Marmaray#10, Public transit in Istanbul#17
+[generation] 66.0 s
+[answer] Marmaray connects the Istanbul Bosphorus between Kazlıçeşme and Ayrılık Çeşmesi.
+```
+
+```text title="The out-of-scope test: 'How do I make pizza dough at home?'"
+[retrieval] best similarity: 0.344 -> İETT#13, Marmaray#9, Tünel (Istanbul)#3, Marmaray#13
+[warning] the best similarity is below the 0.54 threshold — the model should say 'there isn't'.
+[generation] 51.8 s
+[answer] There's no information about this in the documents; there's no information about how
+pizza dough is made in the documents [İETT#13], [Marmaray#9], [Tünel (Istanbul)#3], [Marmaray#13].
+```
+
+```text title="The retrieval test (6 questions, compared against the expected article)"
+  [OK |OK ] In which year did Marmaray open?
+        expected: Marmaray
+        found: Marmaray, Public transit in Istanbul, Marmaray, Marmaray
+  [OK |OK ] Between which two districts does the Tünel run?
+        expected: Tünel (Istanbul)
+        found: Tünel (Istanbul), Public transit in Istanbul, Tünel (Istanbul), Tünel (Istanbul)
+  [MISS|OK ] What route does the Metrobüs follow?
+        expected: Metrobüs
+        found: Public transit in Istanbul, Metrobüs, Public transit in Istanbul, Metrobüs
+  [OK |OK ] When was İETT founded?
+        expected: İETT
+        found: İETT, İETT, İETT, İETT
+  [OK |OK ] Which is Istanbul's first metro line?
+        expected: Istanbul Metro
+        found: Istanbul Metro, Istanbul Metro, Istanbul Metro, Public transit in Istanbul
+  [OK |OK ] On which route does the T1 tram line run?
+        expected: T1 (Istanbul Tram)
+        found: T1 (Istanbul Tram), T1 (Istanbul Tram), T1 (Istanbul Tram), T1 (Istanbul Tram)
+
+  hit@1: 5/6   hit@4: 6/6
+```
+
+## 5) The numbers' honest reading
+
+| Number | Value | The honest reading |
+| --- | --- | --- |
+| The corpus | 8 articles, 88,861 characters, **125 pieces** | A live source: article contents change with time; your piece count may come out different |
+| Length per piece | average **1,145 characters** (min 245, max 3,274) | `TARGET_PIECE = 800` is a **trigger**, not a ceiling: the paragraph is cut when it exceeds the target. 91/125 pieces are over 900 characters |
+| Overlap's price | the chunk texts' total **143,138** characters vs the articles' total 88,861 → **1.61x** | Overlap + merging turn the corpus into an index 1.6x the text read; the CPU indexing time follows it |
+| The indexing time | **246.6 s** (~2 s/piece, CPU, 2026-10-16, the address `127.0.0.1`) — the same script **501.8 s** with `localhost`; the sibling measurements `olc.py` 495.7 → 259.2 s, `hibrit.py` 529.3 → 253.0 s | In Example 5, 8 documents were 20.3 seconds; as the scale grows, indexing takes minutes (a one-time cost). But nearly half of that time isn't the model's work: the box below |
+| The retrieval hits | hit@1 **5/6**, hit@4 **6/6** | The 100% on the 8-document corpus couldn't be sustained on 125 pieces — expected and instructive |
+| The paraphrase hits | hit@1 **4/6**, MRR **0.767** | When the same 6 information needs were asked in other words, one more hit dropped (the `olc.py` measurement) |
+| The in-scope band | **0.598 - 0.714** | The 12 questions' best similarities (`olc.py`, bge-m3) |
+| The out-of-scope band | **0.321 - 0.485** | In 8 irrelevant questions; the traps containing "Istanbul" rise to 0.45-0.48 |
+| The same corpus, the second model | nomic-embed-text: paraphrase hit@1 **1.00**, its out-of-scope band **0.642 - 0.737**, separation **-0.112** | The bands overlap: with this model no threshold can build the "I don't know" branch (`olc.py`) |
+| The answer generation time (CPU) | **66.0 s and 51.8 s** (2026-10-16; the `localhost` run was 68.6 / 57.6 s) | In Example 5 a two-document context took 7.6-12.4 s: 4 pieces ≈ 4,500 characters ≈ a 2,450-token context, slowing things markedly on CPU. With the measured pre-fill speed (~40 tok/s) that's 2,450 ÷ 40 ≈ 61 s — the middle of the band. When the address changed this time stayed nearly the same (the gaps 2.6 and 5.8 s), because there are only two HTTP requests per question (embedding + generation); indexing, at 125 requests, halved |
+
+:::note[Half the index time wasn't the model's work — now this isn't a guess, it's a re-measurement]
+This script, firing one HTTP request per piece, used `http://localhost:11434` on 2026-10-15. The measurement on the [Speed and Cost](/en/kullanim/hiz-ve-maliyet/) page had found that on Windows the `localhost` name resolves in **~2.03 s** per request, dropping to **0.00 s** with `127.0.0.1`; the "501.8 − 125×2.03 ≈ 248 s" split was, at that moment, only arithmetic — i.e. an estimate derived from two measured components. On 2026-10-16 the address was switched and the same script re-run on the same machine, and the prediction held: **501.8 → 246.6 s**, the measured drop **255.2 s**, the predicted share **253.8 s**. `olc.py` and `hibrit.py` also fell in the same direction (495.7 → 259.2 and 529.3 → 253.0 s) and in all three the **retrieval results stayed line-by-line identical**: name resolution doesn't affect the ranking, it only eats the clock.
+:::
+
+**The instructive MISS: overview-article pieces are magnets.** On the question "What route does the Metrobüs follow?", 1st place wasn't taken by the Metrobüs article but by a piece of the *Public transit in Istanbul* overview article. Since overview texts touch many subjects, they produce mid-level similarity to many questions; on specific questions the piece "knowing a little of everything" can get ahead. `olc.py` saw these escapes in the paraphrase set too: on both the "Where does the Metrobüs line go from and to?" and "Which is the oldest line in the Istanbul metro?" questions, the overview article stole first place. The fix is visible in hit@4: growing k brings the right article into the context — but **k is the number of pieces added to the context**; growing it raises the hit while also polluting the context and stretching the CPU time. Managing that trade-off by measuring: [RAG Evaluation](/en/rag/rag-degerlendirme/).
+
+**The inherited threshold collapsed in the measurement — and the page confesses it.** `WEAK_THRESHOLD = 0.35` hadn't been measured for this corpus; it was carried over from Example 5. The 2026-10-15 run's log showed the 0.344 out-of-scope question only barely passing that threshold: the margin **0.006**. Then this margin was genuinely measured (`olc.py`, 8 out-of-scope questions): the band **0.321 - 0.485**. So 0.35 was passing *through* the out-of-scope questions — except the pizza question, 6 of the 7 wouldn't have triggered the warning. The measured threshold suggestion is **0.541** (the bands' middle); the constant in the code was raised to **0.54** on 2026-10-15 and the separation margin recorded as **+0.113**. The out-of-scope record above, with this form of the threshold, gives the same warning with a ~0.20 margin. In the 2026-10-16 re-run the bands, hits and citations came out exactly the same: the threshold behavior wasn't affected by the address change.
+
+Note: all those passing the threshold are irrelevant questions containing the word "Istanbul" (a cheap hotel 0.454, the stock exchange 0.473, Galatasaray 0.469). The out-of-scope test set should be built not from obvious irrelevancies like pizza recipes but from questions **resembling the corpus's topic**; otherwise the threshold doesn't catch real life's semi-meaningful queries.
+
+**The citation came out honest this time — which isn't proof of stability.** In Example 5's out-of-scope test the model had attached a **fabricated source** to the correct "there isn't" answer; here, while saying "no information", it showed the pieces genuinely retrieved (`İETT#13`, `Marmaray#9`...). The same model, two different behaviors: small models' citation discipline varies from question to question. That's why you trust the citation not with the model's word but with **your retrieval record** — checking the shown ids against the retrieved ids is a one-line programmatic check.
+
+## 6) Four subtleties to note in the code
+
+### a) The Wikipedia API's two rules
+
+- **A User-Agent is mandatory:** Wikimedia blocks meaningless clients; the script connects with a `User-Agent` header introducing itself (`VIKI_UA`). This is what should be done in every script using a web API, and what most examples skip.
+- **One article per request:** full-text extraction (`explaintext`) is limited to `exlimit=1` in the API; the script pulls the 8 articles one by one. `redirects=1` carries the redirects to the right title; a missing article arrives with the `missing` flag — instead of crashing, the script prints a WARNING and skips.
+
+The titles aren't assumed in advance: the 8 articles on this page were queried and verified one by one on 2026-10-15; when building your own list too, try each title once.
+
+### b) Chunking: paragraph-based, ~800 characters, overlapping
+
+`parcalara_bol()` contains three decisions:
+
+1. **Cut at the paragraph boundary:** blind cutting by characters splits the sentence in the middle; in Turkish, with its suffixing structure, that's the most expensive way of splitting meaning. The script takes paragraphs longer than 40 characters and stacks them up to the target (article headings `== ... ==` are dropped).
+2. **A target of ~800 characters:** a small piece → meaning alone; a big piece → retrieval blurs and the context swells. 800 is a balanced point for this corpus — in your corpus choose by measuring across the 400-1200 range (the experiment suggestion below).
+3. **Overlap:** when a chunk fills, the **last paragraph** is carried into the new chunk. A fact split at a paragraph boundary is thus found on both sides; if the residue is shorter than 200 characters it's merged into the last chunk (a single-sentence piece is noise in the index).
+
+### c) k = 4: the measurement should reflect k
+
+As the corpus grew from 8 documents to 125 pieces, the number of pieces added to the context was raised from 2 to 4, and the test reports it: hit@**4**. 4 × 800 ≈ 3,200 characters, in Turkish roughly 1,000-1,600 tokens — it fits Ollama's default 4,096 context window. If a bigger k or bigger pieces overflow the window, `num_ctx` is raised under `options`; otherwise the context is silently truncated.
+
+### d) The license: CC BY-SA's price is attribution
+
+Wikipedia texts are CC BY-SA licensed: reusing the text is free, but **attributing the source is mandatory**. The script prints a license reminder at the end of every run. We don't embed the corpus into the repo — pulling it from the API at every run both reduces the license burden and points to the article's current state.
+
+## 7) Try it with your own corpus
+
+1. Replace the `WIKI_TITLES` list with your domain's articles — verify each title once in Wikipedia search.
+2. Write your own question-expected-article pairs into `TEST_QUESTIONS`; measure hit@1/hit@4 with `python viki_rag.py --test`.
+3. Play `TARGET_PIECE` across the 400-1200 range and watch how the hit changes — the chunk size is the cheapest lever for improving retrieval quality.
+4. Re-measure the threshold on your own corpus: the band method and the hit@k/MRR detail in [RAG Evaluation](/en/rag/rag-degerlendirme/); the smaller sibling script in [Example 5](/en/ornekler/yerel-rag/). The effect of changing the chunk size (`TARGET_PIECE`) and the search method: [Chunking and Hybrid Search](/en/rag/parcalama-ve-hibrit-arama/).
+
+:::tip[What changed from Example 5 to Example 6 — and what didn't]
+`embed()`, `cosine()`, `retrieve()`, `answer()` are nearly verbatim the same; only two abilities changed: **data loading** and **chunking**. The RAG skeleton is learned once; the difference between real projects consists of the questions "where's the data from?" and "how shall we chunk?". Both's effect on quality is seen only through measurement.
+:::
+
+## 8) From here on
+
+- Measuring retrieval quality (hit@k, MRR, bands, the threshold): [RAG Evaluation](/en/rag/rag-degerlendirme/)
+- On these 125 pieces, does vector, BM25 or hybrid win: [Chunking and Hybrid Search](/en/rag/parcalama-ve-hibrit-arama/) — `ornekler/viki-rag/hibrit.py` measures with the same corpus
+- The full map of the RAG-or-fine-tuning decision: [RAG or Fine-Tuning?](/en/rag/rag-mi-ince-ayar-mi/)
+- The dataset counterpart of pulling and cleaning data from the internet: [The Data Cleaning Workshop](/en/ornekler/veri-temizleme/) — `atolye.py` also downloads at runtime
+- Ollama setup and local embedding: [Ollama](/en/kullanim/ollama/)
+- The same pipeline's smallest form, with supplied documents: [Example 5: The Local RAG Assistant](/en/ornekler/yerel-rag/)

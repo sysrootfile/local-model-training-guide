@@ -1,0 +1,314 @@
+---
+title: "Example 4: The Image Style LoRA"
+description: "A guide to training a style LoRA on SDXL with your own images using ai-toolkit — the data audit script, a ready YAML config, use in ComfyUI and the real audit output."
+dogrulama: 2026-11-20
+---
+
+import veri from '../../../../../ornekler/gorsel-lora/veri_kontrol.py?raw';
+import config from '../../../../../ornekler/gorsel-lora/sdxl-lora-config.yaml?raw';
+import { Code } from 'astro-expressive-code/components';
+
+This is the site's fourth **runnable example project**. The [Image LoRA Training](/en/gorsel/lora-egitimi/) page told the theory and the kohya pipeline; here we set up the same job end to end with **ai-toolkit**, one of 2026's tools: a script auditing the dataset **before** training, a ready SDXL LoRA config, and the trained LoRA's use in ComfyUI. The goal isn't teaching new concepts; it's turning the "data collection → caption → training → testing" line into files you can copy and run with your own images.
+
+:::note[Which part ran on this machine?]
+**veri_kontrol.py genuinely ran.** The audit output below is a real output taken from the 6 **fake** images produced with PIL into the `cikti/test-gorseller/` folder (Python 3.12, Pillow 12.3.0). Those images are deliberately flawed and **don't represent a real dataset**; the aim is proving the script catches the flaws. **The training itself wasn't run:** ai-toolkit training requires a GPU, and there's no GPU on this machine. On this page there's no number presented "as if real" — no training log, sample generation or duration; only "what you'll see" is narrated in the relevant places. Version and price information is as of 2026.
+:::
+
+## 1) What are we doing?
+
+The scenario: you have **15-30 images** drawn in your own style (e.g. watercolor, charcoal, a color palette unique to you) and you want to teach SDXL that style and generate in any scene you want. The pipeline has five stops:
+
+```text
+1. Data collection     2. Caption              3. Audit             4. Training             5. Use
+15-30 images  ───►  same-named .txt  ───►  veri_kontrol.py  ───►  ai-toolkit   ───►  ComfyUI
+(1024px+)             + trigger              (CPU, seconds)         (a YAML config)     LoraLoader
+                                                                    └──► a LoRA .safetensors
+```
+
+The data rules (the details on the [Image LoRA Training](/en/gorsel/lora-egitimi/) page):
+
+- **Count:** 15-30 images suffice; variety — angles, backgrounds, composition — matters more than the count.
+- **Resolution:** the short edge at least 1024px (the SDXL standard). A small image is upscaled in training and teaches blur.
+- **No repeats:** nearly identical frames shot side by side are really **one image**; the audit script in section 4 finds this automatically.
+- **Captions:** a **same-named** `.txt` beside every image; a trigger word (e.g. `mystyle`) is added per caption. For automatic labeling **WD14 tagger**, **Florence-2** or **JoyCaption** can be used; generating with the machine label and correcting the final form by eye is the most efficient path.
+- **Language:** SDXL's CLIP text encoder was trained mostly on English; writing the captions in English markedly raises the hit rate. The trigger word can stay Turkish — it should be a "meaningless" string anyway.
+
+## 2) The base model and license choice
+
+The base model decision also determines **where your LoRA can be used**: the base model's license binds your LoRA too. As of 2026 the landscape is:
+
+| Base model | License | Approximate VRAM for training | Note |
+| --- | --- | --- | --- |
+| **SDXL** (base 1.0) | CreativeML Open RAIL++-M | 12 GB comfortable, 8 GB borderline | This project's choice: open to commercial use, the most mature tool support |
+| Z-Image 6B | Apache-2.0 | ~16 GB | New generation; permissive, but the ecosystem isn't as broad as SDXL's |
+| FLUX.2 klein 4B | Apache-2.0 | ~12 GB (quantized) | The FLUX family's small, permissively licensed version |
+| Qwen-Image | Apache-2.0 | ~24 GB (quantized) | Strong in text/poster-heavy jobs; its official examples come under the "24gb" name |
+
+Three reasons we started with SDXL: it's **open to commercial use** with an established license, it's the architecture the LoRA training tools (ai-toolkit, kohya, OneTrainer) support best, and at 1024px quality it fits this guide's VRAM budgets.
+
+:::danger[A license warning: a LoRA trained with FLUX.2-dev can't be used commercially]
+FLUX.2-dev is distributed under a **non-commercial** license. You can't use a LoRA you trained with the dev variant in a commercial job, or distribute it with a commercial product — even though you trained it — because the base model's license passes to your derivative work. If you have a commercial plan, choose FLUX.2 **klein** (Apache-2.0), SDXL (Open RAIL++-M) or one of the other listed Apache-2.0 models. If you'll share the model, also remember to write the base model and license on the model card: [Sharing on Hugging Face](/en/kullanim/huggingface-paylasim/).
+:::
+
+## 3) The setup: ai-toolkit
+
+In this project the training side is done with **ai-toolkit** (the MIT license, [ostris/ai-toolkit](https://github.com/ostris/ai-toolkit)). It works with a YAML config and supports both SDXL and Flux LoRA training; it has a web UI too, but we'll use the command line. The official setup steps as of 2026:
+
+```bash
+git clone https://github.com/ostris/ai-toolkit.git
+cd ai-toolkit
+python -m venv venv
+.\venv\Scripts\activate          # Windows
+# source venv/bin/activate       # Linux
+
+# PyTorch is installed first; the version and CUDA index change over time,
+# take the command in the official README as authoritative:
+pip install --no-cache-dir torch==2.13.0 torchvision==0.28.0 torchaudio==2.11.0 --index-url https://download.pytorch.org/whl/cu130
+pip install -r requirements.txt
+```
+
+If you hit compilation problems on Windows, the community's easy-install script ([Tavris1/AI-Toolkit-Easy-Install](https://github.com/Tavris1/AI-Toolkit-Easy-Install)) reduces the job to a single button.
+
+| Alternative tool | Interface | For whom |
+| --- | --- | --- |
+| ai-toolkit | A YAML config + web UI | This project's choice; supports SDXL and Flux in the same structure |
+| OneTrainer | A desktop GUI | Those who like trying by clicking; a kohya-like experience |
+| SimpleTuner | A YAML config | Advanced users; a broad model list and fine-tuning options |
+
+:::tip[The data audit script wants no training environment]
+The audit script asks only for Pillow and runs on any GPU-less machine. Auditing the dataset before preparing the training environment (the heavy setup above) lets you show the flaws in minutes, before a training that will take hours.
+:::
+
+## 4) The scripts and the config
+
+### veri_kontrol.py — the gatekeeper before training
+
+The script audits: the format/size distribution, sub-1024px images, **verbatim identical** files via sha1, **nearly identical** frames via dHash, missing/extra/empty captions and the trigger-word count in the captions. It writes the summary into the `cikti/denetim-raporu.json` file.
+
+<Code code={veri} lang="python" title="ornekler/gorsel-lora/veri_kontrol.py" />
+
+Usage:
+
+```bash
+cd ornekler/gorsel-lora
+pip install pillow            # once, in the virtual environment
+python veri_kontrol.py --klasor veri/stilim
+python veri_kontrol.py --klasor veri/stilim --tetikleyici stilim --cikti-klasoru cikti
+```
+
+### sdxl-lora-config.yaml — the ai-toolkit config
+
+All the key names in the config were verified from ai-toolkit's official repo (the 2026 version; the example configs under `config/examples/` and `jobs/process/BaseSDTrainProcess.py`). Copy the file into the `config/` folder in the ai-toolkit repo and just fill the two marked places (the data folder and the test prompts):
+
+<Code code={config} lang="yaml" title="ornekler/gorsel-lora/sdxl-lora-config.yaml" />
+
+A summary of the config's critical values:
+
+| Setting | Value | Why this value? |
+| --- | --- | --- |
+| `linear` (rank) | 32 | Enough capacity for SDXL style work; 16 weak, 64 an unnecessarily big start |
+| `linear_alpha` | 32 | ai-toolkit's official examples use alpha=rank |
+| `lr` | 1e-4 | The typical start for SDXL LoRA; the first value to lower if the sample images break |
+| `steps` | 1500 | The middle of the 1000-2000 range for SDXL style; you can return to an early checkpoint with the intermediate saves |
+| `resolution` | 1024 | The resolution SDXL was trained at; other ratios are bucketed automatically |
+| `save_every` | 250 | The way to catch overfitting early: test the intermediate files while training runs |
+| `train_text_encoder` | false | Training the text encoder on SDXL seriously grows VRAM and is usually unnecessary for style |
+| `noise_scheduler` / `sampler` | `ddpm` | The two must match; SDXL's noise program is ddpm |
+
+## 5) The real audit output: the fake flawed dataset
+
+To test the script with the question "does it catch every flaw?", we produced 6 images with PIL under `cikti/test-gorseller/` and placed **six deliberate flaws**: a small 512x512 image, a verbatim copy of an image, an image with a few pixels changed, an image with no caption, an orphan `.txt`, and a caption with its trigger removed. The script's **real** output on this folder:
+
+```text title="The real run (the fake test images): python veri_kontrol.py --klasor cikti/test-gorseller"
+============================================================
+1) The folder scan
+============================================================
+Folder          : cikti\test-gorseller
+Image files     : 6
+Captions (.txt) : 6
+Trigger         : 'stilim'
+
+============================================================
+2) The format and size distribution
+============================================================
+The format distribution:
+  PNG   : 5 files
+  JPEG  : 1 file
+
+The size distribution (width x height):
+  1024 x 1024 : 4 images
+   512 x  512 : 1 image
+  1536 x 1024 : 1 image
+
+The smallest short edge: 512 px | Median: 1024 px
+
+============================================================
+3) Very small images (short edge < 1024px)
+============================================================
+  WARNING  sahne_02.jpg             512 x 512
+
+1 image below 1024px. In SDXL training these
+images are upscaled; it produces blur and detail loss.
+Advice: replace with versions of at least a 1024 short edge.
+
+============================================================
+4) Exact duplicates (sha1: byte-identical files)
+============================================================
+  Group (sha1: sahne_01...): sahne_01.png, sahne_03.png
+
+1 duplicate group, 1 extra copy in total.
+Deleting one of the copies suffices.
+
+============================================================
+5) Near duplicates (dHash Hamming distance <= 6/64)
+============================================================
+  sahne_01.png             <-> sahne_04.png             distance: 0/64
+  sahne_03.png             <-> sahne_04.png             distance: 0/64
+
+2 pairs of nearly identical images. These count the same
+pose/frame twice; drop one. (A distance of 0 means the same
+files' re-saved versions, identical to the eye.)
+
+============================================================
+6) The caption (.txt) audit
+============================================================
+The matching rule: every image must have a SAME-NAMED .txt file beside it.
+  Missing caption : 1 image
+    sahne_05.png             -> expected: sahne_05.txt
+  Extra caption   : 1 file (no corresponding image)
+    notlar.txt
+  Empty captions  : 0 files
+
+============================================================
+7) The trigger-word audit: 'stilim'
+============================================================
+Captions evaluated          : 5 (excluding .txt files without images)
+Captions containing the trigger : 4 / 5
+Total trigger passes        : 4
+Captions not containing the trigger:
+  WARNING  sahne_06.txt
+
+The images in these captions don't bind the style to the word; add
+the trigger before training (e.g. at the caption's head: 'stilim, ...').
+
+============================================================
+SUMMARY: the audit result
+============================================================
+  Total image files                      6
+  Unreadable files                       0
+  Images with a short edge under 1024px  1
+  Exact duplicate groups (sha1)          1
+  Nearly identical pairs (dHash <= 6)    2
+  Captions missing / extra / empty       1 / 1 / 0
+  Captions without the trigger           1
+
+WARNINGS (address before training):
+  - 1 image's short edge is under 1024px (a blur risk for SDXL)
+  - 1 exact duplicate group (sha1) exists
+  - 2 pairs of nearly identical images (dHash <= 6)
+  - 1 image's caption is missing
+  - 1 extra caption file (without an image)
+  - 1 caption doesn't contain the trigger word
+
+The report was written: D:\projects\model-egitimi-rehberi\ornekler\gorsel-lora\cikti\denetim-raporu.json
+```
+
+From the same run, `cikti/denetim-raporu.json` (the summary section):
+
+```json title="cikti/denetim-raporu.json — quoted from the real output"
+{
+  "ozet": {
+    "toplam_gorsel": 6,
+    "kucuk_gorsel": 1,
+    "tam_tekrar_grup": 1,
+    "yakin_tekrar_cift": 2,
+    "caption_eksik": 1,
+    "caption_fazla": 1,
+    "tetikleyici_iceren_caption": 4,
+    "tetikleyici_toplam_gecis": 4
+  }
+}
+```
+
+**So what did the script catch?** All six of the six placed flaws entered the report:
+
+| The placed flaw | Where the script found it |
+| --- | --- |
+| A 512x512 image (small for SDXL) | Section 3's warning: `sahne_02.jpg 512 x 512` |
+| A verbatim copy file | Section 4: `sahne_01.png` and `sahne_03.png` in the same sha1 group |
+| A copy with a few pixels changed | Section 5: `sahne_01 <-> sahne_04` and `sahne_03 <-> sahne_04`, distance 0/64 |
+| An image with no caption | Section 6: `sahne_05.png -> expected: sahne_05.txt` |
+| An orphan `.txt` | Section 6: `notlar.txt` listed as an extra caption |
+| A caption with its trigger removed | Section 7: `sahne_06.txt` flagged |
+
+What the summary table says at first glance is striking: **the 6-file "dataset" is really 4 distinct frames.** When the verbatim copy (01 = 03) and the copy-like frame (04) are weeded out, 4 images remain. In your real dataset these flaws are usually more hidden — the copies were saved with different compression, the trigger forgotten on one image — and dHash exists precisely to catch these hidden duplicates.
+
+:::caution[The fake image warning]
+The `cikti/test-gorseller/` folder in this section is **PIL-drawn, non-real test images**. They were produced deliberately flawed and carry no purpose beyond showing the script being tested. When working with a real training dataset the script's headings are the same; only the numbers come out according to your folder.
+:::
+
+## 6) Training and monitoring
+
+When the config is ready, training starts with one command (from the ai-toolkit repo's root):
+
+```bash
+python run.py config/stilim-sdxl-lora.yaml
+```
+
+The outputs are written under `output/` with the session name:
+
+```text
+ai-toolkit/output/stilim-sdxl-lora-v1/
+├── *.safetensors    → the LoRA saves (an intermediate save every save_every: 250 + the final save)
+└── sample images    → the test generations produced while training runs
+```
+
+The file name pattern can change by ai-toolkit version; what matters is the LoRA file with the `safetensors` extension — that's the only thing going to ComfyUI. You can stop the training with `Ctrl+C` and continue with the same command; but if you cut it **at the moment of saving**, that checkpoint corrupts (the official README's open warning).
+
+**What will you see in the training log?** Lines containing the step number and the loss value flow in the terminal at regular intervals; since the exact shape varies by version we're not putting a sample log here — training wasn't run on this page. While watching, read two sources together:
+
+| What's watched | What's looked at |
+| --- | --- |
+| The loss lines | Is it dropping, is it oscillating? A convergence to zero isn't good news, it can be a memorization sign |
+| The sample images (every 250 steps) | The intermediate saves' generations are compared with the same prompt and a fixed `seed` |
+
+:::caution[Trap 1: overfitting]
+While watching, these three signals show memorization: (1) if the generations approach copies of the training images, (2) if the scene doesn't change even when you change the background, (3) if the style forcibly appears in every generation even without the trigger word. The fix is one: **return to an earlier intermediate save.** An undertrained LoRA can always be rescued; an overtrained one can't. That's why we keep `save_every: 250` and the steps at 1500 — we dug into the theory on the [Image LoRA Training](/en/gorsel/lora-egitimi/) page.
+:::
+
+:::caution[Trap 2: caption quality]
+The training learns over "the part of the image the caption **doesn't describe**", not "the whole image". A triggerless caption makes binding the style to the word impossible (like `sahne_06.txt` in section 5). An overly detailed or wrong caption mixes content with style. The golden rule: **label what you're teaching, leave the rest to the model's knowledge.**
+:::
+
+:::note[Trap 3: the license]
+A small but expensive mistake: training FLUX.2-dev with an 8 GB card may be technically possible, but that LoRA can't be used commercially (see section 2). If VRAM is tight, first budget with the tables on the [VRAM Math](/en/donanim/vram-hesabi/) page, and if it's not enough, evaluate a rented GPU from the [Cloud Options](/en/donanim/bulut-secenekleri/) page.
+:::
+
+## 7) Use in ComfyUI
+
+When training finishes you'll have a single `.safetensors` file on the order of MBs. In ComfyUI, three steps:
+
+1. Copy the file into the `ComfyUI/models/loras/` folder.
+2. Add the **LoraLoader** node between the Checkpoint Loader (SDXL base) and the KSampler; chain the `model` and `clip` inputs.
+3. Set the strength (weight) to **0.8** initially; sweep and compare across the 0.6-1.0 range.
+
+The test prompt must definitely contain the trigger word:
+
+```text title="an example test prompt (CLIP-based SDXL understands English)"
+mystyle, watercolor landscape, misty mountains and a lake, pastel colors
+```
+
+When testing, ask two questions:
+
+- **The generalization test:** ask for scenes never seen in training (another season, a crowded city); if the style still comes, the model hasn't memorized, it has learned.
+- **The triggerless test:** if the style appears even without writing the trigger, it may be overtrained; return to an earlier checkpoint.
+
+The LoRA doesn't run alone; it's a **patch** applied on top of the SDXL base. If you want to load it and make it permanent (to carry as a single file), the method on the [LoRA Merging](/en/kullanim/lora-birlestirme/) page does the job — the merged model also carries the base model's license.
+
+## 8) The next steps
+
+- **Refresh the theory:** for whether you're teaching a style or a character, the caption strategy and the kohya alternative, [Image LoRA Training](/en/gorsel/lora-egitimi/); for how diffusion works, [Diffusion Fundamentals](/en/gorsel/diffusion-temelleri/).
+- **Move to Flux:** if you want to train a Flux LoRA with the same ai-toolkit infrastructure, the config changes `is_flux: true` + `quantize: true` + `noise_scheduler: flowmatch` and a rank of 16-32, a 1000-2500 step range suffice — 16 GB and above VRAM is needed.
+- **Stay on the data side:** if you want the audit output to end with no warnings, this script is the sibling of the approach in [Example 2: The Data Cleaning Workshop](/en/ornekler/veri-temizleme/); both work on the "cheap audit before training" principle.
+- **Share:** if you'll open your LoRA to the community, remember to write the base model, the license and the trigger word on the model card: [Sharing on Hugging Face](/en/kullanim/huggingface-paylasim/).
+- **The series' other examples:** to move to the LLM side, [Example 3: The Turkish Chat Assistant](/en/ornekler/turkce-asistan/); for the four projects' comparison and the recommended order, [Example Projects: An Overview](/en/ornekler/genel-bakis/).

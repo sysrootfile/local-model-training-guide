@@ -55,11 +55,11 @@ Astro 7 + Starlight tabanlı, Türkçe model eğitimi rehberi sitesinin kaynağ�
   işaretidir (CHANGELOG taşır).
 
 ## Sıradaki işler
-1. İngilizce çeviri: 55 sayfa canlı (önceki 45 + `gorsel/` ikilisi + `klasik-ml/` ikilisi +
-   `kaynaklar/` altılısı; damgalar 2026-11-19/20). Kalan ~9 sayfa aynı kuralla çevrilir:
-   `ornekler/` onlusu (genel-bakis, klasik-ml, veri-temizleme, turkce-asistan, gorsel-lora,
-   yerel-rag, viki-rag, ajan-dongusu, enjeksiyon-deni, ucdan-uca). Not: `VramCalculator`
-   bileşeni Türkçe arayüzlü; EN `vram-hesabi` sayfası gömmedi, Türkçe sayfaya notla yönlendiriyor.
+1. **İngilizce çeviri TAMAMLANDI (2026-11-20):** 65/66 sayfa — `?raw` importlu 9 MDX örneği
+   dahil; EN index kartları gerçek EN linkleriyle tazelendi. Yalnız TR `index.mdx` (ana sayfa
+   splash) bilinçli olarak tek dilli kaldı. MDX import yolları EN ağacında bir seviye derin
+   (`../../../../../ornekler/...`). Not: `VramCalculator` bileşeni Türkçe arayüzlü; EN
+   `vram-hesabi` sayfası gömmedi, Türkçe sayfaya notla yönlendiriyor.
 2. İsteğe bağlı: `ornekler/klasik-ml` ve `ornekler/veri-temizleme` için README. README satır 70-73
    bilinçli tercih diyor, karar sana ait.
 

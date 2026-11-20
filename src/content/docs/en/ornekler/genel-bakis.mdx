@@ -1,0 +1,80 @@
+---
+title: "Example Projects: An Overview"
+description: "Eight end-to-end projects combining the guide's concepts with real data and real scripts — which suits you, what does it require, how is it run?"
+sidebar:
+  order: -1
+dogrulama: 2026-11-20
+---
+
+This section turns the concepts in the rest of the guide into **runnable projects**. Each project contains: a complete script (or script set) + real run outputs + a line-by-line explanation. All the scripts live in the `ornekler/` folder; you can copy them into your own project.
+
+## The eight projects
+
+| Project | What it teaches | Hardware | Time |
+| --- | --- | --- | --- |
+| [1. End-to-End ML on Tabular Data](/en/ornekler/klasik-ml/) | Pipeline, baseline, cross-validation, metric reading, model persistence | CPU suffices | Seconds |
+| [2. The Data Cleaning Workshop](/en/ornekler/veri-temizleme/) | Normalization, PII masking, the quality filter, deduplication, the SFT format | CPU suffices | Minutes |
+| [3. The Turkish Chat Assistant](/en/ornekler/turkce-asistan/) | LLM fine-tuning with QLoRA, training monitoring, converting to GGUF, running in Ollama | GPU (8-12 GB+ by VRAM) | Hours |
+| [4. The Image Style LoRA](/en/ornekler/gorsel-lora/) | LoRA training on a diffusion model, caption preparation, use in ComfyUI | GPU (8-16 GB+ by VRAM) | 1-3 hours |
+| [5. The Local RAG Assistant](/en/ornekler/yerel-rag/) | Embedding, vector search, document-grounded answers, a retrieval test, the out-of-scope question | CPU suffices (Ollama + 2 small models) | Minutes |
+| [6. Turkish RAG from Wikipedia](/en/ornekler/viki-rag/) | Pulling data from a live API, chunking and overlap, a 100+-piece corpus | CPU suffices (Ollama + internet) | ~5 min |
+| [7. The Agent Loop](/en/ornekler/ajan-dongusu/) | Tool calling, a turn counter, the catalog's token expense, the real behavior of `tool_choice` and `format` | CPU suffices (Ollama + internet) | ~8 min |
+| [8. The Prompt Injection Experiment](/en/ornekler/enjeksiyon-deni/) | Malicious text embedded in the corpus, a canary key, a leak channel, two channels × three defenses, 31 cells | CPU suffices (Ollama; no internet needed if the corpus cache exists) | ~36 min |
+
+:::note[Which parts ran on this machine?]
+Projects 1, 2, 5, 6, 7 and 8 were **genuinely run in this project**; all the outputs and numbers on their pages come from a real run. Projects 5, 6, 7 and 8 ask for no GPU at all: they run entirely on CPU with the bge-m3 (embedding) and qwen2.5:3b (answer generation) models on Ollama; projects 6 and 7 download the corpus from Wikipedia on the first run, and project 8 reused that download's output (the corpus + vector cache), so its own run needed no internet. The **GPU-running training steps of projects 3 and 4 weren't run** (there's no GPU on this machine). But the parts that could run on CPU genuinely did: in project 3 the data-preparation script `hazirla.py` (with a real dataset), and in project 4 the data audit script `veri_kontrol.py` (with deliberately flawed test images) stand on their pages with real outputs. The GPU-requiring scripts were written against the current official tool versions and passed a syntax check; on your own GPU, small version-related fixes may be needed on the first run. We state this split openly in the box at the head of every page; the `not run` label shouldn't be shadowed.
+:::
+
+These eight examples stand on separate pages; but if a line is built, some of the examples become stations of the same line: data download → cleaning → training on CPU → evaluation → running in Ollama. Which examples stand on that line, which file each one's record is in, and where the line breaks — in one place: [The End-to-End Single Line](/en/ornekler/ucdan-uca/). That page produces no new measurement — it carries only the station order, the evidence tier and the record file's name; and it names the unwalked arms under its own name.
+
+## The common setup: the virtual environment and the folder layout
+
+None of the projects requires a system install — they all run in their own virtual environment. Once at the project root:
+
+```bash
+# At the project root (if .venv doesn't exist):
+python -m venv .venv
+.venv\Scripts\activate          # Windows
+# source .venv/bin/activate     # macOS / Linux
+```
+
+The folder layout:
+
+```text
+ornekler/
+├── klasik-ml/
+│   ├── tablo_modeli.py         # the script
+│   ├── veri/breast_cancer.csv  # the data (included in the project)
+│   └── cikti/                  # model.joblib, rapor.txt, the run output
+├── veri-temizleme/
+│   ├── atolye.py               # the script (the data is pulled from the internet)
+│   └── cikti/                  # temiz_veri.jsonl, rapor.json, the run record
+└── yerel-rag/
+    ├── rag.py                  # the script (only the Ollama API + the standard library)
+    ├── olc.py                  # the measurement script (hit@k, MRR, paraphrases, the threshold)
+    └── cikti/                  # the run records
+```
+
+(Example 6's folder `viki-rag/` follows the same layout too: `viki_rag.py` + a run record; the data isn't a fixed file, it comes from Wikipedia at runtime. Example 7's `ajan-dongusu/` folder is the same: `ajan.py` + two exploration scripts + `cikti/korpus.json` and `cikti/ajan-log.txt`. Example 8's `enjeksiyon-deni/` folder carries a single script + four record files (`enjeksiyon-log.txt`, two smoke runs and the leak files under `sizan/`); it reads its corpus and vectors from projects 6-7's output and doesn't **write** them.)
+
+Every project's page has its own `pip install` command; we keep no shared requirements file so the projects can be copied independently.
+
+:::tip[In what order?]
+If you're starting out, go in the order **1 → 2**: both are GPU-less, finish in minutes, and make the guide's core concepts (metrics, leakage, PII, repetition) tangible. If you have a GPU, you can start with whichever of 3 and 4 interests you — the two are independent. Those interested in the GPU-less LLM path can follow 5, then 6, which scales with live data. If you're unsure which project fits your hardware, the [method selector](/) on the home page guides you in three questions.
+:::
+
+:::caution[These projects' model license: research-only]
+The answer-generating model of projects 5, 6, 7 and 8 and of the site's measurement rigs is `qwen2.5:3b-instruct-q4_K_M`. The `LICENSE` field of the package Ollama distributes under this tag carries the text of the **Qwen RESEARCH LICENSE AGREEMENT**: use is "research or evaluation purposes only", commercial use asks for a separate license from Alibaba Cloud, and distributed derivatives are required to carry the "Built with Qwen"/"Improved using Qwen" notice and a `"Notice"` attribution file. So running these examples on your own machine is within the license's permitted area; if you'll carry the output into a product, change the base model or request a license. The measured inventory (the three local models' license texts, byte/line counts and clause quotes): [License, Personal Data and Model Card](/en/kullanim/lisans-ve-model-karti/).
+:::
+
+## Using the scripts with your own data
+
+At the end of every page there's a "to try it yourself" section; roughly the pattern is:
+
+1. Copy the script, turn the data path to your own file.
+2. Run it **error-free** once and inspect the output.
+3. Change the things you changed one by one and watch how the output changes — these projects' real aim is that watching habit.
+
+:::caution[Approach the numbers with suspicion]
+The metrics on the pages were taken with that day's dataset and library versions. Thanks to the fixed `random_state` values they're reproducible with the same versions; if the versions change, the trailing digits may wobble. Don't trust any number without building the sentence "in my own run, this output" — that's this guide's general principle.
+:::
