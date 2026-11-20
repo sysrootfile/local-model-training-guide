@@ -19,6 +19,10 @@ Biçim: [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/); sürümleme
 - Dördüncü çeviri serisi: `en/llm/{pretraining,dpo-rlhf,araclar,hiperparametreler,sorun-giderme}`
   ve `en/degerlendirme/{loss-ve-metrikler,benchmarklar}` — LLM ve değerlendirme bölümleri tam;
   İngilizce sayfa sayısı 26'ya ulaştı.
+- Beşinci çeviri serisi: `en/rag/` dörtlüsü (rag-mi-ince-ayar-mi, rag-degerlendirme,
+  parcalama-ve-hibrit-arama, gomme-egitimi) ve `en/ajan/` beşlisi (ajan-mi-sabit-hat-mi,
+  arac-cagirma-ve-mcp, ajan-olcumu, prompt-enjeksiyonu, enjeksiyon-olcumu) — RAG ve ajan
+  bölümleri tam; İngilizce sayfa sayısı 35'e ulaştı.
 
 ## [0.1.0] — 2026-11-19
 
