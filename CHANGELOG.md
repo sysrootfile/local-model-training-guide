@@ -13,6 +13,9 @@ Biçim: [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/); sürümleme
 - İkinci çeviri serisi: `en/temeller/{transformer,tokenizasyon,egitim-nasil-calisir}`,
   `en/donanim/vram-hesabi` (etkileşimli hesaplayıcı Türkçe arayüzlü olduğu için gömülmedi,
   Türkçe sayfaya yönlendirme notu kondu), `en/kullanim/quantization`.
+- Üçüncü çeviri serisi: `en/donanim/{yerel-kurulum,bulut-secenekleri}`, `en/veri/` beşlisi
+  (turleri, nereden-bulunur, formatlari, temizleme, kendi-verini-olustur),
+  `en/llm/{sft,adim-adim-egitim}` — İngilizce sayfa sayısı 19'a ulaştı.
 
 ## [0.1.0] — 2026-11-19
 

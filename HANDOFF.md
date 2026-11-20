@@ -55,12 +55,13 @@ Astro 7 + Starlight tabanlı, Türkçe model eğitimi rehberi sitesinin kaynağ�
   işaretidir (CHANGELOG taşır).
 
 ## Sıradaki işler
-1. İngilizce çeviri: 9 sayfa canlı (açılış `en/index` + `en/baslangic/` üçlüsü + `llm/lora-qlora`
-   + `temeller/` üçlüsü + `donanim/vram-hesabi` + `kullanim/quantization`; damgalar 2026-11-19/20).
-   Kalan ~55 sayfa aynı kuralla çevrilir: linkler `/en/` önekiyle açıkça yazılır, kod örnekleri
-   İngilizce değişken adlı, damga zorunlu. Sıradan adaylar: `donanim/{yerel-kurulum,bulut-secenekleri}`
-   + `veri/` beşlisi + `llm/sft` + `llm/adim-adim-egitim`. Not: `VramCalculator` bileşeni Türkçe
-   arayüzlü; EN `vram-hesabi` sayfası gömmedi, Türkçe sayfaya notla yönlendiriyor.
+1. İngilizce çeviri: 19 sayfa canlı (açılış + `baslangic/` + `llm/lora-qlora` + `temeller/` +
+   `donanim/vram-hesabi` + `kullanim/quantization` + `donanim/{yerel-kurulum,bulut-secenekleri}` +
+   `veri/` beşlisi + `llm/{sft,adim-adim-egitim}`; damgalar 2026-11-19/20). Kalan ~45 sayfa aynı
+   kuralla çevrilir: linkler `/en/` önekiyle açıkça yazılır, kod örnekleri İngilizce değişken adlı,
+   damga zorunlu. Sıradan adaylar: `llm/` kalan beşlisi (pretraining, dpo-rlhf, araclar,
+   hiperparametreler, sorun-giderme) + `degerlendirme/` ikilisi. Not: `VramCalculator` bileşeni
+   Türkçe arayüzlü; EN `vram-hesabi` sayfası gömmedi, Türkçe sayfaya notla yönlendiriyor.
 2. İsteğe bağlı: `ornekler/klasik-ml` ve `ornekler/veri-temizleme` için README. README satır 70-73
    bilinçli tercih diyor, karar sana ait.
 
