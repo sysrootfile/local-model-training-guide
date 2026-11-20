@@ -16,7 +16,7 @@ export default defineConfig({
         'Türkçe, sıfırdan ileri seviyeye model eğitimi rehberi: veri bulma, veri hazırlama, fine-tuning, LoRA/QLoRA, değerlendirme ve yayınlama.',
       favicon: '/favicon.svg',
       defaultLocale: 'root',
-      // Türkçe kök yerel: URL'ler /tr/ öneki taşımaz; mevcut iç linkler, QODER.md koşum
+      // Türkçe kök yerel: URL'ler /tr/ öneki taşımaz; mevcut iç linkler, AGENT.md koşum
       // örnekleri ve link-check'ın /-köklü href varsayımı sabit kalır.
       // İngilizce ikinci yerel: sayfalar src/content/docs/en/ altına girdikçe /en/ altına
       // yerleşir; çevrilmemiş adresler Starlight fallback'iyle Türkçe içerik ve

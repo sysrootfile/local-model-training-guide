@@ -1,4 +1,4 @@
-# Qoder.md — bu depoda çalışma sözleşmesi
+# AGENT.md — bu depoda çalışma sözleşmesi
 
 Astro + Starlight ile yazılmış, tamamı Türkçe bir model eğitimi rehberi ve onu besleyen ölçüm
 kafesleri. Kurulum, komutlar ve sayfa ekleme akışı için kaynak: [README.md](README.md). Bu dosya

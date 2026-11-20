@@ -29,7 +29,7 @@ npm run dev     # http://localhost:4321
 ## Yazım sözleşmesi
 
 Kanıt kademeleri (0 beklenti → 3 tekrarlandı), "sayı yalnız bitmiş günlükten gelir"
-kuralı, koşum hijyeni ve bilinen tuzaklar: [QODER.md](QODER.md). Kısa hâli: ölçmediğin
+kuralı, koşum hijyeni ve bilinen tuzaklar: [AGENT.md](AGENT.md). Kısa hâli: ölçmediğin
 sayıyı yazma, ölçtüğünün kaydını koşum günlüğünden taşı.
 
 - Betik içi yorumlar ASCII Türkçe; sayfa metni tam Türkçe (ondalık virgül: `141,88 sn`).

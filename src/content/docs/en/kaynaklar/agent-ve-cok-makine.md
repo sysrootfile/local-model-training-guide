@@ -4,7 +4,7 @@ description: "A step-by-step guide to setting up and running the guide's measure
 dogrulama: 2026-11-20
 ---
 
-Every measurement in this guide came from a single machine and the pages say so openly: the absolute numbers (Ryzen 5 2600, 15.9 GB RAM, CPU) **will come out different** on your hardware; the claim the pages carry is the pattern, not the seconds. There are two honest answers to the question "what happens on my machine?": running the scripts yourself, or having a code agent set them up and run them. Both demand the same discipline — this page is that discipline's setup and run instructions. The contract's site summary is at [The Verification Mechanism](/en/kaynaklar/dogrulama-mekanizmasi/) and the [Scope Map](/en/kaynaklar/kapsam-haritasi/); the full text is the QODER.md file in the repo.
+Every measurement in this guide came from a single machine and the pages say so openly: the absolute numbers (Ryzen 5 2600, 15.9 GB RAM, CPU) **will come out different** on your hardware; the claim the pages carry is the pattern, not the seconds. There are two honest answers to the question "what happens on my machine?": running the scripts yourself, or having a code agent set them up and run them. Both demand the same discipline — this page is that discipline's setup and run instructions. The contract's site summary is at [The Verification Mechanism](/en/kaynaklar/dogrulama-mekanizmasi/) and the [Scope Map](/en/kaynaklar/kapsam-haritasi/); the full text is the AGENT.md file in the repo.
 
 ## The setup (a human and an agent follow the same order)
 
@@ -14,7 +14,7 @@ Every measurement in this guide came from a single machine and the pages say so 
 4. **Ollama + models:** install [Ollama](https://docs.ollama.com/); `ollama pull qwen2.5:3b-instruct-q4_K_M` and `ollama pull bge-m3`. The server must be listening at `127.0.0.1:11434` — the rigs don't connect to any other address (the `_url_dogrula` guard allows only the permitted hostnames).
 5. **Turkish output:** on Windows `PYTHONUTF8=1` is mandatory; the run outputs are written to files with `> cikti/<record>.txt 2>&1`.
 
-## The agent-specific rules (distilled from QODER.md)
+## The agent-specific rules (distilled from AGENT.md)
 
 - **Smoke first, the full run after.** One arm, one repeat: is the script producing a record end to end? The full run doesn't start before the smoke passes. In rigs without a smoke mode, the shortest argument combination is used and the record is labeled "smoke".
 - **A number comes only from a finished log.** While the run is going, status can be said, results can't; a half log isn't published.

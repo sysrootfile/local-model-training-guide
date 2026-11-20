@@ -1,5 +1,5 @@
 # Aylik damga tazeligi turu: bayat (>=90 gun) sayfa varsa depoya issue acar/yorumlar.
-# CI'daki `denetim` is akisi bayatligi kirmaz (QODER.md: bayat normal durumdur, eksik damga
+# CI'daki `denetim` is akisi bayatligi kirmaz (AGENT.md: bayat normal durumdur, eksik damga
 # hatadir); bu is akisi HANDOFF "Sirdaki isler" maddesindeki takvimin ta kendisidir.
 name: damga-takvimi
 

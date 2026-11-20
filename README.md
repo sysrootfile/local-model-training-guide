@@ -53,7 +53,7 @@ src/
 │       ├── kullanim/ ornekler/ ajan/ rag/ kaynaklar/
 └── styles/custom.css            # tema
 astro.config.mjs                 # site başlığı, sidebar, yerel ayarlar
-QODER.md                         # yazım ve ölçüm sözleşmesi (kademeler, koşum kuralları, tuzaklar)
+AGENT.md                         # yazım ve ölçüm sözleşmesi (kademeler, koşum kuralları, tuzaklar)
 
 ornekler/                        # 14 klasör: 10 ÖLÇÜM KAFESİ + 4 PROJE BETİĞİ
 ├── <kafes>/                     # 10 kafes, hepsi http://127.0.0.1:11434'e bağlanır:
@@ -94,14 +94,14 @@ PYTHONUTF8=1 ../../.venv/Scripts/python.exe -u <betik>.py > cikti/<kayit>.txt 2>
 
 Ölçüm kafesi koşacaksan Ollama'nın `127.0.0.1:11434`te açık olması gerekir; hangi komutla hangi
 kaydın üretildiği her kafesin kendi `README.md`sinde yazar. Koşum hijyeni (sunucuya dokunma, tek kol
-zamanı, yabancı istek yoklaması) [QODER.md](QODER.md) dosyasında.
+zamanı, yabancı istek yoklaması) [AGENT.md](AGENT.md) dosyasında.
 
 Windows'ta bazı paketlerin en yeni sürümleri kurumsal "Application Control" ilkelerine takılabilir; bu projede çalışan sürümler: `pyarrow 24.0.0`, `scipy 1.15.3` (detaylar ilgili sayfalarda). GPU gerektiren iki proje (turkce-asistan eğitimi, gorsel-lora eğitimi) WSL2/Linux veya bulut GPU önerir.
 
 ## Yeni Sayfa Ekleme
 
 Yazım ve ölçüm kuralları (kanıt kademeleri, "sayı yalnız bitmiş günlükten", koşum hijyeni, tuzaklar)
-[QODER.md](QODER.md) dosyasında; yeni bir sayfaya sayı taşıyorsan önce oraya bak.
+[AGENT.md](AGENT.md) dosyasında; yeni bir sayfaya sayı taşıyorsan önce oraya bak.
 
 1. `src/content/docs/<bölüm>/<sayfa>.md` dosyasını oluştur:
 

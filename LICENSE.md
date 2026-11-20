@@ -4,7 +4,7 @@ Bu depo iki lisansla yayımlanır; hangi dosyanın hangi lisansa tabi olduğu i�
 
 ## İçerik: CC BY-SA 4.0
 
-`src/content/docs/` altındaki tüm sayfalar ile `README.md`, `QODER.md` ve `ornekler/*/README.md`
+`src/content/docs/` altındaki tüm sayfalar ile `README.md`, `AGENT.md` ve `ornekler/*/README.md`
 belgeleri **Creative Commons Atıf-AynıLisanslaPaylaş 4.0 Uluslararası (CC BY-SA 4.0)** lisansıyla
 yayımlanır.
 

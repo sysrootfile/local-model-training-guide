@@ -1,5 +1,5 @@
 # Uc kapilar: derleme + ic link + damga denetimi.
-# QODER.md "Bir sayfa bittiğinde sıra" bölümünün otomatiği; üç betik de
+# AGENT.md "Bir sayfa bittiğinde sıra" bölümünün otomatiği; üç betik de
 # kırık çıktıda sıfırdan farklı çıkış kodu döner, iş akışı kırmızıya düşer.
 name: denetim
 

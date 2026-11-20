@@ -10,7 +10,7 @@ iddia desendir, saniye değildir. "Benim makinemde ne oluyor?" sorusunun iki dü
 betikleri kendiniz koşturmak ya da bir kod agent'ına kurdurup koşturtmak. İkisi de aynı disiplini
 ister — bu sayfa o disiplinin kurulum ve koşum talimatıdır. Sözleşmenin site özeti
 [Doğrulama Mekaniği](/kaynaklar/dogrulama-mekanizmasi/) ve
-[Kapsam Haritası](/kaynaklar/kapsam-haritasi/)'ndadır; tam metin depodaki QODER.md dosyasıdır.
+[Kapsam Haritası](/kaynaklar/kapsam-haritasi/)'ndadır; tam metin depodaki AGENT.md dosyasıdır.
 
 ## Kurulum (insan da agent da aynı sırayı izler)
 
@@ -28,7 +28,7 @@ ister — bu sayfa o disiplinin kurulum ve koşum talimatıdır. Sözleşmenin s
 5. **Türkçe çıktı:** Windows'ta `PYTHONUTF8=1` şart; koşum çıktıları `> cikti/<kayit>.txt 2>&1`
    ile dosyaya yazılır.
 
-## Agent'a özel kurallar (QODER.md'den damıtılmış)
+## Agent'a özel kurallar (AGENT.md'den damıtılmış)
 
 - **Duman önce, tam koşum sonra.** Tek kol, tek tekrar: betik uçtan uca kayıt üretiyor mu?
   Duman geçmeden tam koşum başlamaz. Duman modu olmayan kafeslerde en kısa argüman kombinasyonu
