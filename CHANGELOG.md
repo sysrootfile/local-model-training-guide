@@ -16,6 +16,9 @@ Biçim: [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/); sürümleme
 - Üçüncü çeviri serisi: `en/donanim/{yerel-kurulum,bulut-secenekleri}`, `en/veri/` beşlisi
   (turleri, nereden-bulunur, formatlari, temizleme, kendi-verini-olustur),
   `en/llm/{sft,adim-adim-egitim}` — İngilizce sayfa sayısı 19'a ulaştı.
+- Dördüncü çeviri serisi: `en/llm/{pretraining,dpo-rlhf,araclar,hiperparametreler,sorun-giderme}`
+  ve `en/degerlendirme/{loss-ve-metrikler,benchmarklar}` — LLM ve değerlendirme bölümleri tam;
+  İngilizce sayfa sayısı 26'ya ulaştı.
 
 ## [0.1.0] — 2026-11-19
 
