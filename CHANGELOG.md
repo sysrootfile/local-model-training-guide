@@ -23,6 +23,10 @@ Biçim: [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/); sürümleme
   parcalama-ve-hibrit-arama, gomme-egitimi) ve `en/ajan/` beşlisi (ajan-mi-sabit-hat-mi,
   arac-cagirma-ve-mcp, ajan-olcumu, prompt-enjeksiyonu, enjeksiyon-olcumu) — RAG ve ajan
   bölümleri tam; İngilizce sayfa sayısı 35'e ulaştı.
+- Altıncı çeviri serisi: `en/kullanim/`'in kalan 10 sayfası (lora-birlestirme, ollama,
+  cikarim-parametreleri, tekrarlanabilirlik, hiz-ve-maliyet, eminlik-ve-kalibrasyon,
+  eszamanlilik, sunma-api, huggingface-paylasim, lisans-ve-model-karti) — kullanım bölümü TAM;
+  İngilizce sayfa sayısı 45'e ulaştı.
 
 ## [0.1.0] — 2026-11-19
 
