@@ -1,0 +1,204 @@
+---
+title: "VRAM Math: Will My Model Fit?"
+description: "Learn how much VRAM the model weights, gradients, optimizer states and activations take; estimate the memory need for your training method and graphics card."
+dogrulama: 2026-11-20
+---
+
+Trying to train a model on a graphics card and getting the `CUDA out of memory` error is the most common first experience in this field. Good news: this error is not magic, it is arithmetic. On this page you will learn which line items "eat" VRAM (graphics card memory), and you will be able to answer "will my model fit?" with addition and multiplication.
+
+:::note
+All values here are **rough approximations**. Real consumption can swing 10-30% depending on library version, training framework, kernel choices and driver version. The goal is to know the right order of magnitude before an expensive decision.
+:::
+
+## What Eats VRAM? Four Line Items
+
+When you start a training run, the graphics card memory is shared among four line items. Understanding them turns the error from "magic" into "arithmetic".
+
+### 1. Model weights
+
+All the numbers your model has learned; in an LLM, millions to billions of decimal values. Each parameter takes space according to the precision it is stored in (fp16, 4-bit...).
+
+> **Analogy:** the suitcase itself. Whether you run inference or train, the weights always stay in memory.
+
+### 2. Gradients
+
+The numbers that answer "in which direction and by how much should I adjust each weight?" during training. The serious part: **one gradient is kept per weight**; in fp16, gradients take as much space as the weights themselves.
+
+> **Analogy:** the correction notes stuck onto each item. They exist only on the training "journey"; they are not needed at inference.
+
+### 3. Optimizer states
+
+The most commonly overlooked item, and often the **biggest**. The AdamW optimizer keeps two extra fp32 copies per parameter: momentum (m) and variance (v). That means 4 + 4 = **8 bytes** per parameter. For comparison: the model's own weights in fp16 are only 2 bytes per parameter.
+
+> **Analogy:** the archive copies of the correction notes. You keep two notebooks per item; that's why the luggage is much heavier than you expected.
+
+:::tip
+If you're squeezed, the optimizer is also a lever: SGD + momentum keeps about 4 bytes per parameter instead of AdamW's 8. In exchange, it is more sensitive to learning rate choice.
+:::
+
+### 4. Activations
+
+The intermediate outputs produced by the layers during the forward pass; they must be kept for backpropagation. They depend on two things:
+
+- **Batch size:** the number of examples processed at once,
+- **Sequence length:** the number of tokens in each example.
+
+Activation consumption grows quickly with these two (almost quadratically in attention layers). It can be reduced significantly with **gradient checkpointing**: intermediate outputs are not stored, they are recomputed during backpropagation.
+
+> **Analogy:** the top of your desk. The more jobs you open at once (batch), the fuller the desk gets; it clears when the job is done.
+
+## Number Format: How Many Bytes per Parameter?
+
+The single building block of the whole calculation is this: bytes per parameter.
+
+| Precision | Type | Per parameter | 7B model weights |
+| --- | --- | --- | --- |
+| fp32 | Full precision | 4 bytes | ~28 GB |
+| fp16 / bf16 | Half precision (the training standard) | 2 bytes | ~14 GB |
+| int8 | 8-bit quantization | 1 byte | ~7 GB |
+| 4-bit (NF4) | 4-bit quantization (the basis of QLoRA) | ~0.5 bytes | ~3.5-4 GB |
+
+:::note
+Cross-check: 7 billion parameters × 4 bytes = 28 GB, × 2 bytes = 14 GB, × 1 byte = 7 GB, × 0.5 bytes ≈ 3.5 GB. In practice 4-bit weights take ~0.5-0.6 bytes per parameter together with quantization metadata.
+:::
+
+## Quick Estimate: The Calculator
+
+The interactive VRAM calculator is currently on the Turkish page: [VRAM Hesabı (Türkçe)](/donanim/vram-hesabi/) — its interface is Turkish-only for now. Pick the model size, precision and training method there and it computes the approximate VRAM need for you. The tables and rules below let you do the same math by hand.
+
+## Total Math by Training Method
+
+Now let's combine the four line items by method. The rules below should be read as **per 1 billion parameters (1B)** and as "rough estimates".
+
+### Full fine-tuning: fp16 + AdamW
+
+All parameters are updated; all four line items are paid:
+
+```text title="Per-parameter cost (approximate)"
+weights          :  2 bytes   (fp16)
+gradients        :  2 bytes   (fp16)
+AdamW states     :  8 bytes   (momentum + variance, fp32)
+scratch buffers  :  ~2-4 bytes (activations, CUDA context, headroom)
+--------------------------------------------------
+total            :  ~14-16 bytes/parameter
+                     → 1B parameters ≈ 14-16 GB
+```
+
+So fully fine-tuning an 8B model takes roughly **112-128 GB** of VRAM; not realistic with a single consumer card. This is why LoRA/QLoRA are preferred in practice.
+
+### LoRA (low-rank adaptation)
+
+The base weights are **frozen**; only the small "adapter" matrices are trained (typically 0.1-1% of all parameters):
+
+- Base weights (fp16): **2 GB / 1B**
+- Adapter + its gradients + optimizer states (small): usually under 1 GB
+- Activations: **1-3 GB** depending on sequence length
+
+Rule: **2 GB × (billions of parameters) + 1-3 GB extra**. Details: [LoRA and QLoRA](/en/llm/lora-qlora/).
+
+### QLoRA: 4-bit base + LoRA
+
+The base weights are quantized to 4-bit, and LoRA adapters are trained on top:
+
+- 4-bit base weights: **~0.5 GB / 1B**
+- Adapter + activations: **1-3 GB extra**
+
+Rule: **0.5 GB × (billions of parameters) + 1-3 GB extra**. For quantization itself: [Quantization Guide](/en/kullanim/quantization/).
+
+### Inference only
+
+- Weights (at the chosen precision) + the **KV cache**.
+
+The KV cache holds the key-value vectors the model keeps for previous tokens while generating an answer; it grows as the context grows and as the number of concurrent requests rises. Roughly 0.5-2 GB for a single request with short context; several GB at 8K+ context. The mechanism itself: [Transformer Architecture](/en/temeller/transformer/). For local deployment: [Ollama Guide](/en/kullanim/ollama/).
+
+:::note[There is a measured example of this growth]
+On the [Concurrency](/en/kullanim/eszamanlilik/) page the same model was run under three server settings, and the size reported by `/api/ps` went like this with the number of slots: `-np 1` → 2 168 371 280 bytes, `-np 2` → 2 412 794 346 bytes, `-np 4` → 2 716 000 582 bytes. **+522 MiB** in total, with a single model copy — but **not in equal steps**: the first extra slot brings ≈233 MiB while each of the next two costs ≈145 MiB. The reason is visible line by line in the log: 4096 tokens of context are allocated per slot (`-c 4096 / 8192 / 16384`), i.e. context is not split across slots, it is summed. Two caveats: the measurement was made on the **CPU RAM** side (`size_vram` was 0), and how much of the increase is the KV cache, how much a per-slot compute buffer, and how much one-time structures opened when moving to multiple slots is **not disaggregated**; three points aren't enough to pick a single cause — they only say the unit price is not constant.
+:::
+
+## Example Calculations
+
+Assumptions: 1-2K token context and a single request at inference; small batch (1-2) and short-to-medium sequence (512-2,048 tokens) in training. All values are **approximate GB**:
+
+| Model | Inference 4-bit | Inference fp16 | QLoRA training | LoRA training | Full fine-tuning (fp16) |
+| --- | --- | --- | --- | --- | --- |
+| 1B | ~2 | ~3-4 | ~3-4 | ~5-6 | ~14-18 |
+| 3B | ~3-4 | ~7-9 | ~5-7 | ~9-12 | ~42-48 |
+| 4B | ~3-5 | ~9-11 | ~6-8 | ~11-14 | ~56-64 |
+| 8B | ~5-7 | ~17-19 | ~9-12 | ~20-24 | ~112-128 |
+| 14B | ~9-12 | ~29-32 | ~14-18 | ~32-40 | ~200-240 |
+| 32B | ~18-22 | ~65-70 | ~26-34 | ~70-85 | ~450-500 |
+| 70B | ~36-45 | ~140-150 | ~50-70 | ~150-180 | Multi-GPU required |
+
+:::caution
+The training columns assume small batch and short-to-medium sequence. If you raise the sequence length above 4K, expect 3-8 GB extra in the LoRA/QLoRA rows. The 70B row's values are meaningful with multi-GPU distribution; even training 70B with QLoRA on a single 24 GB card is not realistic.
+:::
+
+:::tip
+If you want to verify the table yourself, try it over 7B: for QLoRA, 7 × 0.5 ≈ 3.5 GB weights + 2-8 GB extra → ~6-12 GB; for fp16 inference, 7 × 2 = 14 GB weights + the KV cache → ~15-17 GB. You will see it agrees with the closest 8B row values.
+:::
+
+## What Fits on My Device?
+
+| VRAM | Comfortable | Borderline / careful |
+| --- | --- | --- |
+| 4 GB | 0.5-2B model 4-bit inference | 1-2B QLoRA only with very short sequences; 3B+ training does not fit |
+| 6 GB | 1-2B QLoRA; 4-bit inference up to 4B | 4B QLoRA can be tried with small batch |
+| 8 GB | 3-4B QLoRA (short sequence); 7-8B 4-bit inference | 8B QLoRA borderline; don't expect 7-8B LoRA |
+| 12 GB | 4B QLoRA comfortably; 3B LoRA; 8B QLoRA (short sequence) | Long sequences hard on 8B QLoRA |
+| 16 GB | 8B QLoRA comfortably; 7-8B LoRA (short sequence); 14B 4-bit inference | 14B QLoRA borderline |
+| 24 GB | 8B QLoRA with long sequences; 7-8B LoRA comfortably | 14B QLoRA borderline; 14B LoRA usually not enough |
+| 48 GB (workstation class) | 13-14B LoRA comfortably; 32B QLoRA (short sequence) | 32B LoRA needs the 80 GB class |
+| 80 GB (A100/H100 class) | 13-14B LoRA with wide sequences; 70B 4-bit inference | 70B training or 32B+ LoRA wants multi-GPU |
+
+As of 2026, popular families by size class:
+
+- **0.6-2B:** Qwen3 (0.6B / 1.7B), Gemma 3 (1B), Llama 3.2 (1B)
+- **3-4B:** Qwen3 (4B), Gemma 3 (4B), Llama 3.2 (3B), Phi-4-mini, SmolLM3
+- **8B:** Qwen3-8B — among the best of its class in fine-tuning comparisons
+- **12B and up:** Gemma 3 (12B), Mistral Small, Llama 4
+
+:::note
+If you don't know how many GB your card has: on Windows, **Task Manager → Performance → GPU** or the "Memory-Usage" line of `nvidia-smi` output shows the total. Model versions and sizes change over time; check the relevant model card before choosing.
+:::
+
+## If VRAM Is Not Enough: The Fix Order
+
+When you get `CUDA out of memory`, "a bigger card" shouldn't be the first reflex. Try in this order; most jobs are saved in the first four steps:
+
+1. **Reduce the batch size.** Directly reduces activations, the fastest gain. Go down to batch 1 if needed.
+2. **Use gradient accumulation.** Combines small batches to give a "big batch" effect; memory doesn't grow, only time does. Settings: [Hyperparameters](/en/llm/hiperparametreler/).
+3. **Shorten the sequence length.** Activations grow with sequence length, almost quadratically in attention layers; going from 2,048 to 1,024 opens serious room.
+4. **Turn on gradient checkpointing.** Recomputes stored intermediate outputs during backpropagation; big memory saving in exchange for a ~20-30% slowdown.
+5. **Switch to 4-bit quantization (QLoRA).** Brings weights down to ~0.5 bytes per parameter: [Quantization Guide](/en/kullanim/quantization/).
+6. **Use LoRA.** If you train an adapter instead of full fine-tuning, the optimizer states cost nearly vanishes: [LoRA and QLoRA](/en/llm/lora-qlora/).
+7. **Move to the cloud.** If your hardware really isn't enough, rent a GPU hourly: [Cloud Options](/en/donanim/bulut-secenekleri/).
+
+For step-by-step error fixing and more scenarios: [Troubleshooting](/en/llm/sorun-giderme/).
+
+## Monitoring VRAM on Windows
+
+Watching memory right before and immediately after starting training lets you prevent the OOM error "by seeing it":
+
+- **Task Manager → Performance → GPU:** the "Dedicated GPU memory" graph shows usage against total VRAM.
+- **`nvidia-smi`:** an instant summary. Run it in the terminal:
+
+```bash title="PowerShell / CMD"
+nvidia-smi
+```
+
+For live tracking refreshed every two seconds:
+
+```bash title="PowerShell / CMD"
+nvidia-smi -l 2
+```
+
+:::tip
+The desktop, browser and games take VRAM too. On Windows, closing heavy tabs before training can give a squeezed 24 GB QLoRA job 1-2 GB of breathing room. Task Manager shows total usage; `nvidia-smi` gives a cleaner picture of your process's share.
+:::
+
+## What's Next?
+
+- The most memory-efficient method: [LoRA and QLoRA](/en/llm/lora-qlora/)
+- Batch, sequence and accumulation settings: [Hyperparameters](/en/llm/hiperparametreler/)
+- Start setting up the environment: [Local Setup (Windows)](/en/donanim/yerel-kurulum/)
+- The runtime counterpart of this math, with numbers measured on CPU: [Speed and Cost](/en/kullanim/hiz-ve-maliyet/) — when `num_ctx` went from 512 to 8192, the resident size rose from 2.0 GB to 2.4 GB.

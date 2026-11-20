@@ -10,6 +10,9 @@ Biçim: [Keep a Changelog](https://keepachangelog.com/tr/1.1.0/); sürümleme
 - İlk İngilizce içerik sayfaları: `en/baslangic/giris`, `en/baslangic/kavramlar`,
   `en/baslangic/yol-haritasi`, `en/llm/lora-qlora` — çevrilmemiş `/en/` adresleri Türkçe
   içerik + "çevrilmemiş" uyarısıyla açılmaya devam eder.
+- İkinci çeviri serisi: `en/temeller/{transformer,tokenizasyon,egitim-nasil-calisir}`,
+  `en/donanim/vram-hesabi` (etkileşimli hesaplayıcı Türkçe arayüzlü olduğu için gömülmedi,
+  Türkçe sayfaya yönlendirme notu kondu), `en/kullanim/quantization`.
 
 ## [0.1.0] — 2026-11-19
 

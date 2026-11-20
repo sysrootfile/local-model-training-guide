@@ -55,10 +55,12 @@ Astro 7 + Starlight tabanlı, Türkçe model eğitimi rehberi sitesinin kaynağ�
   işaretidir (CHANGELOG taşır).
 
 ## Sıradaki işler
-1. İngilizce çeviri: ilk tohum seti yayında (açılış `en/index` + `en/baslangic/` üçlüsü +
-   `en/llm/lora-qlora`, damgalar 2026-11-19). Kalan ~60 sayfa aynı kuralla çevrilir: linkler
-   `/en/` önekiyle açıkça yazılır, kod örnekleri İngilizceye çevrilir, damga zorunlu.
-   Sıradan adaylar: `temeller/` üçlüsü + `donanim/vram-hesabi` + `kullanim/quantization`.
+1. İngilizce çeviri: 9 sayfa canlı (açılış `en/index` + `en/baslangic/` üçlüsü + `llm/lora-qlora`
+   + `temeller/` üçlüsü + `donanim/vram-hesabi` + `kullanim/quantization`; damgalar 2026-11-19/20).
+   Kalan ~55 sayfa aynı kuralla çevrilir: linkler `/en/` önekiyle açıkça yazılır, kod örnekleri
+   İngilizce değişken adlı, damga zorunlu. Sıradan adaylar: `donanim/{yerel-kurulum,bulut-secenekleri}`
+   + `veri/` beşlisi + `llm/sft` + `llm/adim-adim-egitim`. Not: `VramCalculator` bileşeni Türkçe
+   arayüzlü; EN `vram-hesabi` sayfası gömmedi, Türkçe sayfaya notla yönlendiriyor.
 2. İsteğe bağlı: `ornekler/klasik-ml` ve `ornekler/veri-temizleme` için README. README satır 70-73
    bilinçli tercih diyor, karar sana ait.
 
